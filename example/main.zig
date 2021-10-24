@@ -24,7 +24,7 @@ pub fn main() !void {
 
         std.debug.print("Hey2: {s}\n", .{data_buf.items});
         var tok = std.json.TokenStream.init(data_buf.items);
-        var request = try std.json.parse(lsp.types.requests.Request, &tok, .{
+        var request = try std.json.parse(lsp.types.requests.RequestParseTarget, &tok, .{
             .allocator = allocator,
             .ignore_unknown_fields = true,
         });

@@ -64,9 +64,52 @@ pub const Initialize = struct {
     },
 };
 
+fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
+    // pub const StructField = struct {
+    //     name: []const u8,
+    //     field_type: type,
+    //     default_value: anytype,
+    //     is_comptime: bool,
+    //     alignment: comptime_int,
+    // };
+
+    var struct_info = @typeInfo(T).Struct;
+
+    const TPrime = @Type(.{
+        .Struct = .{
+            .layout = .Auto,
+            .fields = struct_info.fields,
+            .decls = struct_info.decls,
+            .is_tuple = false,
+        },
+    });
+
+    return @Type(.{ .Struct = .{
+        .layout = .Auto,
+        .fields = &[2]std.builtin.TypeInfo.StructField{
+            .{
+                .name = "method",
+                .field_type = []const u8,
+                .default_value = method_name,
+                .is_comptime = true,
+                .alignment = 0,
+            },
+            .{
+                .name = "params",
+                .field_type = TPrime,
+                .default_value = null,
+                .is_comptime = false,
+                .alignment = 0,
+            },
+        },
+        .decls = &.{},
+        .is_tuple = false,
+    } });
+}
+
 /// Params of a request (params)
-pub const Request = union(enum) {
-    initialize: Initialize,
+pub const RequestParseTarget = union(enum) {
+    initialize: RequestParamsify(InitializeParams, "initialize"),
 };
 
 pub const InitializeParams = struct {
