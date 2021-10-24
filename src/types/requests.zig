@@ -1,11 +1,6 @@
 const std = @import("std");
 const common = @import("./common.zig");
 
-/// Params of a request (params)
-// pub const Request = union(enum) {
-//     initialize: Initialize,
-// };
-
 /// JSONRPC request
 pub const Request = struct {
     jsonrpc: []const u8 = "2.0",
@@ -37,7 +32,45 @@ pub const Request = struct {
 
 pub const RequestParams = union(enum) {
     initialize: InitializeParams,
+    didChangeWorkspaceFolders: DidChangeWorkspaceFoldersParams,
 };
+
+/// Params of a request (params)
+pub const RequestParseTarget = union(enum) {
+    initialize: RequestParamsify(InitializeParams, "initialize"),
+    didChangeWorkspaceFolders: RequestParamsify(DidChangeWorkspaceFoldersParams, "workspace/didChangeWorkspaceFolders"),
+};
+
+fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
+    return @Type(.{ .Struct = .{
+        .layout = .Auto,
+        .fields = &[3]std.builtin.TypeInfo.StructField{
+            .{
+                .name = "method",
+                .field_type = []const u8,
+                .default_value = method_name,
+                .is_comptime = true,
+                .alignment = 0,
+            },
+            .{
+                .name = "id",
+                .field_type = common.RequestId,
+                .default_value = null,
+                .is_comptime = false,
+                .alignment = 0,
+            },
+            .{
+                .name = "params",
+                .field_type = T,
+                .default_value = null,
+                .is_comptime = false,
+                .alignment = 0,
+            },
+        },
+        .decls = &.{},
+        .is_tuple = false,
+    } });
+}
 
 // Client init, capabilities, metadata
 
@@ -80,55 +113,15 @@ pub const ClientCapabilities = struct {
     offsetEncoding: []const []const u8 = &.{},
 };
 
-fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
-    return @Type(.{ .Struct = .{
-        .layout = .Auto,
-        .fields = &[3]std.builtin.TypeInfo.StructField{
-            .{
-                .name = "method",
-                .field_type = []const u8,
-                .default_value = method_name,
-                .is_comptime = true,
-                .alignment = 0,
-            },
-            .{
-                .name = "id",
-                .field_type = common.RequestId,
-                .default_value = null,
-                .is_comptime = false,
-                .alignment = 0,
-            },
-            .{
-                .name = "params",
-                .field_type = T,
-                .default_value = null,
-                .is_comptime = false,
-                .alignment = 0,
-            },
-        },
-        .decls = &.{},
-        .is_tuple = false,
-    } });
-}
-
-/// Params of a request (params)
-pub const RequestParseTarget = union(enum) {
-    initialize: RequestParamsify(InitializeParams, "initialize"),
-};
-
 pub const InitializeParams = struct {
     capabilities: ClientCapabilities,
     workspaceFolders: ?[]const common.WorkspaceFolder,
 };
 
-pub const WorkspaceFoldersChange = struct {
-    comptime method: []const u8 = "workspace/didChangeWorkspaceFolders",
-
-    params: struct {
-        event: struct {
-            added: []const common.WorkspaceFolder,
-            removed: []const common.WorkspaceFolder,
-        },
+pub const DidChangeWorkspaceFoldersParams = struct {
+    event: struct {
+        added: []const common.WorkspaceFolder,
+        removed: []const common.WorkspaceFolder,
     },
 };
 

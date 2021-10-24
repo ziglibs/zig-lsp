@@ -29,6 +29,9 @@ pub fn main() !void {
             .initialize => |init| {
                 std.debug.print("{s}\n", .{init});
             },
+            .didChangeWorkspaceFolders => |change| {
+                std.debug.print("FOLDERS! {s}\n", .{change});
+            },
         }
     }
 }
