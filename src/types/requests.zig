@@ -48,26 +48,26 @@ pub const RequestParams = union(enum) {
 
 /// Params of a request (params)
 pub const RequestParseTarget = union(enum) {
-    initialize: Paramsify(.request, InitializeParams, "initialize"),
-    initialized: Paramsify(.notification, InitializedParams, "initialized"),
-    didOpen: Paramsify(.notification, DidOpenTextDocumentParams, "textDocument/didOpen"),
-    completion: Paramsify(.request, CompletionParams, "textDocument/completion"),
-    didChangeWorkspaceFolders: Paramsify(.request, DidChangeWorkspaceFoldersParams, "workspace/didChangeWorkspaceFolders"),
+    initialize: Paramsify(InitializeParams),
+    initialized: Paramsify(InitializedParams),
+    didOpen: Paramsify(DidOpenTextDocumentParams),
+    completion: Paramsify(CompletionParams),
+    didChangeWorkspaceFolders: Paramsify(DidChangeWorkspaceFoldersParams),
 };
 
 const ParamsifyKind = enum { request, notification };
-fn Paramsify(comptime kind: ParamsifyKind, comptime T: type, comptime method_name: []const u8) type {
+fn Paramsify(comptime T: type) type {
     return @Type(.{ .Struct = .{
         .layout = .Auto,
         .fields = &([1]std.builtin.TypeInfo.StructField{
             .{
                 .name = "method",
                 .field_type = []const u8,
-                .default_value = method_name,
+                .default_value = std.mem.sliceAsBytes(std.mem.span(@field(T, "method"))),
                 .is_comptime = true,
                 .alignment = 0,
             },
-        } ++ (if (kind == .request) [1]std.builtin.TypeInfo.StructField{
+        } ++ (if (@field(T, "kind") == .request) [1]std.builtin.TypeInfo.StructField{
             .{
                 .name = "id",
                 .field_type = common.RequestId,
@@ -89,7 +89,13 @@ fn Paramsify(comptime kind: ParamsifyKind, comptime T: type, comptime method_nam
     } });
 }
 
-// Client init, capabilities, metadata
+/// The base protocol offers support for request cancellation.
+/// To cancel a request, a notification message with the following properties is sent.
+pub const CancelParams = struct {
+    pub const method = "$/cancelRequest";
+
+    id: common.RequestId,
+};
 
 /// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokensClientCapabilities)
 pub const SemanticTokensClientCapabilities = struct {
@@ -134,13 +140,22 @@ pub const ClientCapabilities = struct {
 };
 
 pub const InitializeParams = struct {
+    pub const method = "initialize";
+    pub const kind = ParamsifyKind.request;
+
     capabilities: ClientCapabilities,
     workspaceFolders: ?[]const common.WorkspaceFolder,
 };
 
-pub const InitializedParams = struct {};
+pub const InitializedParams = struct {
+    pub const method = "initialized";
+    pub const kind = ParamsifyKind.notification;
+};
 
 pub const DidChangeWorkspaceFoldersParams = struct {
+    pub const method = "workspace/didChangeWorkspaceFolders";
+    pub const kind = ParamsifyKind.notification;
+
     event: struct {
         added: []const common.WorkspaceFolder,
         removed: []const common.WorkspaceFolder,
@@ -148,6 +163,9 @@ pub const DidChangeWorkspaceFoldersParams = struct {
 };
 
 pub const DidOpenTextDocumentParams = struct {
+    pub const method = "textDocument/didOpen";
+    pub const kind = ParamsifyKind.notification;
+
     textDocument: struct {
         /// The text document's URI.
         uri: []const u8,
@@ -239,7 +257,13 @@ pub const SignatureHelp = struct {
 };
 
 // TODO: fully implement
-pub const CompletionParams = TextDocumentIdentifierPositionRequest;
+pub const CompletionParams = struct {
+    pub const method = "textDocument/completion";
+    pub const kind = ParamsifyKind.request;
+
+    textDocument: TextDocumentIdentifier,
+    position: common.Position,
+};
 pub const GotoDefinition = TextDocumentIdentifierPositionRequest;
 pub const GotoDeclaration = TextDocumentIdentifierPositionRequest;
 pub const Hover = TextDocumentIdentifierPositionRequest;
