@@ -7,12 +7,37 @@ const common = @import("./common.zig");
 // };
 
 /// JSONRPC request
-// pub const Request = struct {
-//     jsonrpc: []const u8 = "2.0",
-//     id: common.RequestId,
-//     method: []const u8,
-//     params: RequestParams,
-// };
+pub const Request = struct {
+    jsonrpc: []const u8 = "2.0",
+    id: common.RequestId,
+    method: []const u8,
+    params: RequestParams,
+
+    fn fromTarget(target: RequestParseTarget) Request {
+        inline for (std.meta.fields(RequestParseTarget)) |field, i| {
+            if (@enumToInt(target) == i) {
+                return .{
+                    .id = @field(target, field.name).id,
+                    .method = @field(target, field.name).method,
+                    .params = @unionInit(RequestParams, field.name, @field(target, field.name).params),
+                };
+            }
+        }
+
+        unreachable;
+    }
+
+    pub fn parse(allocator: *std.mem.Allocator, buf: []const u8) std.json.ParseError(RequestParseTarget)!Request {
+        return fromTarget(try std.json.parse(RequestParseTarget, &std.json.TokenStream.init(buf), .{
+            .allocator = allocator,
+            .ignore_unknown_fields = true,
+        }));
+    }
+};
+
+pub const RequestParams = union(enum) {
+    initialize: InitializeParams,
+};
 
 // Client init, capabilities, metadata
 
@@ -55,38 +80,10 @@ pub const ClientCapabilities = struct {
     offsetEncoding: []const []const u8 = &.{},
 };
 
-pub const Initialize = struct {
-    comptime method: []const u8 = "initialize",
-
-    params: struct {
-        capabilities: ClientCapabilities,
-        workspaceFolders: ?[]const common.WorkspaceFolder,
-    },
-};
-
 fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
-    // pub const StructField = struct {
-    //     name: []const u8,
-    //     field_type: type,
-    //     default_value: anytype,
-    //     is_comptime: bool,
-    //     alignment: comptime_int,
-    // };
-
-    var struct_info = @typeInfo(T).Struct;
-
-    const TPrime = @Type(.{
-        .Struct = .{
-            .layout = .Auto,
-            .fields = struct_info.fields,
-            .decls = struct_info.decls,
-            .is_tuple = false,
-        },
-    });
-
     return @Type(.{ .Struct = .{
         .layout = .Auto,
-        .fields = &[2]std.builtin.TypeInfo.StructField{
+        .fields = &[3]std.builtin.TypeInfo.StructField{
             .{
                 .name = "method",
                 .field_type = []const u8,
@@ -95,8 +92,15 @@ fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
                 .alignment = 0,
             },
             .{
+                .name = "id",
+                .field_type = common.RequestId,
+                .default_value = null,
+                .is_comptime = false,
+                .alignment = 0,
+            },
+            .{
                 .name = "params",
-                .field_type = TPrime,
+                .field_type = T,
                 .default_value = null,
                 .is_comptime = false,
                 .alignment = 0,

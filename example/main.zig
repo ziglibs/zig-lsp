@@ -23,15 +23,11 @@ pub fn main() !void {
         _ = try stdin.readAll(data_buf.items[0..header.content_length]);
 
         std.debug.print("Hey2: {s}\n", .{data_buf.items});
-        var tok = std.json.TokenStream.init(data_buf.items);
-        var request = try std.json.parse(lsp.types.requests.RequestParseTarget, &tok, .{
-            .allocator = allocator,
-            .ignore_unknown_fields = true,
-        });
+        var request = try lsp.types.requests.Request.parse(allocator, data_buf.items);
 
-        switch (request) {
+        switch (request.params) {
             .initialize => |init| {
-                std.debug.print("{s}\n", .{init.params});
+                std.debug.print("{s}\n", .{init});
             },
         }
     }
