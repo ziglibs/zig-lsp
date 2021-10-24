@@ -74,9 +74,35 @@ pub fn main() !void {
             .didOpen => |open| {
                 std.debug.print("{s}!\n", .{open});
             },
-            .didChangeWorkspaceFolders => |change| {
-                std.debug.print("FOLDERS! {s}\n", .{change});
+            .completion => |comp| {
+                _ = comp;
+                try server.respond(request, .{
+                    .completion_list = .{
+                        .isIncomplete = false,
+                        .items = &[1]lsp.types.responses.CompletionItem{
+                            .{
+                                .label = "joe mama",
+                                .kind = .text,
+                                .textEdit = null,
+                                .filterText = null,
+                                .insertText = "joe mama",
+                                .insertTextFormat = .plaintext,
+                                .detail = "Joe Mama.",
+                                .documentation = .{ .kind = .markdown, .value = 
+                                \\A clever name used to insult another individual's mother.
+                                \\It is a play on words that refers to the saying, "Yo mama!"
+                                \\
+                                \\Person 1: "Where's Joe?"\
+                                \\Victim 1: "Joe? ... Joe who?"\
+                                \\Person 1: "JOE MAMA!"\
+                                \\Victim 1: *Proceeds to feel insulted*
+                                },
+                            },
+                        },
+                    },
+                });
             },
+            else => {},
         }
     }
 }

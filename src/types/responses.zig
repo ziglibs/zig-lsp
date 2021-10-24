@@ -1,9 +1,10 @@
+const std = @import("std");
 const common = @import("common.zig");
 
 /// Params of a response (result)
 pub const ResponseParams = union(enum) {
     signature_help: SignatureHelpResponse,
-    // completion_list: CompletionList,
+    completion_list: CompletionList,
     // location: Location,
     // hover: Hover,
     // document_symbols: []DocumentSymbol,
@@ -101,4 +102,52 @@ pub const InitializeResult = struct {
         name: []const u8,
         version: ?[]const u8 = null,
     },
+};
+
+pub const CompletionList = struct {
+    isIncomplete: bool,
+    items: []const CompletionItem,
+};
+
+pub const CompletionItem = struct {
+    const Kind = enum(i64) {
+        text = 1,
+        method = 2,
+        function = 3,
+        constructor = 4,
+        field = 5,
+        variable = 6,
+        class = 7,
+        interface = 8,
+        module = 9,
+        property = 10,
+        unit = 11,
+        value = 12,
+        @"enum" = 13,
+        keyword = 14,
+        snippet = 15,
+        color = 16,
+        file = 17,
+        reference = 18,
+        folder = 19,
+        enum_member = 20,
+        constant = 21,
+        @"struct" = 22,
+        event = 23,
+        operator = 24,
+        type_parameter = 25,
+
+        pub fn jsonStringify(value: Kind, options: std.json.StringifyOptions, out_stream: anytype) !void {
+            try std.json.stringify(@enumToInt(value), options, out_stream);
+        }
+    };
+
+    label: []const u8,
+    kind: Kind,
+    textEdit: ?common.TextEdit = null,
+    filterText: ?[]const u8 = null,
+    insertText: []const u8 = "",
+    insertTextFormat: ?common.InsertTextFormat = .plaintext,
+    detail: ?[]const u8 = null,
+    documentation: ?common.MarkupContent = null,
 };

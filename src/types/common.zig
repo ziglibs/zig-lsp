@@ -175,11 +175,6 @@ pub const MarkupContent = struct {
     value: []const u8,
 };
 
-pub const CompletionList = struct {
-    isIncomplete: bool,
-    items: []const CompletionItem,
-};
-
 pub const InsertTextFormat = enum(i64) {
     plaintext = 1,
     snippet = 2,
@@ -187,49 +182,6 @@ pub const InsertTextFormat = enum(i64) {
     pub fn jsonStringify(value: InsertTextFormat, options: std.json.StringifyOptions, writer: anytype) !void {
         try std.json.stringify(@enumToInt(value), options, writer);
     }
-};
-
-pub const CompletionItem = struct {
-    const Kind = enum(i64) {
-        text = 1,
-        method = 2,
-        function = 3,
-        constructor = 4,
-        field = 5,
-        variable = 6,
-        class = 7,
-        interface = 8,
-        module = 9,
-        property = 10,
-        unit = 11,
-        value = 12,
-        @"enum" = 13,
-        keyword = 14,
-        snippet = 15,
-        color = 16,
-        file = 17,
-        reference = 18,
-        folder = 19,
-        enum_member = 20,
-        constant = 21,
-        @"struct" = 22,
-        event = 23,
-        operator = 24,
-        type_parameter = 25,
-
-        pub fn jsonStringify(value: Kind, options: std.json.StringifyOptions, out_stream: anytype) !void {
-            try std.json.stringify(@enumToInt(value), options, out_stream);
-        }
-    };
-
-    label: []const u8,
-    kind: Kind,
-    textEdit: ?TextEdit = null,
-    filterText: ?[]const u8 = null,
-    insertText: []const u8 = "",
-    insertTextFormat: ?InsertTextFormat = .PlainText,
-    detail: ?[]const u8 = null,
-    documentation: ?MarkupContent = null,
 };
 
 pub const DocumentSymbol = struct {

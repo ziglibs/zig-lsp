@@ -41,6 +41,8 @@ pub const Request = struct {
 pub const RequestParams = union(enum) {
     initialize: InitializeParams,
     initialized: InitializedParams,
+    didOpen: DidOpenTextDocumentParams,
+    completion: CompletionParams,
     didChangeWorkspaceFolders: DidChangeWorkspaceFoldersParams,
 };
 
@@ -48,6 +50,8 @@ pub const RequestParams = union(enum) {
 pub const RequestParseTarget = union(enum) {
     initialize: Paramsify(.request, InitializeParams, "initialize"),
     initialized: Paramsify(.notification, InitializedParams, "initialized"),
+    didOpen: Paramsify(.notification, DidOpenTextDocumentParams, "textDocument/didOpen"),
+    completion: Paramsify(.request, CompletionParams, "textDocument/completion"),
     didChangeWorkspaceFolders: Paramsify(.request, DidChangeWorkspaceFoldersParams, "workspace/didChangeWorkspaceFolders"),
 };
 
@@ -143,24 +147,20 @@ pub const DidChangeWorkspaceFoldersParams = struct {
     },
 };
 
-pub const OpenDocument = struct {
-    comptime method: []const u8 = "textDocument/didOpen",
+pub const DidOpenTextDocumentParams = struct {
+    textDocument: struct {
+        /// The text document's URI.
+        uri: []const u8,
 
-    params: struct {
-        textDocument: struct {
-            /// The text document's URI.
-            uri: []const u8,
+        /// The text document's language identifier.
+        languageId: []const u8,
 
-            /// The text document's language identifier.
-            languageId: []const u8,
+        /// The version number of this document (it will increase after each
+        /// change, including undo/redo).
+        version: i32,
 
-            /// The version number of this document (it will increase after each
-            /// change, including undo/redo).
-            version: i32,
-
-            /// The content of the opened text document.
-            text: []const u8,
-        },
+        /// The content of the opened text document.
+        text: []const u8,
     },
 };
 
@@ -215,10 +215,8 @@ pub const SemanticTokensFull = struct {
 };
 
 const TextDocumentIdentifierPositionRequest = struct {
-    params: struct {
-        textDocument: TextDocumentIdentifier,
-        position: common.Position,
-    },
+    textDocument: TextDocumentIdentifier,
+    position: common.Position,
 };
 
 pub const SignatureHelp = struct {
@@ -240,7 +238,8 @@ pub const SignatureHelp = struct {
     },
 };
 
-pub const Completion = TextDocumentIdentifierPositionRequest;
+// TODO: fully implement
+pub const CompletionParams = TextDocumentIdentifierPositionRequest;
 pub const GotoDefinition = TextDocumentIdentifierPositionRequest;
 pub const GotoDeclaration = TextDocumentIdentifierPositionRequest;
 pub const Hover = TextDocumentIdentifierPositionRequest;
