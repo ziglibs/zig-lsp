@@ -1,10 +1,12 @@
+///! Process client requests / notifications
 const std = @import("std");
 const common = @import("./common.zig");
 
 /// JSONRPC request
 pub const Request = struct {
     jsonrpc: []const u8 = "2.0",
-    id: common.RequestId,
+    /// Null => notification
+    id: ?common.RequestId,
     method: []const u8,
     params: RequestParams,
 
@@ -12,7 +14,7 @@ pub const Request = struct {
         inline for (std.meta.fields(RequestParseTarget)) |field, i| {
             if (@enumToInt(target) == i) {
                 return .{
-                    .id = @field(target, field.name).id,
+                    .id = if (@hasField(@TypeOf(@field(target, field.name)), "id")) @field(target, field.name).id else null,
                     .method = @field(target, field.name).method,
                     .params = @unionInit(RequestParams, field.name, @field(target, field.name).params),
                 };
@@ -22,7 +24,13 @@ pub const Request = struct {
         unreachable;
     }
 
-    pub fn parse(allocator: *std.mem.Allocator, buf: []const u8) std.json.ParseError(RequestParseTarget)!Request {
+    pub fn encode(self: Request, writer: anytype) @TypeOf(writer).Error!void {
+        try std.json.stringify(self, .{}, writer);
+    }
+
+    pub fn decode(allocator: *std.mem.Allocator, buf: []const u8) !Request {
+        @setEvalBranchQuota(10_000);
+
         return fromTarget(try std.json.parse(RequestParseTarget, &std.json.TokenStream.init(buf), .{
             .allocator = allocator,
             .ignore_unknown_fields = true,
@@ -32,19 +40,22 @@ pub const Request = struct {
 
 pub const RequestParams = union(enum) {
     initialize: InitializeParams,
+    initialized: InitializedParams,
     didChangeWorkspaceFolders: DidChangeWorkspaceFoldersParams,
 };
 
 /// Params of a request (params)
 pub const RequestParseTarget = union(enum) {
-    initialize: RequestParamsify(InitializeParams, "initialize"),
-    didChangeWorkspaceFolders: RequestParamsify(DidChangeWorkspaceFoldersParams, "workspace/didChangeWorkspaceFolders"),
+    initialize: Paramsify(.request, InitializeParams, "initialize"),
+    initialized: Paramsify(.notification, InitializedParams, "initialized"),
+    didChangeWorkspaceFolders: Paramsify(.request, DidChangeWorkspaceFoldersParams, "workspace/didChangeWorkspaceFolders"),
 };
 
-fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
+const ParamsifyKind = enum { request, notification };
+fn Paramsify(comptime kind: ParamsifyKind, comptime T: type, comptime method_name: []const u8) type {
     return @Type(.{ .Struct = .{
         .layout = .Auto,
-        .fields = &[3]std.builtin.TypeInfo.StructField{
+        .fields = &([1]std.builtin.TypeInfo.StructField{
             .{
                 .name = "method",
                 .field_type = []const u8,
@@ -52,6 +63,7 @@ fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
                 .is_comptime = true,
                 .alignment = 0,
             },
+        } ++ (if (kind == .request) [1]std.builtin.TypeInfo.StructField{
             .{
                 .name = "id",
                 .field_type = common.RequestId,
@@ -59,6 +71,7 @@ fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
                 .is_comptime = false,
                 .alignment = 0,
             },
+        } else [0]std.builtin.TypeInfo.StructField{}) ++ [1]std.builtin.TypeInfo.StructField{
             .{
                 .name = "params",
                 .field_type = T,
@@ -66,7 +79,7 @@ fn RequestParamsify(comptime T: type, comptime method_name: []const u8) type {
                 .is_comptime = false,
                 .alignment = 0,
             },
-        },
+        }),
         .decls = &.{},
         .is_tuple = false,
     } });
@@ -120,6 +133,8 @@ pub const InitializeParams = struct {
     capabilities: ClientCapabilities,
     workspaceFolders: ?[]const common.WorkspaceFolder,
 };
+
+pub const InitializedParams = struct {};
 
 pub const DidChangeWorkspaceFoldersParams = struct {
     event: struct {
