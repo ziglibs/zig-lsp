@@ -2,11 +2,13 @@ const std = @import("std");
 
 // Utils
 
-pub const EnumStringify = struct {
-    pub fn jsonStringify(value: @This(), options: std.json.StringifyOptions, out_stream: anytype) !void {
-        try std.json.stringify(@enumToInt(value), options, out_stream);
-    }
-};
+pub fn EnumStringify(comptime T: type) type {
+    return struct {
+        pub fn jsonStringify(value: T, options: std.json.StringifyOptions, out_stream: anytype) !void {
+            try std.json.stringify(@enumToInt(value), options, out_stream);
+        }
+    };
+}
 
 // LSP types
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/
@@ -169,7 +171,7 @@ pub const MarkupContent = struct {
         }
     };
 
-    kind: Kind = .Markdown,
+    kind: Kind = .markdown,
     value: []const u8,
 };
 
@@ -276,62 +278,4 @@ pub const DocumentSymbol = struct {
 pub const WorkspaceFolder = struct {
     uri: []const u8,
     name: []const u8,
-};
-
-// Only includes options we set in our initialize result.
-const InitializeResult = struct {
-    offsetEncoding: []const u8,
-    capabilities: struct {
-        signatureHelpProvider: struct {
-            triggerCharacters: []const []const u8,
-            retriggerCharacters: []const []const u8,
-        },
-        textDocumentSync: enum(u32) {
-            none = 0,
-            full = 1,
-            incremental = 2,
-
-            usingnamespace EnumStringify;
-        },
-        renameProvider: bool,
-        completionProvider: struct {
-            resolveProvider: bool,
-            triggerCharacters: []const []const u8,
-        },
-        documentHighlightProvider: bool,
-        hoverProvider: bool,
-        codeActionProvider: bool,
-        declarationProvider: bool,
-        definitionProvider: bool,
-        typeDefinitionProvider: bool,
-        implementationProvider: bool,
-        referencesProvider: bool,
-        documentSymbolProvider: bool,
-        colorProvider: bool,
-        documentFormattingProvider: bool,
-        documentRangeFormattingProvider: bool,
-        foldingRangeProvider: bool,
-        selectionRangeProvider: bool,
-        workspaceSymbolProvider: bool,
-        rangeProvider: bool,
-        documentProvider: bool,
-        workspace: ?struct {
-            workspaceFolders: ?struct {
-                supported: bool,
-                changeNotifications: bool,
-            },
-        },
-        semanticTokensProvider: struct {
-            full: bool,
-            range: bool,
-            legend: struct {
-                tokenTypes: []const []const u8,
-                tokenModifiers: []const []const u8,
-            },
-        },
-    },
-    serverInfo: struct {
-        name: []const u8,
-        version: ?[]const u8 = null,
-    },
 };

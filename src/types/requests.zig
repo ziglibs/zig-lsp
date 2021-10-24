@@ -110,6 +110,9 @@ pub const ClientCapabilities = struct {
             },
         },
     },
+    /// **LSP extension**
+    ///
+    /// [Docs](https://clangd.llvm.org/extensions.html#utf-8-offsets)
     offsetEncoding: []const []const u8 = &.{},
 };
 
@@ -174,7 +177,7 @@ pub const TextDocumentSaveReason = enum(i64) {
     /// When the editor lost focus.
     focus_out = 3,
 
-    usingnamespace common.EnumStringify;
+    usingnamespace common.EnumStringify(@This());
 };
 
 pub const SaveDocument = struct {
