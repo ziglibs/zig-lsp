@@ -3,19 +3,27 @@ const std = @import("std");
 const json = @import("../json.zig");
 const common = @import("./common.zig");
 
-/// JSONRPC request
-pub const Request = struct {
+/// A request message to describe a request between the client and the server.
+/// Every processed request must send a response back to the sender of the request.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#requestMessage)
+pub const RequestMessage = struct {
     jsonrpc: []const u8 = "2.0",
-    /// Null => notification
-    id: ?common.RequestId,
+
+    /// The request id.
+    id: common.RequestId,
+
+    /// The method to be invoked.
     method: []const u8,
+
+    /// The method's params.
     params: RequestParams,
 
-    fn fromTarget(target: RequestParseTarget) Request {
+    fn fromTarget(target: RequestParseTarget) RequestMessage {
         inline for (std.meta.fields(RequestParseTarget)) |field, i| {
             if (@enumToInt(target) == i) {
                 return .{
-                    .id = if (@hasField(@TypeOf(@field(target, field.name)), "id")) @field(target, field.name).id else null,
+                    .id = if (@hasField(@TypeOf(@field(target, field.name)), "id")) @field(target, field.name).id else .{ .none = {} },
                     .method = @field(target, field.name).method,
                     .params = @unionInit(RequestParams, field.name, @field(target, field.name).params),
                 };
@@ -25,11 +33,11 @@ pub const Request = struct {
         unreachable;
     }
 
-    pub fn encode(self: Request, writer: anytype) @TypeOf(writer).Error!void {
+    pub fn encode(self: RequestMessage, writer: anytype) @TypeOf(writer).Error!void {
         try json.stringify(self, .{}, writer);
     }
 
-    pub fn decode(allocator: *std.mem.Allocator, buf: []const u8) !Request {
+    pub fn decode(allocator: *std.mem.Allocator, buf: []const u8) !RequestMessage {
         @setEvalBranchQuota(10_000);
 
         return fromTarget(try json.parse(RequestParseTarget, &json.TokenStream.init(buf), .{

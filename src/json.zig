@@ -1594,6 +1594,7 @@ fn ParseInternalErrorImpl(comptime T: type, comptime inferred_types: []const typ
                 else => @compileError("Unable to parse into type '" ++ @typeName(T) ++ "'"),
             }
         },
+        .Void => return error{BigNoNo},
         else => return error{},
     }
     unreachable;
@@ -1767,8 +1768,26 @@ fn parseInternal(
                         if (!field.is_comptime) {
                             @field(r, field.name) = default;
                         }
+                    } else if (field.field_type == void) {
+                        @field(r, field.name) = {};
                     } else {
-                        return error.MissingField;
+                        if (@typeInfo(field.field_type) == .Union) {
+                            const un = @typeInfo(field.field_type).Union;
+                            var union_child_is_void = false;
+
+                            inline for (un.fields) |unfield| {
+                                if (unfield.field_type == void) {
+                                    union_child_is_void = true;
+                                    @field(@field(r, field.name), unfield.name) = {};
+                                }
+                            }
+
+                            if (!union_child_is_void) {
+                                return error.MissingField;
+                            }
+                        } else {
+                            return error.MissingField;
+                        }
                     }
                 }
             }
@@ -1863,6 +1882,7 @@ fn parseInternal(
                 else => @compileError("Unable to parse into type '" ++ @typeName(T) ++ "'"),
             }
         },
+        .Void => return error.BigNoNo,
         else => @compileError("Unable to parse into type '" ++ @typeName(T) ++ "'"),
     }
     unreachable;

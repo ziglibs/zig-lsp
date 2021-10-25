@@ -26,7 +26,7 @@ pub fn init(allocator: *std.mem.Allocator) !Server {
 }
 
 /// Caller must call `flushArena` after use.
-pub fn readRequest(self: *Server) !requests.Request {
+pub fn readRequest(self: *Server) !requests.RequestMessage {
     const stdin = std.io.getStdIn().reader();
 
     var header_buf: [128]u8 = undefined;
@@ -38,7 +38,7 @@ pub fn readRequest(self: *Server) !requests.Request {
 
     std.debug.print("{s}\n", .{self.read_buf.items});
 
-    return try requests.Request.decode(&self.arena.allocator, self.read_buf.items);
+    return try requests.RequestMessage.decode(&self.arena.allocator, self.read_buf.items);
 }
 
 pub fn flushArena(self: *Server) void {
@@ -46,9 +46,11 @@ pub fn flushArena(self: *Server) void {
     self.arena.state = .{};
 }
 
-pub fn respond(self: *Server, request: requests.Request, result: responses.ResponseParams) !void {
+pub fn respond(self: *Server, request: requests.RequestMessage, result: responses.ResponseParams) !void {
+    if (request.id == .none) @panic("Cannot respond to notifications!");
+
     try utils.send(&self.write_buf, responses.ResponseMessage{
-        .id = request.id orelse @panic("Cannot respond to notification!"),
+        .id = request.id,
         .result = result,
     });
 }

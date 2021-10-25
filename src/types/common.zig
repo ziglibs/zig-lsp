@@ -49,6 +49,8 @@ pub const Hover = struct {
 
 /// Id of a request
 pub const RequestId = union(enum) {
+    /// Notifications do not have a request id.
+    none: void,
     string: []const u8,
     integer: i64,
     float: f64,

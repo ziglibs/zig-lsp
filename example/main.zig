@@ -15,6 +15,8 @@ pub fn main() !void {
         var request = try server.readRequest();
         defer server.flushArena();
 
+        std.debug.print("{s}\n", .{request});
+
         switch (request.params) {
             .initialize => |init| {
                 server.processInitialize(init);
