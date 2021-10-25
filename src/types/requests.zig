@@ -1,7 +1,9 @@
 ///! Process client requests / notifications
 const std = @import("std");
 const json = @import("../json.zig");
-const common = @import("./common.zig");
+const common = @import("common.zig");
+
+const general = @import("general.zig");
 
 /// A request message to describe a request between the client and the server.
 /// Every processed request must send a response back to the sender of the request.
@@ -18,85 +20,30 @@ pub const RequestMessage = struct {
 
     /// The method's params.
     params: RequestParams,
+};
 
-    fn fromTarget(target: RequestParseTarget) RequestMessage {
+pub const RequestParams = union(enum) {
+    initialize: general.InitializeParams,
+};
+
+/// Params of a request (params)
+pub const RequestParseTarget = union(enum) {
+    initialize: common.Paramsify(general.InitializeParams),
+
+    pub fn toMessage(self: RequestParseTarget) RequestMessage {
         inline for (std.meta.fields(RequestParseTarget)) |field, i| {
-            if (@enumToInt(target) == i) {
+            if (@enumToInt(self) == i) {
                 return .{
-                    .id = if (@hasField(@TypeOf(@field(target, field.name)), "id")) @field(target, field.name).id else .{ .none = {} },
-                    .method = @field(target, field.name).method,
-                    .params = @unionInit(RequestParams, field.name, @field(target, field.name).params),
+                    .id = @field(self, field.name).id,
+                    .method = @field(self, field.name).method,
+                    .params = @unionInit(RequestParams, field.name, @field(self, field.name).params),
                 };
             }
         }
 
         unreachable;
     }
-
-    pub fn encode(self: RequestMessage, writer: anytype) @TypeOf(writer).Error!void {
-        try json.stringify(self, .{}, writer);
-    }
-
-    pub fn decode(allocator: *std.mem.Allocator, buf: []const u8) !RequestMessage {
-        @setEvalBranchQuota(10_000);
-
-        return fromTarget(try json.parse(RequestParseTarget, &json.TokenStream.init(buf), .{
-            .allocator = allocator,
-            .ignore_unknown_fields = true,
-        }));
-    }
 };
-
-pub const RequestParams = union(enum) {
-    initialize: InitializeParams,
-    initialized: InitializedParams,
-    didOpen: DidOpenTextDocumentParams,
-    completion: CompletionParams,
-    didChangeWorkspaceFolders: DidChangeWorkspaceFoldersParams,
-};
-
-/// Params of a request (params)
-pub const RequestParseTarget = union(enum) {
-    initialize: Paramsify(InitializeParams),
-    initialized: Paramsify(InitializedParams),
-    didOpen: Paramsify(DidOpenTextDocumentParams),
-    completion: Paramsify(CompletionParams),
-    didChangeWorkspaceFolders: Paramsify(DidChangeWorkspaceFoldersParams),
-};
-
-const ParamsifyKind = enum { request, notification };
-fn Paramsify(comptime T: type) type {
-    return @Type(.{ .Struct = .{
-        .layout = .Auto,
-        .fields = &([1]std.builtin.TypeInfo.StructField{
-            .{
-                .name = "method",
-                .field_type = []const u8,
-                .default_value = std.mem.sliceAsBytes(std.mem.span(@field(T, "method"))),
-                .is_comptime = true,
-                .alignment = 0,
-            },
-        } ++ (if (@field(T, "kind") == .request) [1]std.builtin.TypeInfo.StructField{
-            .{
-                .name = "id",
-                .field_type = common.RequestId,
-                .default_value = null,
-                .is_comptime = false,
-                .alignment = 0,
-            },
-        } else [0]std.builtin.TypeInfo.StructField{}) ++ [1]std.builtin.TypeInfo.StructField{
-            .{
-                .name = "params",
-                .field_type = T,
-                .default_value = null,
-                .is_comptime = false,
-                .alignment = 0,
-            },
-        }),
-        .decls = &.{},
-        .is_tuple = false,
-    } });
-}
 
 /// The base protocol offers support for request cancellation.
 /// To cancel a request, a notification message with the following properties is sent.
@@ -104,7 +51,7 @@ fn Paramsify(comptime T: type) type {
 /// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#cancelRequest)
 pub const CancelParams = struct {
     pub const method = "$/cancelRequest";
-    pub const kind = ParamsifyKind.notification;
+    pub const kind = common.PacketKind.notification;
 
     /// The request id to cancel.
     id: common.RequestId,
@@ -129,7 +76,7 @@ pub const ProgressValue = union(enum) {
 /// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#progress)
 pub const ProgressParams = struct {
     pub const method = "$/progress";
-    pub const kind = ParamsifyKind.notification;
+    pub const kind = common.PacketKind.notification;
 
     /// The progress token provided by the client or server.
     token: ProgressToken,
@@ -138,64 +85,9 @@ pub const ProgressParams = struct {
     value: ProgressValue,
 };
 
-/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokensClientCapabilities)
-pub const SemanticTokensClientCapabilities = struct {
-    dynamicRegistration: bool = false,
-
-    /// The token types that the client supports.
-    tokenTypes: []const []const u8,
-
-    /// The token modifiers that the client supports.
-    tokenModifiers: []const []const u8,
-
-    /// The formats the clients supports.
-    formats: []const []const u8,
-
-    /// Whether the client supports tokens that can overlap each other.
-    overlappingTokenSupport: bool = false,
-
-    /// Whether the client supports tokens that can span multiple lines.
-    multilineTokenSupport: bool = false,
-};
-
-pub const ClientCapabilities = struct {
-    workspace: ?struct {
-        workspaceFolders: bool = false,
-    },
-    textDocument: ?struct {
-        semanticTokens: ?SemanticTokensClientCapabilities = null,
-        hover: ?struct {
-            contentFormat: []const []const u8 = &.{},
-        },
-        completion: ?struct {
-            completionItem: ?struct {
-                snippetSupport: bool = false,
-                documentationFormat: []const []const u8 = &.{},
-            },
-        },
-    },
-    /// **LSP extension**
-    ///
-    /// [Docs](https://clangd.llvm.org/extensions.html#utf-8-offsets)
-    offsetEncoding: []const []const u8 = &.{},
-};
-
-pub const InitializeParams = struct {
-    pub const method = "initialize";
-    pub const kind = ParamsifyKind.request;
-
-    capabilities: ClientCapabilities,
-    workspaceFolders: ?[]const common.WorkspaceFolder,
-};
-
-pub const InitializedParams = struct {
-    pub const method = "initialized";
-    pub const kind = ParamsifyKind.notification;
-};
-
 pub const DidChangeWorkspaceFoldersParams = struct {
     pub const method = "workspace/didChangeWorkspaceFolders";
-    pub const kind = ParamsifyKind.notification;
+    pub const kind = common.PacketKind.notification;
 
     event: struct {
         added: []const common.WorkspaceFolder,
@@ -205,7 +97,7 @@ pub const DidChangeWorkspaceFoldersParams = struct {
 
 pub const DidOpenTextDocumentParams = struct {
     pub const method = "textDocument/didOpen";
-    pub const kind = ParamsifyKind.notification;
+    pub const kind = common.PacketKind.notification;
 
     textDocument: struct {
         /// The text document's URI.
@@ -300,7 +192,7 @@ pub const SignatureHelp = struct {
 // TODO: fully implement
 pub const CompletionParams = struct {
     pub const method = "textDocument/completion";
-    pub const kind = ParamsifyKind.request;
+    pub const kind = common.PacketKind.request;
 
     textDocument: TextDocumentIdentifier,
     position: common.Position,

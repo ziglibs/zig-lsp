@@ -11,6 +11,40 @@ pub fn EnumStringify(comptime T: type) type {
     };
 }
 
+pub const PacketKind = enum { request, response, notification };
+pub fn Paramsify(comptime T: type) type {
+    return @Type(.{ .Struct = .{
+        .layout = .Auto,
+        .fields = &([1]std.builtin.TypeInfo.StructField{
+            .{
+                .name = "method",
+                .field_type = []const u8,
+                .default_value = std.mem.sliceAsBytes(std.mem.span(@field(T, "method"))),
+                .is_comptime = true,
+                .alignment = 0,
+            },
+        } ++ (if (@field(T, "kind") == .request) [1]std.builtin.TypeInfo.StructField{
+            .{
+                .name = "id",
+                .field_type = RequestId,
+                .default_value = null,
+                .is_comptime = false,
+                .alignment = 0,
+            },
+        } else [0]std.builtin.TypeInfo.StructField{}) ++ [1]std.builtin.TypeInfo.StructField{
+            .{
+                .name = "params",
+                .field_type = T,
+                .default_value = null,
+                .is_comptime = false,
+                .alignment = 0,
+            },
+        }),
+        .decls = &.{},
+        .is_tuple = false,
+    } });
+}
+
 // LSP types
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/
 
@@ -49,8 +83,6 @@ pub const Hover = struct {
 
 /// Id of a request
 pub const RequestId = union(enum) {
-    /// Notifications do not have a request id.
-    none: void,
     string: []const u8,
     integer: i64,
     float: f64,
