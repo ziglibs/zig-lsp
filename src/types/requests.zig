@@ -1,5 +1,6 @@
 ///! Process client requests / notifications
 const std = @import("std");
+const json = @import("../json.zig");
 const common = @import("./common.zig");
 
 /// JSONRPC request
@@ -25,13 +26,13 @@ pub const Request = struct {
     }
 
     pub fn encode(self: Request, writer: anytype) @TypeOf(writer).Error!void {
-        try std.json.stringify(self, .{}, writer);
+        try json.stringify(self, .{}, writer);
     }
 
     pub fn decode(allocator: *std.mem.Allocator, buf: []const u8) !Request {
         @setEvalBranchQuota(10_000);
 
-        return fromTarget(try std.json.parse(RequestParseTarget, &std.json.TokenStream.init(buf), .{
+        return fromTarget(try json.parse(RequestParseTarget, &json.TokenStream.init(buf), .{
             .allocator = allocator,
             .ignore_unknown_fields = true,
         }));
@@ -91,10 +92,42 @@ fn Paramsify(comptime T: type) type {
 
 /// The base protocol offers support for request cancellation.
 /// To cancel a request, a notification message with the following properties is sent.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#cancelRequest)
 pub const CancelParams = struct {
     pub const method = "$/cancelRequest";
+    pub const kind = ParamsifyKind.notification;
 
+    /// The request id to cancel.
     id: common.RequestId,
+};
+
+pub const ProgressToken = union(enum) {
+    integer: common.integer,
+    string: []const u8,
+};
+
+// TODO: Generic T used; what the hell does that mean??
+pub const ProgressValue = union(enum) {
+    integer: common.integer,
+    string: []const u8,
+};
+
+/// The base protocol offers also support to report progress in a generic fashion.
+/// This mechanism can be used to report any kind of progress including work done progress
+/// (usually used to report progress in the user interface using a progress bar)
+/// and partial result progress to support streaming of results.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#progress)
+pub const ProgressParams = struct {
+    pub const method = "$/progress";
+    pub const kind = ParamsifyKind.notification;
+
+    /// The progress token provided by the client or server.
+    token: ProgressToken,
+
+    /// The progress data.
+    value: ProgressValue,
 };
 
 /// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokensClientCapabilities)
@@ -191,7 +224,7 @@ pub const ChangeDocument = struct {
 
     params: struct {
         textDocument: TextDocumentIdentifier,
-        contentChanges: std.json.Value,
+        contentChanges: json.Value,
     },
 };
 

@@ -47,7 +47,7 @@ pub fn flushArena(self: *Server) void {
 }
 
 pub fn respond(self: *Server, request: requests.Request, result: responses.ResponseParams) !void {
-    try utils.send(&self.write_buf, responses.Response{
+    try utils.send(&self.write_buf, responses.ResponseMessage{
         .id = request.id orelse @panic("Cannot respond to notification!"),
         .result = result,
     });

@@ -1,17 +1,31 @@
 const std = @import("std");
+const json = @import("../json.zig");
 
 // Utils
 
 pub fn EnumStringify(comptime T: type) type {
     return struct {
-        pub fn jsonStringify(value: T, options: std.json.StringifyOptions, out_stream: anytype) !void {
-            try std.json.stringify(@enumToInt(value), options, out_stream);
+        pub fn jsonStringify(value: T, options: json.StringifyOptions, out_stream: anytype) !void {
+            try json.stringify(@enumToInt(value), options, out_stream);
         }
     };
 }
 
 // LSP types
 // https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/
+
+/// Defines an integer number in the range of -2^31 to 2^31 - 1.
+pub const integer = i64;
+
+/// Defines an unsigned integer number in the range of 0 to 2^31 - 1.
+pub const uinteger = i64;
+
+/// Defines a decimal number. Since decimal numbers are very
+/// rare in the language server specification we denote the
+/// exact range with every decimal using the mathematics
+/// interval notation (e.g. [0, 1] denotes all decimals d with
+/// 0 <= d <= 1.
+pub const decimal = i64;
 
 pub const Position = struct {
     line: i64,
@@ -70,8 +84,8 @@ pub const MessageType = enum(i64) {
     info = 3,
     log = 4,
 
-    pub fn jsonStringify(value: MessageType, options: std.json.StringifyOptions, out_stream: anytype) !void {
-        try std.json.stringify(@enumToInt(value), options, out_stream);
+    pub fn jsonStringify(value: MessageType, options: json.StringifyOptions, out_stream: anytype) !void {
+        try json.stringify(@enumToInt(value), options, out_stream);
     }
 };
 
@@ -81,8 +95,8 @@ pub const DiagnosticSeverity = enum(i64) {
     info = 3,
     log = 4,
 
-    pub fn jsonStringify(value: DiagnosticSeverity, options: std.json.StringifyOptions, out_stream: anytype) !void {
-        try std.json.stringify(@enumToInt(value), options, out_stream);
+    pub fn jsonStringify(value: DiagnosticSeverity, options: json.StringifyOptions, out_stream: anytype) !void {
+        try json.stringify(@enumToInt(value), options, out_stream);
     }
 };
 
@@ -132,7 +146,7 @@ pub const TextDocument = struct {
 pub const WorkspaceEdit = struct {
     changes: ?std.StringHashMap([]TextEdit),
 
-    pub fn jsonStringify(self: WorkspaceEdit, options: std.json.StringifyOptions, writer: anytype) @TypeOf(writer).Error!void {
+    pub fn jsonStringify(self: WorkspaceEdit, options: json.StringifyOptions, writer: anytype) @TypeOf(writer).Error!void {
         try writer.writeByte('{');
         if (self.changes) |changes| {
             try writer.writeAll("\"changes\": {");
@@ -144,7 +158,7 @@ pub const WorkspaceEdit = struct {
                 try writer.writeByte('"');
                 try writer.writeAll(entry.key_ptr.*);
                 try writer.writeAll("\":");
-                try std.json.stringify(entry.value_ptr.*, options, writer);
+                try json.stringify(entry.value_ptr.*, options, writer);
             }
             try writer.writeByte('}');
         }
@@ -162,12 +176,12 @@ pub const MarkupContent = struct {
         plaintext = 0,
         markdown = 1,
 
-        pub fn jsonStringify(value: Kind, options: std.json.StringifyOptions, out_stream: anytype) !void {
+        pub fn jsonStringify(value: Kind, options: json.StringifyOptions, out_stream: anytype) !void {
             const str = switch (value) {
                 .plaintext => "plaintext",
                 .markdown => "markdown",
             };
-            try std.json.stringify(str, options, out_stream);
+            try json.stringify(str, options, out_stream);
         }
     };
 
@@ -179,8 +193,8 @@ pub const InsertTextFormat = enum(i64) {
     plaintext = 1,
     snippet = 2,
 
-    pub fn jsonStringify(value: InsertTextFormat, options: std.json.StringifyOptions, writer: anytype) !void {
-        try std.json.stringify(@enumToInt(value), options, writer);
+    pub fn jsonStringify(value: InsertTextFormat, options: json.StringifyOptions, writer: anytype) !void {
+        try json.stringify(@enumToInt(value), options, writer);
     }
 };
 
@@ -213,8 +227,8 @@ pub const DocumentSymbol = struct {
         operator = 25,
         type_parameter = 26,
 
-        pub fn jsonStringify(value: Kind, options: std.json.StringifyOptions, writer: anytype) !void {
-            try std.json.stringify(@enumToInt(value), options, writer);
+        pub fn jsonStringify(value: Kind, options: json.StringifyOptions, writer: anytype) !void {
+            try json.stringify(@enumToInt(value), options, writer);
         }
     };
 
