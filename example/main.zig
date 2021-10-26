@@ -47,6 +47,9 @@ pub fn main() !void {
                 .did_open => |open| {
                     std.log.info("{s}!", .{open});
                 },
+                .did_change => |change| {
+                    std.log.info("{s}", .{change.contentChanges[0].full.text});
+                },
                 else => @panic("NO!"),
             },
             .request => |request| switch (request.params) {

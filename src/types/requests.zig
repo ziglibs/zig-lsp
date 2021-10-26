@@ -104,15 +104,6 @@ pub const DidChangeWorkspaceFoldersParams = struct {
     },
 };
 
-pub const ChangeDocument = struct {
-    comptime method: []const u8 = "textDocument/didChange",
-
-    params: struct {
-        textDocument: common.TextDocumentIdentifier,
-        contentChanges: json.Value,
-    },
-};
-
 const TextDocumentIdentifierRequestParams = struct {
     textDocument: common.TextDocumentIdentifier,
 };

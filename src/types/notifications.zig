@@ -24,6 +24,7 @@ pub const NotificationParams = union(enum) {
 
     // Text Sync
     did_open: text_sync.DidOpenTextDocumentParams,
+    did_change: text_sync.DidChangeTextDocumentParams,
 };
 
 /// Params of a request (params)
@@ -36,6 +37,7 @@ pub const NotificationParseTarget = union(enum) {
 
     // Text Sync
     did_open: common.Paramsify(text_sync.DidOpenTextDocumentParams),
+    did_change: common.Paramsify(text_sync.DidChangeTextDocumentParams),
 
     pub fn toMessage(self: NotificationParseTarget) NotificationMessage {
         inline for (std.meta.fields(NotificationParseTarget)) |field, i| {
