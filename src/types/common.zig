@@ -1,3 +1,5 @@
+//! Common types, including Basic Structures
+
 const std = @import("std");
 const json = @import("../json.zig");
 
@@ -81,6 +83,10 @@ pub const Hover = struct {
     contents: MarkupContent,
 };
 
+pub const TextDocumentIdentifier = struct {
+    uri: []const u8,
+};
+
 /// Id of a request
 pub const RequestId = union(enum) {
     string: []const u8,
@@ -89,39 +95,26 @@ pub const RequestId = union(enum) {
 };
 
 /// JSONRPC notifications
-pub const Notification = struct {
-    pub const Params = union(enum) {
-        log_message: struct {
-            @"type": MessageType,
-            message: []const u8,
-        },
-        publish_diagnostics: struct {
-            uri: []const u8,
-            diagnostics: []Diagnostic,
-        },
-        show_message: struct {
-            @"type": MessageType,
-            message: []const u8,
-        },
-    };
+// pub const Notification = struct {
+//     pub const Params = union(enum) {
+//         log_message: struct {
+//             @"type": MessageType,
+//             message: []const u8,
+//         },
+//         publish_diagnostics: struct {
+//             uri: []const u8,
+//             diagnostics: []Diagnostic,
+//         },
+//         show_message: struct {
+//             @"type": MessageType,
+//             message: []const u8,
+//         },
+//     };
 
-    jsonrpc: []const u8 = "2.0",
-    method: []const u8,
-    params: Params,
-};
-
-/// Type of a debug message
-/// https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#messageType
-pub const MessageType = enum(i64) {
-    err = 1,
-    warn = 2,
-    info = 3,
-    log = 4,
-
-    pub fn jsonStringify(value: MessageType, options: json.StringifyOptions, out_stream: anytype) !void {
-        try json.stringify(@enumToInt(value), options, out_stream);
-    }
-};
+//     jsonrpc: []const u8 = "2.0",
+//     method: []const u8,
+//     params: Params,
+// };
 
 pub const DiagnosticSeverity = enum(i64) {
     err = 1,

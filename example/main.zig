@@ -1,15 +1,36 @@
 const std = @import("std");
 const lsp = @import("lsp");
 
-// Always set this to debug to make std.log call into our handler, then control the runtime
-// value in the definition below.
+var server: lsp.Server = undefined;
+
+// TODO: Log level bruh
+// pub fn log(
+//     comptime level: std.log.Level,
+//     comptime scope: @TypeOf(.EnumLiteral),
+//     comptime format: []const u8,
+//     args: anytype,
+// ) void {
+//     var hacky_buffer: [1024]u8 = undefined;
+
+//     server.notify(.{
+//         .log_message = .{
+//             .@"type" = switch (level) {
+//                 .err => .err,
+//                 .warn => .warn,
+//                 .info => .info,
+//                 .debug => .log,
+//             },
+//             .message = std.fmt.bufPrint(&hacky_buffer, "(" ++ @tagName(scope) ++ ") " ++ format, args),
+//         },
+//     });
+// }
 
 pub fn main() !void {
     comptime @setEvalBranchQuota(10_000);
 
     const allocator = std.heap.page_allocator;
 
-    var server = try lsp.Server.init(allocator);
+    server = try lsp.Server.init(allocator);
 
     while (true) {
         var message = try server.readMessage();
@@ -22,6 +43,10 @@ pub fn main() !void {
                 .initialized => {
                     std.debug.print("Successfully initialized!\n", .{});
                 },
+                .did_open => |open| {
+                    std.debug.print("{s}!\n", .{open});
+                },
+                else => @panic("NO!"),
             },
             .request => |request| switch (request.params) {
                 .initialize => |init| {
@@ -76,37 +101,36 @@ pub fn main() !void {
                         },
                     });
                 },
-                // .didOpen => |open| {
-                //     std.debug.print("{s}!\n", .{open});
-                // },
-                // .completion => |comp| {
-                //     _ = comp;
-                //     try server.respond(request, .{
-                //         .completion_list = .{
-                //             .isIncomplete = false,
-                //             .items = &[1]lsp.types.responses.CompletionItem{
-                //                 .{
-                //                     .label = "joe mama",
-                //                     .kind = .text,
-                //                     .textEdit = null,
-                //                     .filterText = null,
-                //                     .insertText = "joe mama",
-                //                     .insertTextFormat = .plaintext,
-                //                     .detail = "Joe Mama.",
-                //                     .documentation = .{ .kind = .markdown, .value =
-                //                     \\A clever name used to insult another individual's mother.
-                //                     \\It is a play on words that refers to the saying, "Yo mama!"
-                //                     \\
-                //                     \\Person 1: "Where's Joe?"\
-                //                     \\Victim 1: "Joe? ... Joe who?"\
-                //                     \\Person 1: "JOE MAMA!"\
-                //                     \\Victim 1: *Proceeds to feel insulted*
-                //                     },
-                //                 },
-                //             },
-                //         },
-                //     });
-                // },
+                .completion => |comp| {
+                    _ = comp;
+                    try server.respond(request, .{
+                        .completion = .{
+                            .completion_list = .{
+                                .isIncomplete = false,
+                                .items = &[1]lsp.types.language_features.CompletionItem{
+                                    .{
+                                        .label = "joe mama",
+                                        .kind = .text,
+                                        .textEdit = null,
+                                        .filterText = null,
+                                        .insertText = "joe mama",
+                                        .insertTextFormat = .plaintext,
+                                        .detail = "Joe Mama.",
+                                        .documentation = .{ .kind = .markdown, .value = 
+                                        \\A clever name used to insult another individual's mother.
+                                        \\It is a play on words that refers to the saying, "Yo mama!"
+                                        \\
+                                        \\Person 1: "Where's Joe?"\
+                                        \\Victim 1: "Joe? ... Joe who?"\
+                                        \\Person 1: "JOE MAMA!"\
+                                        \\Victim 1: *Proceeds to feel insulted*
+                                        },
+                                    },
+                                },
+                            },
+                        },
+                    });
+                },
                 // else => {},
             },
         }

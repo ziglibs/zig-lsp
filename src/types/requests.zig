@@ -4,6 +4,7 @@ const json = @import("../json.zig");
 const common = @import("common.zig");
 
 const general = @import("general.zig");
+const language_features = @import("language_features.zig");
 
 /// A request message to describe a request between the client and the server.
 /// Every processed request must send a response back to the sender of the request.
@@ -23,12 +24,20 @@ pub const RequestMessage = struct {
 };
 
 pub const RequestParams = union(enum) {
+    // General
     initialize: general.InitializeParams,
+
+    // Language Features
+    completion: language_features.CompletionParams,
 };
 
 /// Params of a request (params)
 pub const RequestParseTarget = union(enum) {
+    // General
     initialize: common.Paramsify(general.InitializeParams),
+
+    // Language Features
+    completion: common.Paramsify(language_features.CompletionParams),
 
     pub fn toMessage(self: RequestParseTarget) RequestMessage {
         inline for (std.meta.fields(RequestParseTarget)) |field, i| {
@@ -95,41 +104,17 @@ pub const DidChangeWorkspaceFoldersParams = struct {
     },
 };
 
-pub const DidOpenTextDocumentParams = struct {
-    pub const method = "textDocument/didOpen";
-    pub const kind = common.PacketKind.notification;
-
-    textDocument: struct {
-        /// The text document's URI.
-        uri: []const u8,
-
-        /// The text document's language identifier.
-        languageId: []const u8,
-
-        /// The version number of this document (it will increase after each
-        /// change, including undo/redo).
-        version: i32,
-
-        /// The content of the opened text document.
-        text: []const u8,
-    },
-};
-
-pub const TextDocumentIdentifier = struct {
-    uri: []const u8,
-};
-
 pub const ChangeDocument = struct {
     comptime method: []const u8 = "textDocument/didChange",
 
     params: struct {
-        textDocument: TextDocumentIdentifier,
+        textDocument: common.TextDocumentIdentifier,
         contentChanges: json.Value,
     },
 };
 
 const TextDocumentIdentifierRequestParams = struct {
-    textDocument: TextDocumentIdentifier,
+    textDocument: common.TextDocumentIdentifier,
 };
 
 pub const TextDocumentSaveReason = enum(i64) {
@@ -150,7 +135,7 @@ pub const SaveDocument = struct {
     comptime method: []const u8 = "textDocument/willSave",
 
     params: struct {
-        textDocument: TextDocumentIdentifier,
+        textDocument: common.TextDocumentIdentifier,
         reason: TextDocumentSaveReason,
     },
 };
@@ -166,7 +151,7 @@ pub const SemanticTokensFull = struct {
 };
 
 const TextDocumentIdentifierPositionRequest = struct {
-    textDocument: TextDocumentIdentifier,
+    textDocument: common.TextDocumentIdentifier,
     position: common.Position,
 };
 
@@ -174,7 +159,7 @@ pub const SignatureHelp = struct {
     comptime method: []const u8 = "textDocument/signatureHelp",
 
     params: struct {
-        textDocument: TextDocumentIdentifier,
+        textDocument: common.TextDocumentIdentifier,
         position: common.Position,
         context: ?struct {
             triggerKind: enum(u32) {
@@ -189,14 +174,6 @@ pub const SignatureHelp = struct {
     },
 };
 
-// TODO: fully implement
-pub const CompletionParams = struct {
-    pub const method = "textDocument/completion";
-    pub const kind = common.PacketKind.request;
-
-    textDocument: TextDocumentIdentifier,
-    position: common.Position,
-};
 pub const GotoDefinition = TextDocumentIdentifierPositionRequest;
 pub const GotoDeclaration = TextDocumentIdentifierPositionRequest;
 pub const Hover = TextDocumentIdentifierPositionRequest;
@@ -208,7 +185,7 @@ pub const Formatting = struct {
 };
 pub const Rename = struct {
     params: struct {
-        textDocument: TextDocumentIdentifier,
+        textDocument: common.TextDocumentIdentifier,
         position: common.Position,
         newName: []const u8,
     },
@@ -216,7 +193,7 @@ pub const Rename = struct {
 
 pub const References = struct {
     params: struct {
-        textDocument: TextDocumentIdentifier,
+        textDocument: common.TextDocumentIdentifier,
         position: common.Position,
         context: struct {
             includeDeclaration: bool,

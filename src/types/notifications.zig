@@ -2,6 +2,8 @@ const std = @import("std");
 const common = @import("common.zig");
 
 const general = @import("general.zig");
+const window = @import("window.zig");
+const text_sync = @import("text_sync.zig");
 
 pub const NotificationMessage = struct {
     /// The method to be invoked.
@@ -12,12 +14,26 @@ pub const NotificationMessage = struct {
 };
 
 pub const NotificationParams = union(enum) {
+    // General
     initialized: general.InitializedParams,
+
+    // Window
+    log_message: window.LogMessageParams,
+
+    // Text Sync
+    did_open: text_sync.DidOpenTextDocumentParams,
 };
 
 /// Params of a request (params)
 pub const NotificationParseTarget = union(enum) {
+    // General
     initialized: common.Paramsify(general.InitializedParams),
+
+    // Window
+    log_message: common.Paramsify(window.LogMessageParams),
+
+    // Text Sync
+    did_open: common.Paramsify(text_sync.DidOpenTextDocumentParams),
 
     pub fn toMessage(self: NotificationParseTarget) NotificationMessage {
         inline for (std.meta.fields(NotificationParseTarget)) |field, i| {

@@ -2,6 +2,14 @@
 
 const common = @import("common.zig");
 
+pub const InitializeParams = struct {
+    pub const method = "initialize";
+    pub const kind = common.PacketKind.request;
+
+    capabilities: ClientCapabilities,
+    workspaceFolders: ?[]const common.WorkspaceFolder,
+};
+
 /// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokensClientCapabilities)
 pub const SemanticTokensClientCapabilities = struct {
     dynamicRegistration: bool = false,
@@ -44,12 +52,62 @@ pub const ClientCapabilities = struct {
     offsetEncoding: []const []const u8 = &.{},
 };
 
-pub const InitializeParams = struct {
-    pub const method = "initialize";
-    pub const kind = common.PacketKind.request;
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#initializeResult)
+pub const InitializeResult = struct {
+    offsetEncoding: []const u8,
+    capabilities: struct {
+        signatureHelpProvider: struct {
+            triggerCharacters: []const []const u8,
+            retriggerCharacters: []const []const u8,
+        },
+        textDocumentSync: enum(u32) {
+            none = 0,
+            full = 1,
+            incremental = 2,
 
-    capabilities: ClientCapabilities,
-    workspaceFolders: ?[]const common.WorkspaceFolder,
+            usingnamespace common.EnumStringify(@This());
+        },
+        renameProvider: bool,
+        completionProvider: struct {
+            resolveProvider: bool,
+            triggerCharacters: []const []const u8,
+        },
+        documentHighlightProvider: bool,
+        hoverProvider: bool,
+        codeActionProvider: bool,
+        declarationProvider: bool,
+        definitionProvider: bool,
+        typeDefinitionProvider: bool,
+        implementationProvider: bool,
+        referencesProvider: bool,
+        documentSymbolProvider: bool,
+        colorProvider: bool,
+        documentFormattingProvider: bool,
+        documentRangeFormattingProvider: bool,
+        foldingRangeProvider: bool,
+        selectionRangeProvider: bool,
+        workspaceSymbolProvider: bool,
+        rangeProvider: bool,
+        documentProvider: bool,
+        workspace: ?struct {
+            workspaceFolders: ?struct {
+                supported: bool,
+                changeNotifications: bool,
+            },
+        },
+        semanticTokensProvider: ?struct {
+            full: bool,
+            range: bool,
+            legend: struct {
+                tokenTypes: []const []const u8,
+                tokenModifiers: []const []const u8,
+            },
+        } = null,
+    },
+    serverInfo: struct {
+        name: []const u8,
+        version: ?[]const u8 = null,
+    },
 };
 
 pub const InitializedParams = struct {

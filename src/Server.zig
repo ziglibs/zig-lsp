@@ -84,6 +84,10 @@ pub fn respond(self: *Server, request: types.requests.RequestMessage, result: ty
     });
 }
 
+pub fn notify(self: *Server, notification: types.notifications.NotificationParams) !void {
+    try utils.send(&self.write_buf, notification);
+}
+
 /// Processes an `initialize` message
 /// * Sets the offset encoding
 pub fn processInitialize(self: *Server, initalize: types.general.InitializeParams) void {
