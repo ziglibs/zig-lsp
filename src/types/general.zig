@@ -10,6 +10,22 @@ pub const InitializeParams = struct {
     workspaceFolders: ?[]const common.WorkspaceFolder,
 };
 
+pub const RegularExpressEngineVersion = union(enum) {
+    none: void,
+    string: []const u8,
+};
+
+/// Client capabilities specific to regular expressions.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#regExp)
+pub const RegularExpressionsClientCapabilities = struct {
+    /// The engine's name.
+    engine: []const u8,
+
+    /// The engine's version.
+    version: RegularExpressEngineVersion,
+};
+
 /// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#semanticTokensClientCapabilities)
 pub const SemanticTokensClientCapabilities = struct {
     dynamicRegistration: bool = false,
@@ -31,9 +47,12 @@ pub const SemanticTokensClientCapabilities = struct {
 };
 
 pub const ClientCapabilities = struct {
+    general: ?struct {
+        regularExpressions: ?RegularExpressionsClientCapabilities = null,
+    } = null,
     workspace: ?struct {
         workspaceFolders: bool = false,
-    },
+    } = null,
     textDocument: ?struct {
         semanticTokens: ?SemanticTokensClientCapabilities = null,
         hover: ?struct {
@@ -45,7 +64,7 @@ pub const ClientCapabilities = struct {
                 documentationFormat: []const []const u8 = &.{},
             },
         },
-    },
+    } = null,
     /// **LSP extension**
     ///
     /// [Docs](https://clangd.llvm.org/extensions.html#utf-8-offsets)

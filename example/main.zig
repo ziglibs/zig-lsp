@@ -4,26 +4,27 @@ const lsp = @import("lsp");
 var server: lsp.Server = undefined;
 
 // TODO: Log level bruh
-// pub fn log(
-//     comptime level: std.log.Level,
-//     comptime scope: @TypeOf(.EnumLiteral),
-//     comptime format: []const u8,
-//     args: anytype,
-// ) void {
-//     var hacky_buffer: [1024]u8 = undefined;
+pub fn log(
+    comptime level: std.log.Level,
+    comptime scope: @TypeOf(.EnumLiteral),
+    comptime format: []const u8,
+    args: anytype,
+) void {
+    var hacky_buffer: [1024]u8 = undefined;
 
-//     server.notify(.{
-//         .log_message = .{
-//             .@"type" = switch (level) {
-//                 .err => .err,
-//                 .warn => .warn,
-//                 .info => .info,
-//                 .debug => .log,
-//             },
-//             .message = std.fmt.bufPrint(&hacky_buffer, "(" ++ @tagName(scope) ++ ") " ++ format, args),
-//         },
-//     });
-// }
+    server.notify(.{
+        .log_message = .{
+            .@"type" = switch (level) {
+                .err => .err,
+                .warn => .warn,
+                .info => .info,
+                .debug => .log,
+                else => {},
+            },
+            .message = std.fmt.bufPrint(&hacky_buffer, "(" ++ @tagName(scope) ++ ") " ++ format, args) catch unreachable,
+        },
+    }) catch unreachable;
+}
 
 pub fn main() !void {
     comptime @setEvalBranchQuota(10_000);
@@ -41,16 +42,18 @@ pub fn main() !void {
         switch (message) {
             .notification => |notification| switch (notification.params) {
                 .initialized => {
-                    std.debug.print("Successfully initialized!\n", .{});
+                    std.log.info("Successfully initialized!", .{});
                 },
                 .did_open => |open| {
-                    std.debug.print("{s}!\n", .{open});
+                    std.log.info("{s}!", .{open});
                 },
                 else => @panic("NO!"),
             },
             .request => |request| switch (request.params) {
                 .initialize => |init| {
                     server.processInitialize(init);
+
+                    std.log.info("{s}", .{init.capabilities.general.?.regularExpressions});
 
                     try server.respond(request, .{
                         .initialize_result = .{

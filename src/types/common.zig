@@ -63,19 +63,173 @@ pub const uinteger = i64;
 /// 0 <= d <= 1.
 pub const decimal = i64;
 
+/// Many of the interfaces contain fields that correspond to the URI of a document.
+/// For clarity, the type of such a field is declared as a DocumentUri.
+/// Over the wire, it will still be transferred as a string, but this guarantees
+/// that the contents of that string can be parsed as a valid URI.
+const DocumentUri = []const u8;
+/// There is also a tagging interface for normal non document URIs. It maps to a string as well.
+const Uri = []const u8;
+
+/// Position in a text document expressed as zero-based line and zero-based character offset.
+/// A position is between two characters like an ‘insert’ cursor in an editor.
+/// Special values like for example -1 to denote the end of a line are not supported.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#position)
 pub const Position = struct {
-    line: i64,
-    character: i64,
+    /// Line position in a document (zero-based).
+    line: uinteger,
+
+    /// Character offset on a line in a document (zero-based). Assuming that
+    /// the line is represented as a string, the `character` value represents
+    /// the gap between the `character` and `character + 1`.
+    ///
+    /// If the character value is greater than the line length it defaults back
+    /// to the line length.
+    character: uinteger,
 };
 
+/// A range in a text document expressed as (zero-based) start and end positions.
+/// A range is comparable to a selection in an editor. Therefore the end position is exclusive.
+/// If you want to specify a range that contains a line including the line ending character(s)
+/// then use an end position denoting the start of the next line.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#range)
 pub const Range = struct {
+    /// The range's start position.
     start: Position,
+
+    /// The range's end position.
     end: Position,
 };
 
+/// Represents a location inside a resource, such as a line inside a text file.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#location)
 pub const Location = struct {
-    uri: []const u8,
+    uri: DocumentUri,
     range: Range,
+};
+
+/// Represents a link between a source and a target location.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#locationLink)
+pub const LocationLink = struct {
+    /// Span of the origin of this link.
+    ///
+    /// Used as the underlined span for mouse interaction. Defaults to the word
+    /// range at the mouse position.
+    originSelectionRange: Range,
+
+    /// The target resource identifier of this link.
+    targetUri: DocumentUri,
+
+    /// The full target range of this link. If the target for example is a symbol
+    /// then target range is the range enclosing this symbol not including
+    /// leading/trailing whitespace but everything else like comments. This
+    /// information is typically used to highlight the range in the editor.
+    targetRange: Range,
+
+    /// The range that should be selected and revealed when this link is being
+    /// followed, e.g the name of a function. Must be contained by the the
+    /// `targetRange`. See also `DocumentSymbol#range`
+    targetSelectionRange: Range,
+};
+
+pub const DiagnosticSeverity = enum(i64) {
+    err = 1,
+    warn = 2,
+    info = 3,
+    log = 4,
+
+    pub fn jsonStringify(value: DiagnosticSeverity, options: json.StringifyOptions, out_stream: anytype) !void {
+        try json.stringify(@enumToInt(value), options, out_stream);
+    }
+};
+
+pub const DiagnosticCode = union(enum) {
+    integer: integer,
+    string: []const u8,
+};
+
+/// The diagnostic tags.
+///
+/// Ssince 3.15.0
+pub const DiagnosticTag = enum(i64) {
+    /// Unused or unnecessary code.
+    /// 
+    /// Clients are allowed to render diagnostics with this tag faded out
+    /// instead of having an error squiggle.
+    unnecessary = 1,
+
+    /// Deprecated or obsolete code.
+    ///
+    /// Clients are allowed to rendered diagnostics with this tag strike through.
+    deprecated = 2,
+};
+
+/// Structure to capture a description for an error code.
+/// 
+/// Since 3.16.0
+pub const CodeDescription = struct {
+    /// An URI to open with more information about the diagnostic error.
+    href: Uri,
+};
+
+/// Represents a related message and source code location for a diagnostic.
+/// This should be used to point to code locations that cause or are related to
+/// a diagnostics, e.g when duplicating a symbol in a scope.
+pub const DiagnosticRelatedInformation = struct {
+    /// The location of this related diagnostic information.
+    location: Location,
+
+    /// The message of this related diagnostic information.
+    message: []const u8,
+};
+
+/// Represents a diagnostic, such as a compiler error or warning.
+/// Diagnostic objects are only valid in the scope of a resource.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#diagnostic)
+pub const Diagnostic = struct {
+    /// The range at which the message applies.
+    range: Range,
+
+    /// The diagnostic's severity. Can be omitted. If omitted it is up to the
+    /// client to interpret diagnostics as error, warning, info or hint.
+    severity: ?DiagnosticSeverity = null,
+
+    /// The diagnostic's code, which might appear in the user interface.
+    code: DiagnosticCode,
+
+    /// An optional property to describe the error code.
+    /// 
+    /// Since 3.16.0
+    codeDescription: CodeDescription = null,
+
+    /// A human-readable string describing the source of this
+    /// diagnostic, e.g. 'typescript' or 'super lint'.
+    source: []const u8 = null,
+
+    /// The diagnostic's message.
+    message: []const u8,
+
+    /// Additional metadata about the diagnostic.
+    /// 
+    /// Since 3.15.0
+    tags: ?[]DiagnosticTag = null,
+
+    // An array of related diagnostic information, e.g. when symbol-names within
+    // a scope collide all definitions can be marked via this property.
+    relatedInformation: ?[]DiagnosticRelatedInformation = null,
+
+    // TODO: wtf is going on here???
+    // A data entry field that is preserved between a
+    // `textDocument/publishDiagnostics` notification and
+    // `textDocument/codeAction` request.
+    //
+    // Since 3.16.0
+    // data?: unknown;
 };
 
 /// Hover response
@@ -92,47 +246,6 @@ pub const RequestId = union(enum) {
     string: []const u8,
     integer: i64,
     float: f64,
-};
-
-/// JSONRPC notifications
-// pub const Notification = struct {
-//     pub const Params = union(enum) {
-//         log_message: struct {
-//             @"type": MessageType,
-//             message: []const u8,
-//         },
-//         publish_diagnostics: struct {
-//             uri: []const u8,
-//             diagnostics: []Diagnostic,
-//         },
-//         show_message: struct {
-//             @"type": MessageType,
-//             message: []const u8,
-//         },
-//     };
-
-//     jsonrpc: []const u8 = "2.0",
-//     method: []const u8,
-//     params: Params,
-// };
-
-pub const DiagnosticSeverity = enum(i64) {
-    err = 1,
-    warn = 2,
-    info = 3,
-    log = 4,
-
-    pub fn jsonStringify(value: DiagnosticSeverity, options: json.StringifyOptions, out_stream: anytype) !void {
-        try json.stringify(@enumToInt(value), options, out_stream);
-    }
-};
-
-pub const Diagnostic = struct {
-    range: Range,
-    severity: DiagnosticSeverity,
-    code: []const u8,
-    source: []const u8,
-    message: []const u8,
 };
 
 pub const TextDocument = struct {

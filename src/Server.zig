@@ -84,8 +84,15 @@ pub fn respond(self: *Server, request: types.requests.RequestMessage, result: ty
     });
 }
 
-pub fn notify(self: *Server, notification: types.notifications.NotificationParams) !void {
-    try utils.send(&self.write_buf, notification);
+pub fn notify(self: *Server, params: types.notifications.NotificationParams) !void {
+    inline for (std.meta.fields(types.notifications.NotificationParams)) |field| {
+        if (params == @field(types.notifications.NotificationParams, field.name)) {
+            try utils.send(&self.write_buf, types.notifications.NotificationMessage{
+                .method = @field(field.field_type, "method"),
+                .params = params,
+            });
+        }
+    }
 }
 
 /// Processes an `initialize` message

@@ -6,6 +6,8 @@ const window = @import("window.zig");
 const text_sync = @import("text_sync.zig");
 
 pub const NotificationMessage = struct {
+    jsonrpc: []const u8 = "2.0",
+
     /// The method to be invoked.
     method: []const u8,
 
