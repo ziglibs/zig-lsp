@@ -17,9 +17,11 @@ pub const NotificationMessage = struct {
 
 pub const NotificationParams = union(enum) {
     // General
+    progress: ProgressParams,
     initialized: general.InitializedParams,
 
     // Window
+    show_message: window.ShowMessageParams,
     log_message: window.LogMessageParams,
 
     // Text Sync
@@ -30,9 +32,11 @@ pub const NotificationParams = union(enum) {
 /// Params of a request (params)
 pub const NotificationParseTarget = union(enum) {
     // General
+    progress: common.Paramsify(ProgressParams),
     initialized: common.Paramsify(general.InitializedParams),
 
     // Window
+    show_message: common.Paramsify(window.ShowMessageParams),
     log_message: common.Paramsify(window.LogMessageParams),
 
     // Text Sync
@@ -51,4 +55,32 @@ pub const NotificationParseTarget = union(enum) {
 
         unreachable;
     }
+};
+
+pub const ProgressToken = union(enum) {
+    integer: common.integer,
+    string: []const u8,
+};
+
+// TODO: Generic T used; what the hell does that mean??
+pub const ProgressValue = union(enum) {
+    integer: common.integer,
+    string: []const u8,
+};
+
+/// The base protocol offers also support to report progress in a generic fashion.
+/// This mechanism can be used to report any kind of progress including work done progress
+/// (usually used to report progress in the user interface using a progress bar)
+/// and partial result progress to support streaming of results.
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#progress)
+pub const ProgressParams = struct {
+    pub const method = "$/progress";
+    pub const kind = common.PacketKind.notification;
+
+    /// The progress token provided by the client or server.
+    token: ProgressToken,
+
+    /// The progress data.
+    value: ProgressValue,
 };

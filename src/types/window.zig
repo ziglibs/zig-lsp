@@ -15,6 +15,20 @@ pub const MessageType = enum(i64) {
     }
 };
 
+/// The show message notification is sent from a server to a client to ask the client to display a particular message in the user interface..
+///
+/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/#window_showMessage)
+pub const ShowMessageParams = struct {
+    pub const method = "window/showMessage";
+    pub const kind = common.PacketKind.notification;
+
+    /// The message type. See `MessageType`.
+    @"type": MessageType,
+
+    /// The actual message.
+    message: []const u8,
+};
+
 /// The log message notification is sent from the server to the client to ask the client to log a particular message.
 ///
 /// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-16/#window_logMessage)

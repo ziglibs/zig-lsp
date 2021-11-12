@@ -27,6 +27,10 @@ pub const RequestParams = union(enum) {
     // General
     initialize: general.InitializeParams,
 
+    // Window
+    // show_message_request
+    // show_document
+
     // Language Features
     completion: language_features.CompletionParams,
 };
@@ -64,34 +68,6 @@ pub const CancelParams = struct {
 
     /// The request id to cancel.
     id: common.RequestId,
-};
-
-pub const ProgressToken = union(enum) {
-    integer: common.integer,
-    string: []const u8,
-};
-
-// TODO: Generic T used; what the hell does that mean??
-pub const ProgressValue = union(enum) {
-    integer: common.integer,
-    string: []const u8,
-};
-
-/// The base protocol offers also support to report progress in a generic fashion.
-/// This mechanism can be used to report any kind of progress including work done progress
-/// (usually used to report progress in the user interface using a progress bar)
-/// and partial result progress to support streaming of results.
-///
-/// [Docs](https://microsoft.github.io/language-server-protocol/specifications/specification-3-17/#progress)
-pub const ProgressParams = struct {
-    pub const method = "$/progress";
-    pub const kind = common.PacketKind.notification;
-
-    /// The progress token provided by the client or server.
-    token: ProgressToken,
-
-    /// The progress data.
-    value: ProgressValue,
 };
 
 pub const DidChangeWorkspaceFoldersParams = struct {
