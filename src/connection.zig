@@ -1,6 +1,58 @@
 const std = @import("std");
 const tres = @import("tres");
-pub const lsp = @import("lsp");
+const Header = @import("Header.zig");
+const lsp = @import("lsp.zig");
+
+pub fn NotificationParams(comptime method: []const u8) type {
+    for (lsp.notification_metadata) |notif| {
+        if (std.mem.eql(u8, method, notif.method)) return notif.Params orelse void;
+    }
+
+    @compileError("Couldn't find notification named " ++ method);
+}
+
+pub fn RequestParams(comptime method: []const u8) type {
+    for (lsp.request_metadata) |req| {
+        if (std.mem.eql(u8, method, req.method)) return req.Params orelse void;
+    }
+
+    @compileError("Couldn't find notification named " ++ method);
+}
+
+pub fn RequestResult(comptime method: []const u8) type {
+    for (lsp.request_metadata) |req| {
+        if (std.mem.eql(u8, method, req.method)) return req.Result orelse void;
+    }
+
+    @compileError("Couldn't find notification named " ++ method);
+}
+
+const StoredCallback = struct { onResponse: *const fn () void, onError: *const fn () void };
+pub fn RequestCallback(
+    HandlerType: type,
+    ResultType: type,
+) type {
+    return struct {
+        const Self = @This();
+
+        onResponse: *const fn (handler: *HandlerType, result: ResultType) anyerror!void,
+        onError: *const fn (handler: *HandlerType) anyerror!void,
+
+        pub fn store(self: Self) StoredCallback {
+            return .{
+                .onResponse = @ptrCast(*const fn () void, self.onResponse),
+                .onError = @ptrCast(*const fn () void, self.onError),
+            };
+        }
+
+        pub fn unstore(stored: StoredCallback) Self {
+            return .{
+                .onResponse = @ptrCast(*const fn () void, stored.onResponse),
+                .onError = @ptrCast(*const fn () void, stored.onError),
+            };
+        }
+    };
+}
 
 pub fn Connection(
     comptime ReaderType: type,
@@ -13,17 +65,20 @@ pub fn Connection(
         allocator: std.mem.Allocator,
         reader: ReaderType,
         writer: WriterType,
-        handler: Handler,
+        handler: HandlerType,
 
-        header_buffer: std.ArrayListUnmanaged(u8) = .{},
+        id: usize = 0,
+        write_buffer: std.ArrayListUnmanaged(u8) = .{},
+        callback_map: std.AutoHashMapUnmanaged(usize, StoredCallback) = .{},
 
         pub fn init(
             allocator: std.mem.Allocator,
             reader: ReaderType,
             writer: WriterType,
-            handler: Handler,
+            handler: HandlerType,
         ) Self {
             return .{
+                .allocator = allocator,
                 .reader = reader,
                 .writer = writer,
                 .handler = handler,
@@ -58,12 +113,56 @@ pub fn Connection(
 
                 conn.handleRequest(arena, tree, id, method);
             } else if (maybe_id) |id| {
+                _ = id;
                 @panic("TODO: Handle response");
             } else if (maybe_method) |method| {
+                _ = method;
                 @panic("TODO: Handle notification");
             } else {
                 @panic("Invalid JSON-RPC message.");
             }
+        }
+
+        pub fn send(
+            conn: *Self,
+            value: anytype,
+        ) !void {
+            conn.write_buffer.items.len = 0;
+            try tres.stringify(value, .{}, conn.write_buffer.writer(conn.allocator));
+
+            try Header.encode(.{
+                .content_length = conn.write_buffer.items.len,
+            }, conn.writer);
+            try conn.writer.writeAll(conn.write_buffer.items);
+        }
+
+        pub fn notify(
+            conn: *Self,
+            comptime method: []const u8,
+            params: NotificationParams(method),
+        ) !void {
+            try conn.send(.{
+                .jsonrpc = "2.0",
+                .method = method,
+                .params = params,
+            });
+        }
+
+        pub fn request(
+            conn: *Self,
+            comptime method: []const u8,
+            params: RequestParams(method),
+            callback: RequestCallback,
+        ) !void {
+            try conn.send(.{
+                .jsonrpc = "2.0",
+                .method = method,
+                .params = params,
+            });
+
+            conn.callback_map.put(conn.allocator, conn.id, callback.toStored());
+
+            conn.id +%= 1;
         }
 
         pub fn handleRequest(
@@ -81,7 +180,7 @@ pub fn Connection(
                     const params = func_info.params;
                     if (params.len != 3) @compileError("Handler function has invalid number of parameters");
                     const handler_param_type = params[0].type;
-                    if (handler_param_type != HandlerType and handler_param_type != *HandlerType and handler_param_type != *const HandlerType) @compileError("First parameter of all handlers should be the handler instance");
+                    if (handler_param_type != *HandlerType) @compileError("First parameter of all handlers should be the handler instance");
                     const id_type = params[1].type;
                     if (id != lsp.RequestId) @compileError("Expected RequestId found " ++ @typeName(id_type));
                     const params_type = params[2].type;
@@ -91,10 +190,7 @@ pub fn Connection(
                     if (func_info.return_type != entry.Result) @compileError("Expected " ++ @typeName(entry.Result) ++ " found " ++ @typeName(func_info.return_type));
 
                     const output = handler_func(conn.handler, id, try tres.parse(entry.Params, value, arena));
-                    // tres.stringify(
-                    //     output,
-                    //     .{},
-                    // );
+                    std.log.info("{s}", .{output});
                 } else {
                     // TODO: Return error unimplemented
                     std.log.warn("Client asked for unimplemented method: {s}", .{method});
@@ -106,16 +202,4 @@ pub fn Connection(
             @panic("Unknown");
         }
     };
-}
-
-pub const FileConnection = Connection(std.fs.File.Reader, std.fs.File.Writer);
-
-/// Raw stdio connection, probably not the most efficient
-pub fn initStdioConnection(allocator: std.mem.Allocator, handler: anytype) FileConnection {
-    return FileConnection.init(
-        allocator,
-        std.io.getStdIn().reader(),
-        std.io.getStdOut().writer(),
-        @TypeOf(handler),
-    );
 }
