@@ -1218,7 +1218,7 @@ pub const SelectionRange = struct {
     range: Range,
     /// The parent selection range containing this range. Therefore `parent.range` must contain `this.range`.
     /// field can be undefined, but this possible state is non-critical
-    parent: ?SelectionRange = null,
+    parent: ?*SelectionRange = null,
 };
 
 pub const SelectionRangeRegistrationOptions = struct {

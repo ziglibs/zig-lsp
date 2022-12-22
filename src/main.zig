@@ -1,5 +1,6 @@
 const std = @import("std");
-pub const connection = @import("connection.zig");
+const lsp = @import("lsp.zig");
+const connection = @import("connection.zig");
 
 pub const Handler = struct {
     pub const Error = error{};
@@ -23,7 +24,7 @@ pub fn main() !void {
     const Connection = connection.Connection(
         @TypeOf(reader),
         @TypeOf(writer),
-        struct {},
+        Handler,
     );
 
     var conn = Connection.init(
@@ -43,7 +44,7 @@ pub fn main() !void {
     });
 
     const cb = struct {
-        pub fn res(handler: *Handler, result: connection.lsp.InitializeResult) !void {
+        pub fn res(handler: *Handler, result: lsp.InitializeResult) !void {
             std.log.info("bruh", .{});
             _ = handler;
             _ = result;
@@ -57,6 +58,7 @@ pub fn main() !void {
     try conn.request("initialize", .{
         .capabilities = .{},
     }, .{ .onResponse = cb.res, .onError = cb.err });
+    try conn.callSuccessCallback(0);
 
     // while (true) {
     //     try conn.accept();

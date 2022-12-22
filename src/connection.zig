@@ -21,25 +21,33 @@ pub fn RequestParams(comptime method: []const u8) type {
 
 pub fn RequestResult(comptime method: []const u8) type {
     for (lsp.request_metadata) |req| {
-        if (std.mem.eql(u8, method, req.method)) return req.Result orelse void;
+        if (std.mem.eql(u8, method, req.method)) return req.Result;
     }
 
     @compileError("Couldn't find notification named " ++ method);
 }
 
-const StoredCallback = struct { onResponse: *const fn () void, onError: *const fn () void };
+const StoredCallback = struct {
+    method: []const u8,
+    onResponse: *const fn () void,
+    onError: *const fn () void,
+};
 pub fn RequestCallback(
-    HandlerType: type,
-    ResultType: type,
+    comptime HandlerType: type,
+    comptime method: []const u8,
 ) type {
     return struct {
         const Self = @This();
 
-        onResponse: *const fn (handler: *HandlerType, result: ResultType) anyerror!void,
-        onError: *const fn (handler: *HandlerType) anyerror!void,
+        const OnResponse = *const fn (handler: *HandlerType, result: RequestResult(method)) anyerror!void;
+        const OnError = *const fn (handler: *HandlerType) anyerror!void;
+
+        onResponse: OnResponse,
+        onError: OnError,
 
         pub fn store(self: Self) StoredCallback {
             return .{
+                .method = method,
                 .onResponse = @ptrCast(*const fn () void, self.onResponse),
                 .onError = @ptrCast(*const fn () void, self.onError),
             };
@@ -47,8 +55,8 @@ pub fn RequestCallback(
 
         pub fn unstore(stored: StoredCallback) Self {
             return .{
-                .onResponse = @ptrCast(*const fn () void, stored.onResponse),
-                .onError = @ptrCast(*const fn () void, stored.onError),
+                .onResponse = @ptrCast(OnResponse, stored.onResponse),
+                .onError = @ptrCast(OnError, stored.onError),
             };
         }
     };
@@ -152,7 +160,7 @@ pub fn Connection(
             conn: *Self,
             comptime method: []const u8,
             params: RequestParams(method),
-            callback: RequestCallback,
+            callback: RequestCallback(HandlerType, method),
         ) !void {
             try conn.send(.{
                 .jsonrpc = "2.0",
@@ -160,9 +168,22 @@ pub fn Connection(
                 .params = params,
             });
 
-            conn.callback_map.put(conn.allocator, conn.id, callback.toStored());
+            try conn.callback_map.put(conn.allocator, conn.id, callback.store());
 
             conn.id +%= 1;
+        }
+
+        pub fn callSuccessCallback(
+            conn: *Self,
+            id: usize,
+        ) !void {
+            // TODO: Handle
+            const entry = conn.callback_map.fetchRemove(id) orelse @panic("nothing!");
+            inline for (lsp.request_metadata) |req| {
+                if (std.mem.eql(u8, req.method, entry.value.method)) {
+                    try (RequestCallback(HandlerType, req.method).unstore(entry.value).onResponse(&conn.handler, undefined));
+                }
+            }
         }
 
         pub fn handleRequest(
