@@ -5,6 +5,8 @@ const connection = @import("connection.zig");
 pub const Handler = struct {
     pub const Error = error{};
 
+    done: bool = false,
+
     // pub fn initialize(
     //     handler: *Handler,
     //     id: connection.lsp.RequestId,
@@ -19,46 +21,111 @@ pub const Handler = struct {
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
-    var reader = std.io.getStdIn().reader();
-    var writer = std.io.getStdOut().writer();
+    var process = std.ChildProcess.init(&.{ "typescript-language-server", "--stdio" }, allocator);
+
+    process.stdin_behavior = .Pipe;
+    process.stdout_behavior = .Pipe;
+
+    try process.spawn();
+    defer _ = process.kill() catch {};
+
+    var reader = process.stdout.?.reader();
+    var writer = process.stdin.?.writer();
     const Connection = connection.Connection(
         @TypeOf(reader),
         @TypeOf(writer),
         Handler,
     );
 
+    var handler = Handler{};
     var conn = Connection.init(
         allocator,
         reader,
         writer,
-        .{},
+        &handler,
     );
 
-    try conn.notify("textDocument/didOpen", .{
-        .textDocument = .{
-            .uri = "uri",
-            .languageId = "abc",
-            .version = 123,
-            .text = "bruh",
-        },
-    });
-
     const cb = struct {
-        pub fn res(handler: *Handler, result: lsp.InitializeResult) !void {
-            std.log.info("bruh", .{});
-            _ = handler;
-            _ = result;
+        pub fn res(h: *Handler, result: lsp.InitializeResult) !void {
+            std.log.info("bruh {any}", .{result});
+            h.done = true;
         }
 
-        pub fn err(handler: *Handler) !void {
-            _ = handler;
+        pub fn err(h: *Handler) !void {
+            _ = h;
         }
     };
 
     try conn.request("initialize", .{
-        .capabilities = .{},
+        .capabilities = .{
+            .textDocument = .{
+                .documentSymbol = .{
+                    .hierarchicalDocumentSymbolSupport = true,
+                },
+            },
+        },
     }, .{ .onResponse = cb.res, .onError = cb.err });
-    try conn.callSuccessCallback(0);
+
+    while (!handler.done) {
+        try conn.accept();
+    }
+    handler.done = false;
+
+    try conn.notify("textDocument/didOpen", .{
+        .textDocument = .{
+            .uri = "file:///file.js",
+            .languageId = "js",
+            .version = 123,
+            .text = 
+            \\/**
+            \\ * @type {number}
+            \\ */
+            \\var abc = 123;
+            ,
+        },
+    });
+
+    const cb2 = struct {
+        pub fn res(h: *Handler, result: connection.RequestResult("textDocument/documentSymbol")) !void {
+            std.log.info("bruh {any}", .{result.?.array_of_DocumentSymbol});
+            h.done = true;
+        }
+
+        pub fn err(h: *Handler) !void {
+            _ = h;
+        }
+    };
+
+    try conn.request("textDocument/documentSymbol", .{
+        .textDocument = .{
+            .uri = "file:///file.js",
+        },
+    }, .{
+        .onResponse = cb2.res,
+        .onError = cb2.err,
+    });
+
+    while (!handler.done) {
+        try conn.accept();
+    }
+    handler.done = false;
+
+    // const cb = struct {
+    //     pub fn res(handler: *Handler, result: lsp.InitializeResult) !void {
+    //         std.log.info("bruh", .{});
+    //         _ = handler;
+    //         _ = result;
+    //     }
+
+    //     pub fn err(handler: *Handler) !void {
+    //         _ = handler;
+    //     }
+    // };
+
+    // try conn.request("initialize", .{
+    //     .capabilities = .{},
+    // }, .{ .onResponse = cb.res, .onError = cb.err });
+    // try conn.callSuccessCallback(0);
 
     // while (true) {
     //     try conn.accept();

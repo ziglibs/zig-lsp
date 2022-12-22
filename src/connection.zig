@@ -73,17 +73,19 @@ pub fn Connection(
         allocator: std.mem.Allocator,
         reader: ReaderType,
         writer: WriterType,
-        handler: HandlerType,
+        handler: *HandlerType,
 
         id: usize = 0,
         write_buffer: std.ArrayListUnmanaged(u8) = .{},
+
+        // TODO: Handle string ids
         callback_map: std.AutoHashMapUnmanaged(usize, StoredCallback) = .{},
 
         pub fn init(
             allocator: std.mem.Allocator,
             reader: ReaderType,
             writer: WriterType,
-            handler: HandlerType,
+            handler: *HandlerType,
         ) Self {
             return .{
                 .allocator = allocator,
@@ -91,44 +93,6 @@ pub fn Connection(
                 .writer = writer,
                 .handler = handler,
             };
-        }
-
-        pub const AcceptError = std.mem.Allocator.Error || ReaderType.Error || WriterType.Error || HandlerType.Error;
-
-        pub fn accept(conn: *Self) AcceptError!void {
-            var arena = std.heap.ArenaAllocator.init(conn.allocator);
-            defer arena.deinit();
-
-            const allocator = arena.allocator();
-
-            var data = "";
-            var parser = std.json.Parser.init(allocator, false);
-            defer parser.deinit();
-
-            var tree = try parser.parse(data);
-
-            // There are three cases at this point:
-            // 1. We have a request (id + method)
-            // 2. We have a response (id)
-            // 3. We have a notification (method)
-
-            const maybe_id = tree.Object.get("id");
-            const maybe_method = tree.Object.get("method");
-
-            if (maybe_id != null and maybe_method != null) {
-                const id = try tres.parse(lsp.RequestId, maybe_id.?);
-                const method = maybe_method.?.String;
-
-                conn.handleRequest(arena, tree, id, method);
-            } else if (maybe_id) |id| {
-                _ = id;
-                @panic("TODO: Handle response");
-            } else if (maybe_method) |method| {
-                _ = method;
-                @panic("TODO: Handle notification");
-            } else {
-                @panic("Invalid JSON-RPC message.");
-            }
         }
 
         pub fn send(
@@ -164,6 +128,7 @@ pub fn Connection(
         ) !void {
             try conn.send(.{
                 .jsonrpc = "2.0",
+                .id = conn.id,
                 .method = method,
                 .params = params,
             });
@@ -173,16 +138,71 @@ pub fn Connection(
             conn.id +%= 1;
         }
 
-        pub fn callSuccessCallback(
-            conn: *Self,
-            id: usize,
-        ) !void {
-            // TODO: Handle
-            const entry = conn.callback_map.fetchRemove(id) orelse @panic("nothing!");
-            inline for (lsp.request_metadata) |req| {
-                if (std.mem.eql(u8, req.method, entry.value.method)) {
-                    try (RequestCallback(HandlerType, req.method).unstore(entry.value).onResponse(&conn.handler, undefined));
+        // pub fn callSuccessCallback(
+        //     conn: *Self,
+        //     id: usize,
+        // ) !void {
+        //     // TODO: Handle
+        //     const entry = conn.callback_map.fetchRemove(id) orelse @panic("nothing!");
+        //     inline for (lsp.request_metadata) |req| {
+        //         if (std.mem.eql(u8, req.method, entry.value.method)) {
+        //             try (RequestCallback(HandlerType, req.method).unstore(entry.value).onResponse(&conn.handler, undefined));
+        //         }
+        //     }
+        // }
+
+        pub fn accept(conn: *Self) !void {
+            var arena = std.heap.ArenaAllocator.init(conn.allocator);
+            defer arena.deinit();
+
+            const allocator = arena.allocator();
+
+            const header = try Header.decode(allocator, conn.reader);
+
+            var data = try allocator.alloc(u8, header.content_length);
+            _ = try conn.reader.readAll(data);
+
+            var parser = std.json.Parser.init(allocator, false);
+            defer parser.deinit();
+
+            var tree = (try parser.parse(data)).root;
+
+            // There are three cases at this point:
+            // 1. We have a request (id + method)
+            // 2. We have a response (id)
+            // 3. We have a notification (method)
+
+            const maybe_id = tree.Object.get("id");
+            const maybe_method = tree.Object.get("method");
+
+            if (maybe_id != null and maybe_method != null) {
+                std.log.info("Received request {s}", .{maybe_method.?.String});
+                // const id = try tres.parse(lsp.RequestId, maybe_id.?, allocator);
+                // const method = maybe_method.?.String;
+
+                // try conn.handleRequest(allocator, tree, id, method);
+            } else if (maybe_id) |id| {
+                std.log.info("Received response {d}", .{maybe_id.?.Integer});
+                @setEvalBranchQuota(100_000);
+
+                // TODO: Handle errors
+                const iid = @intCast(usize, id.Integer);
+
+                const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
+                inline for (lsp.request_metadata) |req| {
+                    if (std.mem.eql(u8, req.method, entry.value.method)) {
+                        const value = try tres.parse(RequestResult(req.method), tree.Object.get("result").?, allocator);
+                        try (RequestCallback(HandlerType, req.method).unstore(entry.value).onResponse(conn.handler, value));
+                        return;
+                    }
                 }
+
+                @panic("Received response to non-existent request");
+            } else if (maybe_method) |method| {
+                std.log.info("Notifications not handled: {s}", .{method.String});
+                // @panic("TODO: Handle notification");
+            } else {
+                @panic("Invalid JSON-RPC message.");
             }
         }
 
