@@ -142,18 +142,18 @@ pub fn Connection(
             conn.id +%= 1;
         }
 
-        // pub fn callSuccessCallback(
-        //     conn: *Self,
-        //     id: usize,
-        // ) !void {
-        //     // TODO: Handle
-        //     const entry = conn.callback_map.fetchRemove(id) orelse @panic("nothing!");
-        //     inline for (lsp.request_metadata) |req| {
-        //         if (std.mem.eql(u8, req.method, entry.value.method)) {
-        //             try (RequestCallback(ContextType, req.method).unstore(entry.value).onResponse(&conn.context, undefined));
-        //         }
-        //     }
-        // }
+        pub fn respond(
+            conn: *Self,
+            comptime method: []const u8,
+            id: lsp.RequestId,
+            result: RequestResult(method),
+        ) !void {
+            try conn.send(.{
+                .jsonrpc = "2.0",
+                .id = id,
+                .result = result,
+            });
+        }
 
         pub fn accept(conn: *Self) !void {
             var arena = std.heap.ArenaAllocator.init(conn.allocator);
@@ -180,11 +180,28 @@ pub fn Connection(
             const maybe_method = tree.Object.get("method");
 
             if (maybe_id != null and maybe_method != null) {
-                std.log.info("Received request {s}", .{maybe_method.?.String});
-                // const id = try tres.parse(lsp.RequestId, maybe_id.?, allocator);
-                // const method = maybe_method.?.String;
+                const id = maybe_id.?;
+                const method = maybe_method.?.String;
 
-                // try conn.handleRequest(allocator, tree, id, method);
+                inline for (lsp.request_metadata) |req| {
+                    if (@hasDecl(ContextType, req.method)) {
+                        if (std.mem.eql(u8, req.method, method.String)) {
+                            const value = try tres.parse(NotificationParams(req.method), tree.Object.get("params").?, allocator);
+                            try conn.respond(req.method, id, try @field(ContextType, req.method)(conn, id, value));
+                            return;
+                        }
+                    }
+                }
+
+                // TODO: Are ids shared between server and client or not? If not, we can remove the line below
+                conn.id +%= 1;
+
+                std.log.warn("Request not handled: {s}", .{method});
+                try conn.send(.{
+                    .jsonrpc = "2.0",
+                    .id = id,
+                    .@"error" = .{ .code = -32601, .message = "NotImplemented" },
+                });
             } else if (maybe_id) |id| {
                 @setEvalBranchQuota(100_000);
 
@@ -200,7 +217,7 @@ pub fn Connection(
                     }
                 }
 
-                @panic("Received response to non-existent request");
+                std.log.warn("Received unhandled response: {d}", .{iid});
             } else if (maybe_method) |method| {
                 inline for (lsp.notification_metadata) |notif| {
                     if (@hasDecl(ContextType, notif.method)) {
@@ -212,9 +229,7 @@ pub fn Connection(
                     }
                 }
 
-                std.log.info("Notifications not handled: {s}", .{method.String});
-
-                // @panic("TODO: Handle notification");
+                std.log.warn("Notification not handled: {s}", .{method.String});
             } else {
                 @panic("Invalid JSON-RPC message.");
             }
@@ -226,43 +241,6 @@ pub fn Connection(
                 try conn.accept();
                 if (initial_size != conn.callback_map.size) return;
             }
-        }
-
-        pub fn handleRequest(
-            conn: *Self,
-            arena: std.mem.Allocator,
-            value: std.json.Value,
-            id: lsp.RequestId,
-            method: []const u8,
-        ) !void {
-            inline for (lsp.request_metadata) |entry| {
-                if (@hasDecl(ContextType, entry.method)) {
-                    const context_func = @field(ContextType, entry.method);
-                    const func_info = @Type(context_func).Fn;
-
-                    const params = func_info.params;
-                    if (params.len != 3) @compileError("Handler function has invalid number of parameters");
-                    const context_param_type = params[0].type;
-                    if (context_param_type != *ContextType) @compileError("First parameter of all contexts should be the context instance");
-                    const id_type = params[1].type;
-                    if (id != lsp.RequestId) @compileError("Expected RequestId found " ++ @typeName(id_type));
-                    const params_type = params[2].type;
-                    if (params_type != entry.Params) @compileError("Expected " ++ @typeName(entry.Params) ++ " found " ++ @typeName(params_type));
-
-                    // TODO: Handle errors
-                    if (func_info.return_type != entry.Result) @compileError("Expected " ++ @typeName(entry.Result) ++ " found " ++ @typeName(func_info.return_type));
-
-                    const output = context_func(conn.context, id, try tres.parse(entry.Params, value, arena));
-                    std.log.info("{s}", .{output});
-                } else {
-                    // TODO: Return error unimplemented
-                    std.log.warn("Client asked for unimplemented method: {s}", .{method});
-                }
-            }
-
-            // TODO: Support custom method contexts
-            std.log.err("Encountered unknown method: {s}", .{method});
-            @panic("Unknown");
         }
     };
 }
