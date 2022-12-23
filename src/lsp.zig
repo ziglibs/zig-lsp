@@ -328,7 +328,7 @@ pub const Pattern = []const u8;
 ///
 /// @since 3.16.0
 pub const SemanticTokenTypes = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     namespace,
     /// Represents a generic type. Acts as a fallback for types which can't be mapped to
@@ -364,7 +364,7 @@ pub const SemanticTokenTypes = enum {
 ///
 /// @since 3.16.0
 pub const SemanticTokenModifiers = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     declaration,
     definition,
@@ -382,7 +382,7 @@ pub const SemanticTokenModifiers = enum {
 ///
 /// @since 3.17.0
 pub const DocumentDiagnosticReportKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// A diagnostic report with a full
     /// set of problems.
@@ -435,7 +435,7 @@ pub const LSPErrorCodes = enum(i64) {
 
 /// A set of predefined range kinds.
 pub const FoldingRangeKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// Folding range for a comment
     comment,
@@ -488,7 +488,7 @@ pub const SymbolTag = enum(u64) {
 ///
 /// @since 3.16.0
 pub const UniquenessLevel = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// The moniker is only unique inside a document
     document,
@@ -506,7 +506,7 @@ pub const UniquenessLevel = enum {
 ///
 /// @since 3.16.0
 pub const MonikerKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// The moniker represent a symbol that is imported into a project
     import,
@@ -721,7 +721,7 @@ pub const CodeActionKind = enum {
 };
 
 pub const TraceValues = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// Turn tracing off.
     off,
@@ -737,7 +737,7 @@ pub const TraceValues = enum {
 /// Please note that `MarkupKinds` must not start with a `$`. This kinds
 /// are reserved for internal usage.
 pub const MarkupKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// Plain text is supported as a content format
     plaintext,
@@ -749,7 +749,7 @@ pub const MarkupKind = enum {
 ///
 /// @since 3.17.0
 pub const PositionEncodingKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// Character offsets count UTF-8 code units.
     @"utf-8",
@@ -854,7 +854,7 @@ pub const CodeActionTriggerKind = enum(u64) {
 ///
 /// @since 3.16.0
 pub const FileOperationPatternKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// The pattern matches a file only.
     file,
@@ -873,7 +873,7 @@ pub const NotebookCellKind = enum(u64) {
 };
 
 pub const ResourceOperationKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// Supports creating new files and folders.
     create,
@@ -884,7 +884,7 @@ pub const ResourceOperationKind = enum {
 };
 
 pub const FailureHandlingKind = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     /// Applying the workspace change is simply aborted if one of the changes provided
     /// fails. All operations executed before the failing operation stay executed.
@@ -909,7 +909,7 @@ pub const PrepareSupportDefaultBehavior = enum(u64) {
 };
 
 pub const TokenFormat = enum {
-    const tres_string_enum = {};
+    pub const tres_string_enum = {};
 
     relative,
     placeholder__, // fixes alignment issue
