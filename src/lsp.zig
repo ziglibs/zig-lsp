@@ -74,7 +74,7 @@ test {
 
 // Type Aliases
 
-/// The definition of a symbol represented as one or many {@link Location locations}.
+/// The definition of a symbol represented as one or many [locations](#Location).
 /// For most programming languages there is only one location at which a symbol is
 /// defined.
 ///
@@ -82,24 +82,24 @@ test {
 /// by the client.
 pub const Definition = union(enum) {
     Location: Location,
-    array_of_Location: []Location,
+    array_of_Location: []const Location,
 };
 
 /// Information about where a symbol is defined.
 ///
-/// Provides additional metadata over normal {@link Location location} definitions, including the range of
+/// Provides additional metadata over normal [location](#Location) definitions, including the range of
 /// the defining symbol
 pub const DefinitionLink = LocationLink;
 
-/// The declaration of a symbol representation as one or many {@link Location locations}.
+/// The declaration of a symbol representation as one or many [locations](#Location).
 pub const Declaration = union(enum) {
     Location: Location,
-    array_of_Location: []Location,
+    array_of_Location: []const Location,
 };
 
 /// Information about where a symbol is declared.
 ///
-/// Provides additional metadata over normal {@link Location location} declarations, including the range of
+/// Provides additional metadata over normal [location](#Location) declarations, including the range of
 /// the declaring symbol.
 ///
 /// Servers should prefer returning `DeclarationLink` over `Declaration` if supported
@@ -142,17 +142,17 @@ pub const PrepareRenameResult = union(enum) {
     },
 };
 
+pub const ProgressToken = union(enum) {
+    integer: i64,
+    string: []const u8,
+};
+
 /// A document selector is the combination of one or many document filters.
 ///
 /// @sample `let sel:DocumentSelector = [{ language: 'typescript' }, { language: 'json', pattern: '**∕tsconfig.json' }]`;
 ///
 /// The use of a string as a document filter is deprecated @since 3.16.0.
-pub const DocumentSelector = []DocumentFilter;
-
-pub const ProgressToken = union(enum) {
-    integer: i64,
-    string: []const u8,
-};
+pub const DocumentSelector = []const DocumentFilter;
 
 /// An identifier to refer to a change annotation stored with a workspace edit.
 pub const ChangeAnnotationIdentifier = []const u8;
@@ -223,8 +223,8 @@ pub const GlobPattern = union(enum) {
 };
 
 /// A document filter denotes a document by different properties like
-/// the {@link TextDocument.languageId language}, the {@link Uri.scheme scheme} of
-/// its resource, or a glob-pattern that is applied to the {@link TextDocument.fileName path}.
+/// the [language](#TextDocument.languageId), the [scheme](#Uri.scheme) of
+/// its resource, or a glob-pattern that is applied to the [path](#TextDocument.fileName).
 ///
 /// Glob patterns can have the following syntax:
 /// - `*` to match one or more characters in a path segment
@@ -242,7 +242,7 @@ pub const TextDocumentFilter = union(enum) {
     literal_0: struct {
         /// A language id, like `typescript`.
         language: []const u8,
-        /// A Uri {@link Uri.scheme scheme}, like `file` or `untitled`.
+        /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern, like `*.{ts,js}`.
@@ -253,7 +253,7 @@ pub const TextDocumentFilter = union(enum) {
         /// A language id, like `typescript`.
         /// field can be undefined, but this possible state is non-critical
         language: ?[]const u8 = null,
-        /// A Uri {@link Uri.scheme scheme}, like `file` or `untitled`.
+        /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         scheme: []const u8,
         /// A glob pattern, like `*.{ts,js}`.
         /// field can be undefined, but this possible state is non-critical
@@ -263,7 +263,7 @@ pub const TextDocumentFilter = union(enum) {
         /// A language id, like `typescript`.
         /// field can be undefined, but this possible state is non-critical
         language: ?[]const u8 = null,
-        /// A Uri {@link Uri.scheme scheme}, like `file` or `untitled`.
+        /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern, like `*.{ts,js}`.
@@ -280,7 +280,7 @@ pub const NotebookDocumentFilter = union(enum) {
     literal_0: struct {
         /// The type of the enclosing notebook.
         notebookType: []const u8,
-        /// A Uri {@link Uri.scheme scheme}, like `file` or `untitled`.
+        /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern.
@@ -291,7 +291,7 @@ pub const NotebookDocumentFilter = union(enum) {
         /// The type of the enclosing notebook.
         /// field can be undefined, but this possible state is non-critical
         notebookType: ?[]const u8 = null,
-        /// A Uri {@link Uri.scheme scheme}, like `file` or `untitled`.
+        /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         scheme: []const u8,
         /// A glob pattern.
         /// field can be undefined, but this possible state is non-critical
@@ -301,7 +301,7 @@ pub const NotebookDocumentFilter = union(enum) {
         /// The type of the enclosing notebook.
         /// field can be undefined, but this possible state is non-critical
         notebookType: ?[]const u8 = null,
-        /// A Uri {@link Uri.scheme scheme}, like `file` or `untitled`.
+        /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern.
@@ -328,7 +328,7 @@ pub const Pattern = []const u8;
 ///
 /// @since 3.16.0
 pub const SemanticTokenTypes = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     namespace,
     /// Represents a generic type. Acts as a fallback for types which can't be mapped to
@@ -364,7 +364,7 @@ pub const SemanticTokenTypes = enum {
 ///
 /// @since 3.16.0
 pub const SemanticTokenModifiers = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     declaration,
     definition,
@@ -382,7 +382,7 @@ pub const SemanticTokenModifiers = enum {
 ///
 /// @since 3.17.0
 pub const DocumentDiagnosticReportKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// A diagnostic report with a full
     /// set of problems.
@@ -435,7 +435,7 @@ pub const LSPErrorCodes = enum(i64) {
 
 /// A set of predefined range kinds.
 pub const FoldingRangeKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// Folding range for a comment
     comment,
@@ -488,7 +488,7 @@ pub const SymbolTag = enum(u64) {
 ///
 /// @since 3.16.0
 pub const UniquenessLevel = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// The moniker is only unique inside a document
     document,
@@ -506,7 +506,7 @@ pub const UniquenessLevel = enum {
 ///
 /// @since 3.16.0
 pub const MonikerKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// The moniker represent a symbol that is imported into a project
     import,
@@ -721,7 +721,7 @@ pub const CodeActionKind = enum {
 };
 
 pub const TraceValues = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// Turn tracing off.
     off,
@@ -737,7 +737,7 @@ pub const TraceValues = enum {
 /// Please note that `MarkupKinds` must not start with a `$`. This kinds
 /// are reserved for internal usage.
 pub const MarkupKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// Plain text is supported as a content format
     plaintext,
@@ -749,7 +749,7 @@ pub const MarkupKind = enum {
 ///
 /// @since 3.17.0
 pub const PositionEncodingKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// Character offsets count UTF-8 code units.
     @"utf-8",
@@ -854,7 +854,7 @@ pub const CodeActionTriggerKind = enum(u64) {
 ///
 /// @since 3.16.0
 pub const FileOperationPatternKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// The pattern matches a file only.
     file,
@@ -873,7 +873,7 @@ pub const NotebookCellKind = enum(u64) {
 };
 
 pub const ResourceOperationKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// Supports creating new files and folders.
     create,
@@ -884,7 +884,7 @@ pub const ResourceOperationKind = enum {
 };
 
 pub const FailureHandlingKind = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     /// Applying the workspace change is simply aborted if one of the changes provided
     /// fails. All operations executed before the failing operation stay executed.
@@ -909,7 +909,7 @@ pub const PrepareSupportDefaultBehavior = enum(u64) {
 };
 
 pub const TokenFormat = enum {
-    pub const tres_string_enum = {};
+    const tres_string_enum = {};
 
     relative,
     placeholder__, // fixes alignment issue
@@ -1015,10 +1015,17 @@ pub const DidChangeWorkspaceFoldersParams = struct {
 
 /// The parameters of a configuration request.
 pub const ConfigurationParams = struct {
-    items: []ConfigurationItem,
+    items: []const ConfigurationItem,
 };
 
-/// Parameters for a {@link DocumentColorRequest}.
+pub const PartialResultParams = struct {
+    /// An optional token that a server can use to report partial results (e.g. streaming) to
+    /// the client.
+    /// field can be undefined, but this possible state is non-critical
+    partialResultToken: ?ProgressToken = null,
+};
+
+/// Parameters for a [DocumentColorRequest](#DocumentColorRequest).
 pub const DocumentColorParams = struct {
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1060,7 +1067,7 @@ pub const DocumentColorRegistrationOptions = struct {
     id: ?[]const u8 = null,
 };
 
-/// Parameters for a {@link ColorPresentationRequest}.
+/// Parameters for a [ColorPresentationRequest](#ColorPresentationRequest).
 pub const ColorPresentationParams = struct {
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1085,15 +1092,15 @@ pub const ColorPresentation = struct {
     /// picker header. By default this is also the text that is inserted when selecting
     /// this color presentation.
     label: []const u8,
-    /// An {@link TextEdit edit} which is applied to a document when selecting
-    /// this presentation for the color.  When `falsy` the {@link ColorPresentation.label label}
+    /// An [edit](#TextEdit) which is applied to a document when selecting
+    /// this presentation for the color.  When `falsy` the [label](#ColorPresentation.label)
     /// is used.
     /// field can be undefined, but this possible state is non-critical
     textEdit: ?TextEdit = null,
-    /// An optional array of additional {@link TextEdit text edits} that are applied when
-    /// selecting this color presentation. Edits must not overlap with the main {@link ColorPresentation.textEdit edit} nor with themselves.
+    /// An optional array of additional [text edits](#TextEdit) that are applied when
+    /// selecting this color presentation. Edits must not overlap with the main [edit](#ColorPresentation.textEdit) nor with themselves.
     /// field can be undefined, but this possible state is non-critical
-    additionalTextEdits: ?[]TextEdit = null,
+    additionalTextEdits: ?[]const TextEdit = null,
 };
 
 pub const WorkDoneProgressOptions = struct {
@@ -1108,7 +1115,7 @@ pub const TextDocumentRegistrationOptions = struct {
     documentSelector: ?DocumentSelector = null,
 };
 
-/// Parameters for a {@link FoldingRangeRequest}.
+/// Parameters for a [FoldingRangeRequest](#FoldingRangeRequest).
 pub const FoldingRangeParams = struct {
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1141,7 +1148,7 @@ pub const FoldingRange = struct {
     endCharacter: ?u64 = null,
     /// Describes the kind of the folding range such as `comment' or 'region'. The kind
     /// is used to categorize folding ranges and used by commands like 'Fold all comments'.
-    /// See {@link FoldingRangeKind} for an enumeration of standardized kinds.
+    /// See [FoldingRangeKind](#FoldingRangeKind) for an enumeration of standardized kinds.
     /// field can be undefined, but this possible state is non-critical
     kind: ?FoldingRangeKind = null,
     /// The text that the client should show when the specified range is
@@ -1213,7 +1220,7 @@ pub const SelectionRangeParams = struct {
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The positions inside the text document.
-    positions: []Position,
+    positions: []const Position,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
     /// field can be undefined, but this possible state is non-critical
@@ -1229,11 +1236,11 @@ pub const SelectionRangeParams = struct {
 /// A selection range represents a part of a selection hierarchy. A selection range
 /// may have a parent selection range that contains it.
 pub const SelectionRange = struct {
-    /// The {@link Range range} of this selection range.
+    /// The [range](#Range) of this selection range.
     range: Range,
     /// The parent selection range containing this range. Therefore `parent.range` must contain `this.range`.
     /// field can be undefined, but this possible state is non-critical
-    parent: ?*SelectionRange = null,
+    parent: ?*const SelectionRange = null,
 };
 
 pub const SelectionRangeRegistrationOptions = struct {
@@ -1291,7 +1298,7 @@ pub const CallHierarchyItem = struct {
     kind: SymbolKind,
     /// Tags for this item.
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]SymbolTag = null,
+    tags: ?[]const SymbolTag = null,
     /// More detail for this item, e.g. the signature of a function.
     /// field can be undefined, but this possible state is non-critical
     detail: ?[]const u8 = null,
@@ -1300,7 +1307,7 @@ pub const CallHierarchyItem = struct {
     /// The range enclosing this symbol not including leading/trailing whitespace but everything else, e.g. comments and code.
     range: Range,
     /// The range that should be selected and revealed when this symbol is being picked, e.g. the name of a function.
-    /// Must be contained by the {@link CallHierarchyItem.range `range`}.
+    /// Must be contained by the [`range`](#CallHierarchyItem.range).
     selectionRange: Range,
     /// A data entry field that is preserved between a call hierarchy prepare and
     /// incoming calls or outgoing calls requests.
@@ -1353,8 +1360,8 @@ pub const CallHierarchyIncomingCall = struct {
     /// The item that makes the call.
     from: CallHierarchyItem,
     /// The ranges at which the calls appear. This is relative to the caller
-    /// denoted by {@link CallHierarchyIncomingCall.from `this.from`}.
-    fromRanges: []Range,
+    /// denoted by [`this.from`](#CallHierarchyIncomingCall.from).
+    fromRanges: []const Range,
 };
 
 /// The parameter of a `callHierarchy/outgoingCalls` request.
@@ -1381,9 +1388,9 @@ pub const CallHierarchyOutgoingCall = struct {
     /// The item that is called.
     to: CallHierarchyItem,
     /// The range at which this item is called. This is the range relative to the caller, e.g the item
-    /// passed to {@link CallHierarchyItemProvider.provideCallHierarchyOutgoingCalls `provideCallHierarchyOutgoingCalls`}
-    /// and not {@link CallHierarchyOutgoingCall.to `this.to`}.
-    fromRanges: []Range,
+    /// passed to [`provideCallHierarchyOutgoingCalls`](#CallHierarchyItemProvider.provideCallHierarchyOutgoingCalls)
+    /// and not [`this.to`](#CallHierarchyOutgoingCall.to).
+    fromRanges: []const Range,
 };
 
 /// @since 3.16.0
@@ -1411,12 +1418,12 @@ pub const SemanticTokens = struct {
     /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual tokens.
-    data: []u64,
+    data: []const u64,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensPartialResult = struct {
-    data: []u64,
+    data: []const u64,
 };
 
 /// @since 3.16.0
@@ -1481,12 +1488,12 @@ pub const SemanticTokensDelta = struct {
     /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The semantic token edits to transform a previous result into a new result.
-    edits: []SemanticTokensEdit,
+    edits: []const SemanticTokensEdit,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensDeltaPartialResult = struct {
-    edits: []SemanticTokensEdit,
+    edits: []const SemanticTokensEdit,
 };
 
 /// @since 3.16.0
@@ -1559,7 +1566,7 @@ pub const LinkedEditingRangeParams = struct {
 pub const LinkedEditingRanges = struct {
     /// A list of ranges that can be edited together. The ranges must have
     /// identical length and contain identical text content. The ranges cannot overlap.
-    ranges: []Range,
+    ranges: []const Range,
     /// An optional word pattern (regular expression) that describes valid contents for
     /// the given ranges. If no pattern is provided, the client configuration's word
     /// pattern will be used.
@@ -1591,7 +1598,7 @@ pub const LinkedEditingRangeRegistrationOptions = struct {
 /// @since 3.16.0
 pub const CreateFilesParams = struct {
     /// An array of all files/folders created in this operation.
-    files: []FileCreate,
+    files: []const FileCreate,
 };
 
 /// A workspace edit represents changes to many resources managed in the workspace. The edit
@@ -1609,7 +1616,7 @@ pub const CreateFilesParams = struct {
 pub const WorkspaceEdit = struct {
     /// Holds changes to existing resources.
     /// field can be undefined, but this possible state is non-critical
-    changes: ?Map(DocumentUri, []TextEdit) = null,
+    changes: ?Map(DocumentUri, []const TextEdit) = null,
     /// Depending on the client capability `workspace.workspaceEdit.resourceOperations` document changes
     /// are either an array of `TextDocumentEdit`s to express changes to n different text documents
     /// where each text document edit addresses a specific version of a text document. Or it can contain
@@ -1621,7 +1628,7 @@ pub const WorkspaceEdit = struct {
     /// If a client neither supports `documentChanges` nor `workspace.workspaceEdit.resourceOperations` then
     /// only plain `TextEdit`s using the `changes` property are supported.
     /// field can be undefined, but this possible state is non-critical
-    documentChanges: ?[]union(enum) {
+    documentChanges: ?[]const union(enum) {
         TextDocumentEdit: TextDocumentEdit,
         CreateFile: CreateFile,
         RenameFile: RenameFile,
@@ -1642,7 +1649,7 @@ pub const WorkspaceEdit = struct {
 /// @since 3.16.0
 pub const FileOperationRegistrationOptions = struct {
     /// The actual filters.
-    filters: []FileOperationFilter,
+    filters: []const FileOperationFilter,
 };
 
 /// The parameters sent in notifications/requests for user-initiated renames of
@@ -1652,7 +1659,7 @@ pub const FileOperationRegistrationOptions = struct {
 pub const RenameFilesParams = struct {
     /// An array of all files/folders renamed in this operation. When a folder is renamed, only
     /// the folder will be included, and not its children.
-    files: []FileRename,
+    files: []const FileRename,
 };
 
 /// The parameters sent in notifications/requests for user-initiated deletes of
@@ -1661,7 +1668,7 @@ pub const RenameFilesParams = struct {
 /// @since 3.16.0
 pub const DeleteFilesParams = struct {
     /// An array of all files/folders deleted in this operation.
-    files: []FileDelete,
+    files: []const FileDelete,
 };
 
 pub const MonikerParams = struct {
@@ -1735,7 +1742,7 @@ pub const TypeHierarchyItem = struct {
     kind: SymbolKind,
     /// Tags for this item.
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]SymbolTag = null,
+    tags: ?[]const SymbolTag = null,
     /// More detail for this item, e.g. the signature of a function.
     /// field can be undefined, but this possible state is non-critical
     detail: ?[]const u8 = null,
@@ -1746,7 +1753,7 @@ pub const TypeHierarchyItem = struct {
     range: Range,
     /// The range that should be selected and revealed when this symbol is being
     /// picked, e.g. the name of a function. Must be contained by the
-    /// {@link TypeHierarchyItem.range `range`}.
+    /// [`range`](#TypeHierarchyItem.range).
     selectionRange: Range,
     /// A data entry field that is preserved between a type hierarchy prepare and
     /// supertypes or subtypes requests. It could also be used to identify the
@@ -1875,7 +1882,7 @@ pub const InlayHint = struct {
     /// *Note* that neither the string nor the label part can be empty.
     label: union(enum) {
         string: []const u8,
-        array_of_InlayHintLabelPart: []InlayHintLabelPart,
+        array_of_InlayHintLabelPart: []const InlayHintLabelPart,
     },
     /// The kind of this hint. Can be omitted in which case the client
     /// should fall back to a reasonable default.
@@ -1887,7 +1894,7 @@ pub const InlayHint = struct {
     /// hint (or its nearest variant) is now part of the document and the inlay
     /// hint itself is now obsolete.
     /// field can be undefined, but this possible state is non-critical
-    textEdits: ?[]TextEdit = null,
+    textEdits: ?[]const TextEdit = null,
     /// The tooltip text when you hover over this item.
     /// field can be undefined, but this possible state is non-critical
     tooltip: ?union(enum) {
@@ -2021,7 +2028,7 @@ pub const WorkspaceDiagnosticParams = struct {
     identifier: ?[]const u8 = null,
     /// The currently known diagnostic reports with their
     /// previous result ids.
-    previousResultIds: []PreviousResultId,
+    previousResultIds: []const PreviousResultId,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
     /// field can be undefined, but this possible state is non-critical
@@ -2038,14 +2045,14 @@ pub const WorkspaceDiagnosticParams = struct {
 ///
 /// @since 3.17.0
 pub const WorkspaceDiagnosticReport = struct {
-    items: []WorkspaceDocumentDiagnosticReport,
+    items: []const WorkspaceDocumentDiagnosticReport,
 };
 
 /// A partial result for a workspace diagnostic report.
 ///
 /// @since 3.17.0
 pub const WorkspaceDiagnosticReportPartialResult = struct {
-    items: []WorkspaceDocumentDiagnosticReport,
+    items: []const WorkspaceDocumentDiagnosticReport,
 };
 
 /// The params sent in an open notebook document notification.
@@ -2056,7 +2063,7 @@ pub const DidOpenNotebookDocumentParams = struct {
     notebookDocument: NotebookDocument,
     /// The text documents that represent the content
     /// of a notebook cell.
-    cellTextDocuments: []TextDocumentItem,
+    cellTextDocuments: []const TextDocumentItem,
 };
 
 /// The params sent in a change notebook document notification.
@@ -2100,15 +2107,15 @@ pub const DidCloseNotebookDocumentParams = struct {
     notebookDocument: NotebookDocumentIdentifier,
     /// The text documents that represent the content
     /// of a notebook cell that got closed.
-    cellTextDocuments: []TextDocumentIdentifier,
+    cellTextDocuments: []const TextDocumentIdentifier,
 };
 
 pub const RegistrationParams = struct {
-    registrations: []Registration,
+    registrations: []const Registration,
 };
 
 pub const UnregistrationParams = struct {
-    unregisterations: []Unregistration,
+    unregisterations: []const Unregistration,
 };
 
 pub const InitializeParams = struct {
@@ -2159,7 +2166,13 @@ pub const InitializeParams = struct {
     initializationOptions: ?LSPAny = null,
     /// The initial trace setting. If omitted trace is disabled ('off').
     /// field can be undefined, but this possible state is non-critical
-    trace: ?TraceValues = null,
+    trace: ?enum {
+        pub const tres_string_enum = {};
+        off,
+        messages,
+        compact,
+        verbose,
+    } = null,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
     /// field can be undefined, but this possible state is non-critical
@@ -2174,7 +2187,7 @@ pub const InitializeParams = struct {
     ///
     /// @since 3.6.0
     /// field can be undefined, but this possible state is non-critical
-    workspaceFolders: ?[]WorkspaceFolder = null,
+    workspaceFolders: ?[]const WorkspaceFolder = null,
 };
 
 /// The result returned from an initialize request.
@@ -2216,7 +2229,7 @@ pub const DidChangeConfigurationRegistrationOptions = struct {
     /// field can be undefined, but this possible state is non-critical
     section: ?union(enum) {
         string: []const u8,
-        array_of_string: [][]const u8,
+        array_of_string: []const []const u8,
     } = null,
 };
 
@@ -2235,7 +2248,7 @@ pub const ShowMessageRequestParams = struct {
     message: []const u8,
     /// The message action items to present.
     /// field can be undefined, but this possible state is non-critical
-    actions: ?[]MessageActionItem = null,
+    actions: ?[]const MessageActionItem = null,
 };
 
 pub const MessageActionItem = struct {
@@ -2274,7 +2287,7 @@ pub const DidChangeTextDocumentParams = struct {
     /// - apply the 'textDocument/didChange' notifications in the order you receive them.
     /// - apply the `TextDocumentContentChangeEvent`s in a single notification in the order
     ///   you receive them.
-    contentChanges: []TextDocumentContentChangeEvent,
+    contentChanges: []const TextDocumentContentChangeEvent,
 };
 
 /// Describe options to be used when registered for text document change events.
@@ -2337,13 +2350,13 @@ pub const TextEdit = struct {
 /// The watched files change notification's parameters.
 pub const DidChangeWatchedFilesParams = struct {
     /// The actual file events.
-    changes: []FileEvent,
+    changes: []const FileEvent,
 };
 
 /// Describe options to be used when registered for text document change events.
 pub const DidChangeWatchedFilesRegistrationOptions = struct {
     /// The watchers to register.
-    watchers: []FileSystemWatcher,
+    watchers: []const FileSystemWatcher,
 };
 
 /// The publish diagnostic notification's parameters.
@@ -2356,7 +2369,7 @@ pub const PublishDiagnosticsParams = struct {
     /// field can be undefined, but this possible state is non-critical
     version: ?i64 = null,
     /// An array of diagnostic information items.
-    diagnostics: []Diagnostic,
+    diagnostics: []const Diagnostic,
 };
 
 /// Completion parameters
@@ -2407,7 +2420,7 @@ pub const CompletionItem = struct {
     ///
     /// @since 3.15.0
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]CompletionItemTag = null,
+    tags: ?[]const CompletionItemTag = null,
     /// A human-readable string with additional information
     /// about this item, like type or symbol information.
     /// field can be undefined, but this possible state is non-critical
@@ -2430,17 +2443,17 @@ pub const CompletionItem = struct {
     /// field can be undefined, but this possible state is non-critical
     preselect: ?bool = null,
     /// A string that should be used when comparing this item
-    /// with other items. When `falsy` the {@link CompletionItem.label label}
+    /// with other items. When `falsy` the [label](#CompletionItem.label)
     /// is used.
     /// field can be undefined, but this possible state is non-critical
     sortText: ?[]const u8 = null,
     /// A string that should be used when filtering a set of
-    /// completion items. When `falsy` the {@link CompletionItem.label label}
+    /// completion items. When `falsy` the [label](#CompletionItem.label)
     /// is used.
     /// field can be undefined, but this possible state is non-critical
     filterText: ?[]const u8 = null,
     /// A string that should be inserted into a document when selecting
-    /// this completion. When `falsy` the {@link CompletionItem.label label}
+    /// this completion. When `falsy` the [label](#CompletionItem.label)
     /// is used.
     ///
     /// The `insertText` is subject to interpretation by the client side.
@@ -2467,9 +2480,9 @@ pub const CompletionItem = struct {
     /// @since 3.16.0
     /// field can be undefined, but this possible state is non-critical
     insertTextMode: ?InsertTextMode = null,
-    /// An {@link TextEdit edit} which is applied to a document when selecting
+    /// An [edit](#TextEdit) which is applied to a document when selecting
     /// this completion. When an edit is provided the value of
-    /// {@link CompletionItem.insertText insertText} is ignored.
+    /// [insertText](#CompletionItem.insertText) is ignored.
     ///
     /// Most editors support two different operations when accepting a completion
     /// item. One is to insert a completion text and the other is to replace an
@@ -2504,32 +2517,32 @@ pub const CompletionItem = struct {
     /// @since 3.17.0
     /// field can be undefined, but this possible state is non-critical
     textEditText: ?[]const u8 = null,
-    /// An optional array of additional {@link TextEdit text edits} that are applied when
+    /// An optional array of additional [text edits](#TextEdit) that are applied when
     /// selecting this completion. Edits must not overlap (including the same insert position)
-    /// with the main {@link CompletionItem.textEdit edit} nor with themselves.
+    /// with the main [edit](#CompletionItem.textEdit) nor with themselves.
     ///
     /// Additional text edits should be used to change text unrelated to the current cursor position
     /// (for example adding an import statement at the top of the file if the completion item will
     /// insert an unqualified type).
     /// field can be undefined, but this possible state is non-critical
-    additionalTextEdits: ?[]TextEdit = null,
+    additionalTextEdits: ?[]const TextEdit = null,
     /// An optional set of characters that when pressed while this completion is active will accept it first and
     /// then type that character. *Note* that all commit characters should have `length=1` and that superfluous
     /// characters will be ignored.
     /// field can be undefined, but this possible state is non-critical
-    commitCharacters: ?[][]const u8 = null,
-    /// An optional {@link Command command} that is executed *after* inserting this completion. *Note* that
+    commitCharacters: ?[]const []const u8 = null,
+    /// An optional [command](#Command) that is executed *after* inserting this completion. *Note* that
     /// additional modifications to the current document should be described with the
-    /// {@link CompletionItem.additionalTextEdits additionalTextEdits}-property.
+    /// [additionalTextEdits](#CompletionItem.additionalTextEdits)-property.
     /// field can be undefined, but this possible state is non-critical
     command: ?Command = null,
     /// A data entry field that is preserved on a completion item between a
-    /// {@link CompletionRequest} and a {@link CompletionResolveRequest}.
+    /// [CompletionRequest](#CompletionRequest) and a [CompletionResolveRequest](#CompletionResolveRequest).
     /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
-/// Represents a collection of {@link CompletionItem completion items} to be presented
+/// Represents a collection of [completion items](#CompletionItem) to be presented
 /// in the editor.
 pub const CompletionList = struct {
     /// This list it not complete. Further typing results in recomputing this list.
@@ -2556,7 +2569,7 @@ pub const CompletionList = struct {
         ///
         /// @since 3.17.0
         /// field can be undefined, but this possible state is non-critical
-        commitCharacters: ?[][]const u8 = null,
+        commitCharacters: ?[]const []const u8 = null,
         /// A default edit range.
         ///
         /// @since 3.17.0
@@ -2585,10 +2598,10 @@ pub const CompletionList = struct {
         data: ?LSPAny = null,
     } = null,
     /// The completion items.
-    items: []CompletionItem,
+    items: []const CompletionItem,
 };
 
-/// Registration options for a {@link CompletionRequest}.
+/// Registration options for a [CompletionRequest](#CompletionRequest).
 pub const CompletionRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -2605,7 +2618,7 @@ pub const CompletionRegistrationOptions = struct {
     /// If code complete should automatically be trigger on characters not being valid inside
     /// an identifier (for example `.` in JavaScript) list them in `triggerCharacters`.
     /// field can be undefined, but this possible state is non-critical
-    triggerCharacters: ?[][]const u8 = null,
+    triggerCharacters: ?[]const []const u8 = null,
     /// The list of all possible characters that commit a completion. This field can be used
     /// if clients don't support individual commit characters per completion item. See
     /// `ClientCapabilities.textDocument.completion.completionItem.commitCharactersSupport`
@@ -2615,7 +2628,7 @@ pub const CompletionRegistrationOptions = struct {
     ///
     /// @since 3.2.0
     /// field can be undefined, but this possible state is non-critical
-    allCommitCharacters: ?[][]const u8 = null,
+    allCommitCharacters: ?[]const []const u8 = null,
     /// The server provides support to resolve additional
     /// information for a completion item.
     /// field can be undefined, but this possible state is non-critical
@@ -2639,7 +2652,7 @@ pub const CompletionRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Parameters for a {@link HoverRequest}.
+/// Parameters for a [HoverRequest](#HoverRequest).
 pub const HoverParams = struct {
     // Extends TextDocumentPositionParams
     /// The text document.
@@ -2659,7 +2672,7 @@ pub const Hover = struct {
     contents: union(enum) {
         MarkupContent: MarkupContent,
         MarkedString: MarkedString,
-        array_of_MarkedString: []MarkedString,
+        array_of_MarkedString: []const MarkedString,
     },
     /// An optional range inside the text document that is used to
     /// visualize the hover, e.g. by changing the background color.
@@ -2667,7 +2680,7 @@ pub const Hover = struct {
     range: ?Range = null,
 };
 
-/// Registration options for a {@link HoverRequest}.
+/// Registration options for a [HoverRequest](#HoverRequest).
 pub const HoverRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -2680,7 +2693,7 @@ pub const HoverRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Parameters for a {@link SignatureHelpRequest}.
+/// Parameters for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpParams = struct {
     /// The signature help context. This is only available if the client specifies
     /// to send this using the client capability `textDocument.signatureHelp.contextSupport === true`
@@ -2705,7 +2718,7 @@ pub const SignatureHelpParams = struct {
 /// active and only one active parameter.
 pub const SignatureHelp = struct {
     /// One or more signatures.
-    signatures: []SignatureInformation,
+    signatures: []const SignatureInformation,
     /// The active signature. If omitted or the value lies outside the
     /// range of `signatures` the value defaults to zero or is ignored if
     /// the `SignatureHelp` has no signatures.
@@ -2728,7 +2741,7 @@ pub const SignatureHelp = struct {
     activeParameter: ?u64 = null,
 };
 
-/// Registration options for a {@link SignatureHelpRequest}.
+/// Registration options for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -2738,7 +2751,7 @@ pub const SignatureHelpRegistrationOptions = struct {
     // Extends SignatureHelpOptions
     /// List of characters that trigger signature help automatically.
     /// field can be undefined, but this possible state is non-critical
-    triggerCharacters: ?[][]const u8 = null,
+    triggerCharacters: ?[]const []const u8 = null,
     /// List of characters that re-trigger signature help.
     ///
     /// These trigger characters are only active when signature help is already showing. All trigger characters
@@ -2746,13 +2759,13 @@ pub const SignatureHelpRegistrationOptions = struct {
     ///
     /// @since 3.15.0
     /// field can be undefined, but this possible state is non-critical
-    retriggerCharacters: ?[][]const u8 = null,
+    retriggerCharacters: ?[]const []const u8 = null,
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
-/// Parameters for a {@link DefinitionRequest}.
+/// Parameters for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionParams = struct {
     // Extends TextDocumentPositionParams
     /// The text document.
@@ -2772,7 +2785,7 @@ pub const DefinitionParams = struct {
     partialResultToken: ?ProgressToken = null,
 };
 
-/// Registration options for a {@link DefinitionRequest}.
+/// Registration options for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -2785,7 +2798,7 @@ pub const DefinitionRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Parameters for a {@link ReferencesRequest}.
+/// Parameters for a [ReferencesRequest](#ReferencesRequest).
 pub const ReferenceParams = struct {
     context: ReferenceContext,
     // Extends TextDocumentPositionParams
@@ -2806,7 +2819,7 @@ pub const ReferenceParams = struct {
     partialResultToken: ?ProgressToken = null,
 };
 
-/// Registration options for a {@link ReferencesRequest}.
+/// Registration options for a [ReferencesRequest](#ReferencesRequest).
 pub const ReferenceRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -2819,7 +2832,7 @@ pub const ReferenceRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Parameters for a {@link DocumentHighlightRequest}.
+/// Parameters for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightParams = struct {
     // Extends TextDocumentPositionParams
     /// The text document.
@@ -2845,12 +2858,12 @@ pub const DocumentHighlightParams = struct {
 pub const DocumentHighlight = struct {
     /// The range this highlight applies to.
     range: Range,
-    /// The highlight kind, default is {@link DocumentHighlightKind.Text text}.
+    /// The highlight kind, default is [text](#DocumentHighlightKind.Text).
     /// field can be undefined, but this possible state is non-critical
     kind: ?DocumentHighlightKind = null,
 };
 
-/// Registration options for a {@link DocumentHighlightRequest}.
+/// Registration options for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -2863,7 +2876,7 @@ pub const DocumentHighlightRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Parameters for a {@link DocumentSymbolRequest}.
+/// Parameters for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolParams = struct {
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -2906,7 +2919,7 @@ pub const SymbolInformation = struct {
     ///
     /// @since 3.16.0
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]SymbolTag = null,
+    tags: ?[]const SymbolTag = null,
     /// The name of the symbol containing this symbol. This information is for
     /// user interface purposes (e.g. to render a qualifier in the user interface
     /// if necessary). It can't be used to re-infer a hierarchy for the document
@@ -2932,7 +2945,7 @@ pub const DocumentSymbol = struct {
     ///
     /// @since 3.16.0
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]SymbolTag = null,
+    tags: ?[]const SymbolTag = null,
     /// Indicates if this symbol is deprecated.
     ///
     /// @deprecated Use tags instead
@@ -2947,10 +2960,10 @@ pub const DocumentSymbol = struct {
     selectionRange: Range,
     /// Children of this symbol, e.g. properties of a class.
     /// field can be undefined, but this possible state is non-critical
-    children: ?[]DocumentSymbol = null,
+    children: ?[]const DocumentSymbol = null,
 };
 
-/// Registration options for a {@link DocumentSymbolRequest}.
+/// Registration options for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -2969,7 +2982,7 @@ pub const DocumentSymbolRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The parameters of a {@link CodeActionRequest}.
+/// The parameters of a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionParams = struct {
     /// The document in which the command was invoked.
     textDocument: TextDocumentIdentifier,
@@ -3001,7 +3014,7 @@ pub const Command = struct {
     /// Arguments that the command handler should be
     /// invoked with.
     /// field can be undefined, but this possible state is non-critical
-    arguments: ?[]LSPAny = null,
+    arguments: ?[]const LSPAny = null,
 };
 
 /// A code action represents a change that can be performed in code, e.g. to fix a problem or
@@ -3018,7 +3031,7 @@ pub const CodeAction = struct {
     kind: ?CodeActionKind = null,
     /// The diagnostics that this code action resolves.
     /// field can be undefined, but this possible state is non-critical
-    diagnostics: ?[]Diagnostic = null,
+    diagnostics: ?[]const Diagnostic = null,
     /// Marks this as a preferred action. Preferred actions are used by the `auto fix` command and can be targeted
     /// by keybindings.
     ///
@@ -3066,7 +3079,7 @@ pub const CodeAction = struct {
     data: ?LSPAny = null,
 };
 
-/// Registration options for a {@link CodeActionRequest}.
+/// Registration options for a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -3079,7 +3092,7 @@ pub const CodeActionRegistrationOptions = struct {
     /// The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server
     /// may list out every specific kind they provide.
     /// field can be undefined, but this possible state is non-critical
-    codeActionKinds: ?[]CodeActionKind = null,
+    codeActionKinds: ?[]const CodeActionKind = null,
     /// The server provides support to resolve additional
     /// information for a code action.
     ///
@@ -3091,7 +3104,7 @@ pub const CodeActionRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The parameters of a {@link WorkspaceSymbolRequest}.
+/// The parameters of a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolParams = struct {
     /// A query string to filter symbols by. Clients may send an empty
     /// string here to request all symbols.
@@ -3138,7 +3151,7 @@ pub const WorkspaceSymbol = struct {
     ///
     /// @since 3.16.0
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]SymbolTag = null,
+    tags: ?[]const SymbolTag = null,
     /// The name of the symbol containing this symbol. This information is for
     /// user interface purposes (e.g. to render a qualifier in the user interface
     /// if necessary). It can't be used to re-infer a hierarchy for the document
@@ -3147,7 +3160,7 @@ pub const WorkspaceSymbol = struct {
     containerName: ?[]const u8 = null,
 };
 
-/// Registration options for a {@link WorkspaceSymbolRequest}.
+/// Registration options for a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolRegistrationOptions = struct {
     // Extends WorkspaceSymbolOptions
     /// The server provides support to resolve additional
@@ -3161,7 +3174,7 @@ pub const WorkspaceSymbolRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The parameters of a {@link CodeLensRequest}.
+/// The parameters of a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensParams = struct {
     /// The document to request code lens for.
     textDocument: TextDocumentIdentifier,
@@ -3177,7 +3190,7 @@ pub const CodeLensParams = struct {
     partialResultToken: ?ProgressToken = null,
 };
 
-/// A code lens represents a {@link Command command} that should be shown along with
+/// A code lens represents a [command](#Command) that should be shown along with
 /// source text, like the number of references, a way to run tests, etc.
 ///
 /// A code lens is _unresolved_ when no command is associated to it. For performance
@@ -3189,13 +3202,13 @@ pub const CodeLens = struct {
     /// field can be undefined, but this possible state is non-critical
     command: ?Command = null,
     /// A data entry field that is preserved on a code lens item between
-    /// a {@link CodeLensRequest} and a [CodeLensResolveRequest]
+    /// a [CodeLensRequest](#CodeLensRequest) and a [CodeLensResolveRequest]
     /// (#CodeLensResolveRequest)
     /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
-/// Registration options for a {@link CodeLensRequest}.
+/// Registration options for a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -3211,7 +3224,7 @@ pub const CodeLensRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The parameters of a {@link DocumentLinkRequest}.
+/// The parameters of a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkParams = struct {
     /// The document to provide document links for.
     textDocument: TextDocumentIdentifier,
@@ -3250,7 +3263,7 @@ pub const DocumentLink = struct {
     data: ?LSPAny = null,
 };
 
-/// Registration options for a {@link DocumentLinkRequest}.
+/// Registration options for a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -3266,7 +3279,7 @@ pub const DocumentLinkRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The parameters of a {@link DocumentFormattingRequest}.
+/// The parameters of a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingParams = struct {
     /// The document to format.
     textDocument: TextDocumentIdentifier,
@@ -3278,7 +3291,7 @@ pub const DocumentFormattingParams = struct {
     workDoneToken: ?ProgressToken = null,
 };
 
-/// Registration options for a {@link DocumentFormattingRequest}.
+/// Registration options for a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -3291,7 +3304,7 @@ pub const DocumentFormattingRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The parameters of a {@link DocumentRangeFormattingRequest}.
+/// The parameters of a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingParams = struct {
     /// The document to format.
     textDocument: TextDocumentIdentifier,
@@ -3305,7 +3318,7 @@ pub const DocumentRangeFormattingParams = struct {
     workDoneToken: ?ProgressToken = null,
 };
 
-/// Registration options for a {@link DocumentRangeFormattingRequest}.
+/// Registration options for a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -3318,7 +3331,7 @@ pub const DocumentRangeFormattingRegistrationOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The parameters of a {@link DocumentOnTypeFormattingRequest}.
+/// The parameters of a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingParams = struct {
     /// The document to format.
     textDocument: TextDocumentIdentifier,
@@ -3335,7 +3348,7 @@ pub const DocumentOnTypeFormattingParams = struct {
     options: FormattingOptions,
 };
 
-/// Registration options for a {@link DocumentOnTypeFormattingRequest}.
+/// Registration options for a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -3347,17 +3360,17 @@ pub const DocumentOnTypeFormattingRegistrationOptions = struct {
     firstTriggerCharacter: []const u8,
     /// More trigger characters.
     /// field can be undefined, but this possible state is non-critical
-    moreTriggerCharacter: ?[][]const u8 = null,
+    moreTriggerCharacter: ?[]const []const u8 = null,
 };
 
-/// The parameters of a {@link RenameRequest}.
+/// The parameters of a [RenameRequest](#RenameRequest).
 pub const RenameParams = struct {
     /// The document to rename.
     textDocument: TextDocumentIdentifier,
     /// The position at which this request was sent.
     position: Position,
     /// The new name of the symbol. If the given name is not valid the
-    /// request must return a {@link ResponseError} with an
+    /// request must return a [ResponseError](#ResponseError) with an
     /// appropriate message set.
     newName: []const u8,
     // Uses mixin WorkDoneProgressParams
@@ -3366,7 +3379,7 @@ pub const RenameParams = struct {
     workDoneToken: ?ProgressToken = null,
 };
 
-/// Registration options for a {@link RenameRequest}.
+/// Registration options for a [RenameRequest](#RenameRequest).
 pub const RenameRegistrationOptions = struct {
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
@@ -3397,24 +3410,24 @@ pub const PrepareRenameParams = struct {
     workDoneToken: ?ProgressToken = null,
 };
 
-/// The parameters of a {@link ExecuteCommandRequest}.
+/// The parameters of a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandParams = struct {
     /// The identifier of the actual command handler.
     command: []const u8,
     /// Arguments that the command should be invoked with.
     /// field can be undefined, but this possible state is non-critical
-    arguments: ?[]LSPAny = null,
+    arguments: ?[]const LSPAny = null,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
     /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
-/// Registration options for a {@link ExecuteCommandRequest}.
+/// Registration options for a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandRegistrationOptions = struct {
     // Extends ExecuteCommandOptions
     /// The commands to be executed on the server
-    commands: [][]const u8,
+    commands: []const []const u8,
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
@@ -3551,14 +3564,7 @@ pub const WorkDoneProgressParams = struct {
     workDoneToken: ?ProgressToken = null,
 };
 
-pub const PartialResultParams = struct {
-    /// An optional token that a server can use to report partial results (e.g. streaming) to
-    /// the client.
-    /// field can be undefined, but this possible state is non-critical
-    partialResultToken: ?ProgressToken = null,
-};
-
-/// Represents the connection of two locations. Provides additional metadata over normal {@link Location locations},
+/// Represents the connection of two locations. Provides additional metadata over normal [locations](#Location),
 /// including an origin range.
 pub const LocationLink = struct {
     /// Span of the origin of this link.
@@ -3620,9 +3626,9 @@ pub const TypeDefinitionOptions = struct {
 /// The workspace folder change event.
 pub const WorkspaceFoldersChangeEvent = struct {
     /// The array of added workspace folders
-    added: []WorkspaceFolder,
+    added: []const WorkspaceFolder,
     /// The array of the removed workspace folders
-    removed: []WorkspaceFolder,
+    removed: []const WorkspaceFolder,
 };
 
 pub const ConfigurationItem = struct {
@@ -3762,7 +3768,7 @@ pub const SemanticTokensEdit = struct {
     deleteCount: u64,
     /// The elements to insert.
     /// field can be undefined, but this possible state is non-critical
-    data: ?[]u64 = null,
+    data: ?[]const u64 = null,
 };
 
 pub const LinkedEditingRangeOptions = struct {
@@ -3790,7 +3796,7 @@ pub const TextDocumentEdit = struct {
     ///
     /// @since 3.16.0 - support for AnnotatedTextEdit. This is guarded using a
     /// client capability.
-    edits: []union(enum) {
+    edits: []const union(enum) {
         TextEdit: TextEdit,
         AnnotatedTextEdit: AnnotatedTextEdit,
     },
@@ -4072,7 +4078,7 @@ pub const RelatedFullDocumentDiagnosticReport = struct {
     /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual items.
-    items: []Diagnostic,
+    items: []const Diagnostic,
 };
 
 /// An unchanged diagnostic report with a set of related documents.
@@ -4114,7 +4120,7 @@ pub const FullDocumentDiagnosticReport = struct {
     /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual items.
-    items: []Diagnostic,
+    items: []const Diagnostic,
 };
 
 /// A diagnostic report indicating that the last returned
@@ -4181,7 +4187,7 @@ pub const NotebookDocument = struct {
     /// field can be undefined, but this possible state is non-critical
     metadata: ?LSPObject = null,
     /// The cells of a notebook.
-    cells: []NotebookCell,
+    cells: []const NotebookCell,
 };
 
 /// An item to transfer a text document from the client to the
@@ -4228,20 +4234,20 @@ pub const NotebookDocumentChangeEvent = struct {
             array: NotebookCellArrayChange,
             /// Additional opened cell text documents.
             /// field can be undefined, but this possible state is non-critical
-            didOpen: ?[]TextDocumentItem = null,
+            didOpen: ?[]const TextDocumentItem = null,
             /// Additional closed cell text documents.
             /// field can be undefined, but this possible state is non-critical
-            didClose: ?[]TextDocumentIdentifier = null,
+            didClose: ?[]const TextDocumentIdentifier = null,
         } = null,
         /// Changes to notebook cells properties like its
         /// kind, execution summary or metadata.
         /// field can be undefined, but this possible state is non-critical
-        data: ?[]NotebookCell = null,
+        data: ?[]const NotebookCell = null,
         /// Changes to the text content of notebook cells.
         /// field can be undefined, but this possible state is non-critical
-        textContent: ?[]struct {
+        textContent: ?[]const struct {
             document: VersionedTextDocumentIdentifier,
-            changes: []TextDocumentContentChangeEvent,
+            changes: []const TextDocumentContentChangeEvent,
         } = null,
     } = null,
 };
@@ -4323,7 +4329,13 @@ pub const _InitializeParams = struct {
     initializationOptions: ?LSPAny = null,
     /// The initial trace setting. If omitted trace is disabled ('off').
     /// field can be undefined, but this possible state is non-critical
-    trace: ?TraceValues = null,
+    trace: ?enum {
+        pub const tres_string_enum = {};
+        off,
+        messages,
+        compact,
+        verbose,
+    } = null,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
     /// field can be undefined, but this possible state is non-critical
@@ -4339,7 +4351,7 @@ pub const WorkspaceFoldersInitializeParams = struct {
     ///
     /// @since 3.6.0
     /// field can be undefined, but this possible state is non-critical
-    workspaceFolders: ?[]WorkspaceFolder = null,
+    workspaceFolders: ?[]const WorkspaceFolder = null,
 };
 
 /// Defines the capabilities provided by a language
@@ -4653,11 +4665,11 @@ pub const Diagnostic = struct {
     ///
     /// @since 3.15.0
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]DiagnosticTag = null,
+    tags: ?[]const DiagnosticTag = null,
     /// An array of related diagnostic information, e.g. when symbol-names within
     /// a scope collide all definitions can be marked via this property.
     /// field can be undefined, but this possible state is non-critical
-    relatedInformation: ?[]DiagnosticRelatedInformation = null,
+    relatedInformation: ?[]const DiagnosticRelatedInformation = null,
     /// A data entry field that is preserved between a `textDocument/publishDiagnostics`
     /// notification and `textDocument/codeAction` request.
     ///
@@ -4713,7 +4725,7 @@ pub const CompletionOptions = struct {
     /// If code complete should automatically be trigger on characters not being valid inside
     /// an identifier (for example `.` in JavaScript) list them in `triggerCharacters`.
     /// field can be undefined, but this possible state is non-critical
-    triggerCharacters: ?[][]const u8 = null,
+    triggerCharacters: ?[]const []const u8 = null,
     /// The list of all possible characters that commit a completion. This field can be used
     /// if clients don't support individual commit characters per completion item. See
     /// `ClientCapabilities.textDocument.completion.completionItem.commitCharactersSupport`
@@ -4723,7 +4735,7 @@ pub const CompletionOptions = struct {
     ///
     /// @since 3.2.0
     /// field can be undefined, but this possible state is non-critical
-    allCommitCharacters: ?[][]const u8 = null,
+    allCommitCharacters: ?[]const []const u8 = null,
     /// The server provides support to resolve additional
     /// information for a completion item.
     /// field can be undefined, but this possible state is non-critical
@@ -4794,7 +4806,7 @@ pub const SignatureInformation = struct {
     } = null,
     /// The parameters of this signature.
     /// field can be undefined, but this possible state is non-critical
-    parameters: ?[]ParameterInformation = null,
+    parameters: ?[]const ParameterInformation = null,
     /// The index of the active parameter.
     ///
     /// If provided, this is used in place of `SignatureHelp.activeParameter`.
@@ -4804,11 +4816,11 @@ pub const SignatureInformation = struct {
     activeParameter: ?u64 = null,
 };
 
-/// Server Capabilities for a {@link SignatureHelpRequest}.
+/// Server Capabilities for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpOptions = struct {
     /// List of characters that trigger signature help automatically.
     /// field can be undefined, but this possible state is non-critical
-    triggerCharacters: ?[][]const u8 = null,
+    triggerCharacters: ?[]const []const u8 = null,
     /// List of characters that re-trigger signature help.
     ///
     /// These trigger characters are only active when signature help is already showing. All trigger characters
@@ -4816,13 +4828,13 @@ pub const SignatureHelpOptions = struct {
     ///
     /// @since 3.15.0
     /// field can be undefined, but this possible state is non-critical
-    retriggerCharacters: ?[][]const u8 = null,
+    retriggerCharacters: ?[]const []const u8 = null,
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
-/// Server Capabilities for a {@link DefinitionRequest}.
+/// Server Capabilities for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionOptions = struct {
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
@@ -4843,7 +4855,7 @@ pub const ReferenceOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Provider options for a {@link DocumentHighlightRequest}.
+/// Provider options for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightOptions = struct {
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
@@ -4860,7 +4872,7 @@ pub const BaseSymbolInformation = struct {
     ///
     /// @since 3.16.0
     /// field can be undefined, but this possible state is non-critical
-    tags: ?[]SymbolTag = null,
+    tags: ?[]const SymbolTag = null,
     /// The name of the symbol containing this symbol. This information is for
     /// user interface purposes (e.g. to render a qualifier in the user interface
     /// if necessary). It can't be used to re-infer a hierarchy for the document
@@ -4869,7 +4881,7 @@ pub const BaseSymbolInformation = struct {
     containerName: ?[]const u8 = null,
 };
 
-/// Provider options for a {@link DocumentSymbolRequest}.
+/// Provider options for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolOptions = struct {
     /// A human-readable string that is shown when multiple outlines trees
     /// are shown for the same document.
@@ -4883,20 +4895,20 @@ pub const DocumentSymbolOptions = struct {
 };
 
 /// Contains additional diagnostic information about the context in which
-/// a {@link CodeActionProvider.provideCodeActions code action} is run.
+/// a [code action](#CodeActionProvider.provideCodeActions) is run.
 pub const CodeActionContext = struct {
     /// An array of diagnostics known on the client side overlapping the range provided to the
     /// `textDocument/codeAction` request. They are provided so that the server knows which
     /// errors are currently presented to the user for the given range. There is no guarantee
     /// that these accurately reflect the error state of the resource. The primary parameter
     /// to compute code actions is the provided range.
-    diagnostics: []Diagnostic,
+    diagnostics: []const Diagnostic,
     /// Requested kind of actions to return.
     ///
     /// Actions not of this kind are filtered out by the client before being shown. So servers
     /// can omit computing them.
     /// field can be undefined, but this possible state is non-critical
-    only: ?[]CodeActionKind = null,
+    only: ?[]const CodeActionKind = null,
     /// The reason why code actions were requested.
     ///
     /// @since 3.17.0
@@ -4904,14 +4916,14 @@ pub const CodeActionContext = struct {
     triggerKind: ?CodeActionTriggerKind = null,
 };
 
-/// Provider options for a {@link CodeActionRequest}.
+/// Provider options for a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionOptions = struct {
     /// CodeActionKinds that this server may return.
     ///
     /// The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server
     /// may list out every specific kind they provide.
     /// field can be undefined, but this possible state is non-critical
-    codeActionKinds: ?[]CodeActionKind = null,
+    codeActionKinds: ?[]const CodeActionKind = null,
     /// The server provides support to resolve additional
     /// information for a code action.
     ///
@@ -4923,7 +4935,7 @@ pub const CodeActionOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Server capabilities for a {@link WorkspaceSymbolRequest}.
+/// Server capabilities for a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolOptions = struct {
     /// The server provides support to resolve additional
     /// information for a workspace symbol.
@@ -4936,7 +4948,7 @@ pub const WorkspaceSymbolOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Code Lens provider options of a {@link CodeLensRequest}.
+/// Code Lens provider options of a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensOptions = struct {
     /// Code lens has a resolve provider as well.
     /// field can be undefined, but this possible state is non-critical
@@ -4946,7 +4958,7 @@ pub const CodeLensOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// Provider options for a {@link DocumentLinkRequest}.
+/// Provider options for a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkOptions = struct {
     /// Document links have a resolve provider as well.
     /// field can be undefined, but this possible state is non-critical
@@ -4979,30 +4991,30 @@ pub const FormattingOptions = struct {
     trimFinalNewlines: ?bool = null,
 };
 
-/// Provider options for a {@link DocumentFormattingRequest}.
+/// Provider options for a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingOptions = struct {
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
-/// Provider options for a {@link DocumentRangeFormattingRequest}.
+/// Provider options for a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingOptions = struct {
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
-/// Provider options for a {@link DocumentOnTypeFormattingRequest}.
+/// Provider options for a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingOptions = struct {
     /// A character on which formatting should be triggered, like `{`.
     firstTriggerCharacter: []const u8,
     /// More trigger characters.
     /// field can be undefined, but this possible state is non-critical
-    moreTriggerCharacter: ?[][]const u8 = null,
+    moreTriggerCharacter: ?[]const []const u8 = null,
 };
 
-/// Provider options for a {@link RenameRequest}.
+/// Provider options for a [RenameRequest](#RenameRequest).
 pub const RenameOptions = struct {
     /// Renames should be checked and tested before being executed.
     ///
@@ -5014,10 +5026,10 @@ pub const RenameOptions = struct {
     workDoneProgress: ?bool = null,
 };
 
-/// The server capabilities of a {@link ExecuteCommandRequest}.
+/// The server capabilities of a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandOptions = struct {
     /// The commands to be executed on the server
-    commands: [][]const u8,
+    commands: []const []const u8,
     // Uses mixin WorkDoneProgressOptions
     /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
@@ -5026,9 +5038,9 @@ pub const ExecuteCommandOptions = struct {
 /// @since 3.16.0
 pub const SemanticTokensLegend = struct {
     /// The token types a server uses.
-    tokenTypes: [][]const u8,
+    tokenTypes: []const []const u8,
     /// The token modifiers a server uses.
-    tokenModifiers: [][]const u8,
+    tokenModifiers: []const []const u8,
 };
 
 /// A text document identifier to optionally denote a specific version of a text document.
@@ -5141,7 +5153,7 @@ pub const WorkspaceFullDocumentDiagnosticReport = struct {
     /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual items.
-    items: []Diagnostic,
+    items: []const Diagnostic,
 };
 
 /// An unchanged document diagnostic report for a workspace diagnostic result.
@@ -5199,7 +5211,7 @@ pub const NotebookCellArrayChange = struct {
     deleteCount: u64,
     /// The new cells, if any
     /// field can be undefined, but this possible state is non-critical
-    cells: ?[]NotebookCell = null,
+    cells: ?[]const NotebookCell = null,
 };
 
 /// Defines the capabilities provided by the client.
@@ -5269,7 +5281,7 @@ pub const TextDocumentSyncOptions = struct {
 /// @since 3.17.0
 pub const NotebookDocumentSyncOptions = struct {
     /// The notebooks to be synced
-    notebookSelector: []union(enum) {
+    notebookSelector: []const union(enum) {
         literal_0: struct {
             /// The notebook to be synced If a string
             /// value is provided it matches against the
@@ -5280,7 +5292,7 @@ pub const NotebookDocumentSyncOptions = struct {
             },
             /// The cells of the matching notebook to be synced.
             /// field can be undefined, but this possible state is non-critical
-            cells: ?[]struct {
+            cells: ?[]const struct {
                 language: []const u8,
             } = null,
         },
@@ -5294,7 +5306,7 @@ pub const NotebookDocumentSyncOptions = struct {
                 NotebookDocumentFilter: NotebookDocumentFilter,
             } = null,
             /// The cells of the matching notebook to be synced.
-            cells: []struct {
+            cells: []const struct {
                 language: []const u8,
             },
         },
@@ -5311,7 +5323,7 @@ pub const NotebookDocumentSyncOptions = struct {
 pub const NotebookDocumentSyncRegistrationOptions = struct {
     // Extends NotebookDocumentSyncOptions
     /// The notebooks to be synced
-    notebookSelector: []union(enum) {
+    notebookSelector: []const union(enum) {
         literal_0: struct {
             /// The notebook to be synced If a string
             /// value is provided it matches against the
@@ -5322,7 +5334,7 @@ pub const NotebookDocumentSyncRegistrationOptions = struct {
             },
             /// The cells of the matching notebook to be synced.
             /// field can be undefined, but this possible state is non-critical
-            cells: ?[]struct {
+            cells: ?[]const struct {
                 language: []const u8,
             } = null,
         },
@@ -5336,7 +5348,7 @@ pub const NotebookDocumentSyncRegistrationOptions = struct {
                 NotebookDocumentFilter: NotebookDocumentFilter,
             } = null,
             /// The cells of the matching notebook to be synced.
-            cells: []struct {
+            cells: []const struct {
                 language: []const u8,
             },
         },
@@ -5721,7 +5733,7 @@ pub const GeneralClientCapabilities = struct {
         /// The list of requests for which the client
         /// will retry the request if it receives a
         /// response with error code `ContentModified`
-        retryOnContentModified: [][]const u8,
+        retryOnContentModified: []const []const u8,
     } = null,
     /// Client capabilities specific to regular expressions.
     ///
@@ -5752,7 +5764,7 @@ pub const GeneralClientCapabilities = struct {
     ///
     /// @since 3.17.0
     /// field can be undefined, but this possible state is non-critical
-    positionEncodings: ?[]PositionEncodingKind = null,
+    positionEncodings: ?[]const PositionEncodingKind = null,
 };
 
 /// A relative pattern is a helper to construct glob patterns that are matched
@@ -5780,7 +5792,7 @@ pub const WorkspaceEditClientCapabilities = struct {
     ///
     /// @since 3.13.0
     /// field can be undefined, but this possible state is non-critical
-    resourceOperations: ?[]ResourceOperationKind = null,
+    resourceOperations: ?[]const ResourceOperationKind = null,
     /// The failure handling strategy of a client if applying the workspace edit
     /// fails.
     ///
@@ -5830,7 +5842,7 @@ pub const DidChangeWatchedFilesClientCapabilities = struct {
     relativePatternSupport: ?bool = null,
 };
 
-/// Client capabilities for a {@link WorkspaceSymbolRequest}.
+/// Client capabilities for a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolClientCapabilities = struct {
     /// Symbol request supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -5847,7 +5859,7 @@ pub const WorkspaceSymbolClientCapabilities = struct {
         /// the symbol kinds from `File` to `Array` as defined in
         /// the initial version of the protocol.
         /// field can be undefined, but this possible state is non-critical
-        valueSet: ?[]SymbolKind = null,
+        valueSet: ?[]const SymbolKind = null,
     } = null,
     /// The client supports tags on `SymbolInformation`.
     /// Clients supporting tags have to handle unknown tags gracefully.
@@ -5856,7 +5868,7 @@ pub const WorkspaceSymbolClientCapabilities = struct {
     /// field can be undefined, but this possible state is non-critical
     tagSupport: ?struct {
         /// The tags supported by the client.
-        valueSet: []SymbolTag,
+        valueSet: []const SymbolTag,
     } = null,
     /// The client support partial workspace symbols. The client will send the
     /// request `workspaceSymbol/resolve` to the server to resolve additional
@@ -5867,11 +5879,11 @@ pub const WorkspaceSymbolClientCapabilities = struct {
     resolveSupport: ?struct {
         /// The properties that a client can resolve lazily. Usually
         /// `location.range`
-        properties: [][]const u8,
+        properties: []const []const u8,
     } = null,
 };
 
-/// The client capabilities of a {@link ExecuteCommandRequest}.
+/// The client capabilities of a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandClientCapabilities = struct {
     /// Execute command supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -6019,7 +6031,7 @@ pub const CompletionClientCapabilities = struct {
         /// Client supports the following content formats for the documentation
         /// property. The order describes the preferred format of the client.
         /// field can be undefined, but this possible state is non-critical
-        documentationFormat: ?[]MarkupKind = null,
+        documentationFormat: ?[]const MarkupKind = null,
         /// Client supports the deprecated property on a completion item.
         /// field can be undefined, but this possible state is non-critical
         deprecatedSupport: ?bool = null,
@@ -6035,7 +6047,7 @@ pub const CompletionClientCapabilities = struct {
         /// field can be undefined, but this possible state is non-critical
         tagSupport: ?struct {
             /// The tags supported by the client.
-            valueSet: []CompletionItemTag,
+            valueSet: []const CompletionItemTag,
         } = null,
         /// Client support insert replace edit to control different behavior if a
         /// completion item is inserted in the text or should replace text.
@@ -6051,7 +6063,7 @@ pub const CompletionClientCapabilities = struct {
         /// field can be undefined, but this possible state is non-critical
         resolveSupport: ?struct {
             /// The properties that a client can resolve lazily.
-            properties: [][]const u8,
+            properties: []const []const u8,
         } = null,
         /// The client supports the `insertTextMode` property on
         /// a completion item to override the whitespace handling mode
@@ -6060,7 +6072,7 @@ pub const CompletionClientCapabilities = struct {
         /// @since 3.16.0
         /// field can be undefined, but this possible state is non-critical
         insertTextModeSupport: ?struct {
-            valueSet: []InsertTextMode,
+            valueSet: []const InsertTextMode,
         } = null,
         /// The client has support for completion item label
         /// details (see also `CompletionItemLabelDetails`).
@@ -6080,7 +6092,7 @@ pub const CompletionClientCapabilities = struct {
         /// the completion items kinds from `Text` to `Reference` as defined in
         /// the initial version of the protocol.
         /// field can be undefined, but this possible state is non-critical
-        valueSet: ?[]CompletionItemKind = null,
+        valueSet: ?[]const CompletionItemKind = null,
     } = null,
     /// Defines how the client handles whitespace and indentation
     /// when accepting a completion item that uses multi line
@@ -6108,7 +6120,7 @@ pub const CompletionClientCapabilities = struct {
         ///
         /// @since 3.17.0
         /// field can be undefined, but this possible state is non-critical
-        itemDefaults: ?[][]const u8 = null,
+        itemDefaults: ?[]const []const u8 = null,
     } = null,
 };
 
@@ -6119,10 +6131,10 @@ pub const HoverClientCapabilities = struct {
     /// Client supports the following content formats for the content
     /// property. The order describes the preferred format of the client.
     /// field can be undefined, but this possible state is non-critical
-    contentFormat: ?[]MarkupKind = null,
+    contentFormat: ?[]const MarkupKind = null,
 };
 
-/// Client Capabilities for a {@link SignatureHelpRequest}.
+/// Client Capabilities for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpClientCapabilities = struct {
     /// Whether signature help supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -6134,7 +6146,7 @@ pub const SignatureHelpClientCapabilities = struct {
         /// Client supports the following content formats for the documentation
         /// property. The order describes the preferred format of the client.
         /// field can be undefined, but this possible state is non-critical
-        documentationFormat: ?[]MarkupKind = null,
+        documentationFormat: ?[]const MarkupKind = null,
         /// Client capabilities specific to parameter information.
         /// field can be undefined, but this possible state is non-critical
         parameterInformation: ?struct {
@@ -6174,7 +6186,7 @@ pub const DeclarationClientCapabilities = struct {
     linkSupport: ?bool = null,
 };
 
-/// Client Capabilities for a {@link DefinitionRequest}.
+/// Client Capabilities for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionClientCapabilities = struct {
     /// Whether definition supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -6214,21 +6226,21 @@ pub const ImplementationClientCapabilities = struct {
     linkSupport: ?bool = null,
 };
 
-/// Client Capabilities for a {@link ReferencesRequest}.
+/// Client Capabilities for a [ReferencesRequest](#ReferencesRequest).
 pub const ReferenceClientCapabilities = struct {
     /// Whether references supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
-/// Client Capabilities for a {@link DocumentHighlightRequest}.
+/// Client Capabilities for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightClientCapabilities = struct {
     /// Whether document highlight supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
-/// Client Capabilities for a {@link DocumentSymbolRequest}.
+/// Client Capabilities for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolClientCapabilities = struct {
     /// Whether document symbol supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -6246,7 +6258,7 @@ pub const DocumentSymbolClientCapabilities = struct {
         /// the symbol kinds from `File` to `Array` as defined in
         /// the initial version of the protocol.
         /// field can be undefined, but this possible state is non-critical
-        valueSet: ?[]SymbolKind = null,
+        valueSet: ?[]const SymbolKind = null,
     } = null,
     /// The client supports hierarchical document symbols.
     /// field can be undefined, but this possible state is non-critical
@@ -6259,7 +6271,7 @@ pub const DocumentSymbolClientCapabilities = struct {
     /// field can be undefined, but this possible state is non-critical
     tagSupport: ?struct {
         /// The tags supported by the client.
-        valueSet: []SymbolTag,
+        valueSet: []const SymbolTag,
     } = null,
     /// The client supports an additional label presented in the UI when
     /// registering a document symbol provider.
@@ -6269,7 +6281,7 @@ pub const DocumentSymbolClientCapabilities = struct {
     labelSupport: ?bool = null,
 };
 
-/// The Client Capabilities of a {@link CodeActionRequest}.
+/// The Client Capabilities of a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionClientCapabilities = struct {
     /// Whether code action supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -6288,7 +6300,7 @@ pub const CodeActionClientCapabilities = struct {
             /// property exists the client also guarantees that it will
             /// handle values outside its set gracefully and falls back
             /// to a default value when unknown.
-            valueSet: []CodeActionKind,
+            valueSet: []const CodeActionKind,
         },
     } = null,
     /// Whether code action supports the `isPreferred` property.
@@ -6315,7 +6327,7 @@ pub const CodeActionClientCapabilities = struct {
     /// field can be undefined, but this possible state is non-critical
     resolveSupport: ?struct {
         /// The properties that a client can resolve lazily.
-        properties: [][]const u8,
+        properties: []const []const u8,
     } = null,
     /// Whether the client honors the change annotations in
     /// text edits and resource operations returned via the
@@ -6328,14 +6340,14 @@ pub const CodeActionClientCapabilities = struct {
     honorsChangeAnnotations: ?bool = null,
 };
 
-/// The client capabilities  of a {@link CodeLensRequest}.
+/// The client capabilities  of a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensClientCapabilities = struct {
     /// Whether code lens supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
-/// The client capabilities of a {@link DocumentLinkRequest}.
+/// The client capabilities of a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkClientCapabilities = struct {
     /// Whether document link supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -6355,21 +6367,21 @@ pub const DocumentColorClientCapabilities = struct {
     dynamicRegistration: ?bool = null,
 };
 
-/// Client capabilities of a {@link DocumentFormattingRequest}.
+/// Client capabilities of a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingClientCapabilities = struct {
     /// Whether formatting supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
-/// Client capabilities of a {@link DocumentRangeFormattingRequest}.
+/// Client capabilities of a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingClientCapabilities = struct {
     /// Whether range formatting supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
-/// Client capabilities of a {@link DocumentOnTypeFormattingRequest}.
+/// Client capabilities of a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingClientCapabilities = struct {
     /// Whether on type formatting supports dynamic registration.
     /// field can be undefined, but this possible state is non-critical
@@ -6432,7 +6444,7 @@ pub const FoldingRangeClientCapabilities = struct {
         /// handle values outside its set gracefully and falls back
         /// to a default value when unknown.
         /// field can be undefined, but this possible state is non-critical
-        valueSet: ?[]FoldingRangeKind = null,
+        valueSet: ?[]const FoldingRangeKind = null,
     } = null,
     /// Specific options for the folding range.
     ///
@@ -6468,7 +6480,7 @@ pub const PublishDiagnosticsClientCapabilities = struct {
     /// field can be undefined, but this possible state is non-critical
     tagSupport: ?struct {
         /// The tags supported by the client.
-        valueSet: []DiagnosticTag,
+        valueSet: []const DiagnosticTag,
     } = null,
     /// Whether the client interprets the version property of the
     /// `textDocument/publishDiagnostics` notification's parameter.
@@ -6536,11 +6548,11 @@ pub const SemanticTokensClientCapabilities = struct {
         } = null,
     },
     /// The token types that the client supports.
-    tokenTypes: [][]const u8,
+    tokenTypes: []const []const u8,
     /// The token modifiers that the client supports.
-    tokenModifiers: [][]const u8,
+    tokenModifiers: []const []const u8,
     /// The token formats the clients supports.
-    formats: []TokenFormat,
+    formats: []const TokenFormat,
     /// Whether the client supports tokens that can overlap each other.
     /// field can be undefined, but this possible state is non-critical
     overlappingTokenSupport: ?bool = null,
@@ -6621,7 +6633,7 @@ pub const InlayHintClientCapabilities = struct {
     /// field can be undefined, but this possible state is non-critical
     resolveSupport: ?struct {
         /// The properties that a client can resolve lazily.
-        properties: [][]const u8,
+        properties: []const []const u8,
     } = null,
 };
 
@@ -6701,7 +6713,7 @@ pub const MarkdownClientCapabilities = struct {
     ///
     /// @since 3.17.0
     /// field can be undefined, but this possible state is non-critical
-    allowedTags: ?[][]const u8 = null,
+    allowedTags: ?[]const []const u8 = null,
 };
 
 pub const notification_metadata = [_]NotificationMetadata{
@@ -6955,40 +6967,40 @@ pub const notification_metadata = [_]NotificationMetadata{
 pub const request_metadata = [_]RequestMetadata{
     // A request to resolve the implementation locations of a symbol at a given text
     // document position. The request's parameter is of type [TextDocumentPositionParams]
-    // (#TextDocumentPositionParams) the response is of type {@link Definition} or a
+    // (#TextDocumentPositionParams) the response is of type [Definition](#Definition) or a
     // Thenable that resolves to such.
     .{
         .method = "textDocument/implementation",
-        .documentation = "A request to resolve the implementation locations of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPositionParams]\n(#TextDocumentPositionParams) the response is of type {@link Definition} or a\nThenable that resolves to such.",
+        .documentation = "A request to resolve the implementation locations of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPositionParams]\n(#TextDocumentPositionParams) the response is of type [Definition](#Definition) or a\nThenable that resolves to such.",
         .direction = .client_to_server,
         .Params = ImplementationParams,
         .Result = ?union(enum) {
             Definition: Definition,
-            array_of_DefinitionLink: []DefinitionLink,
+            array_of_DefinitionLink: []const DefinitionLink,
         },
         .PartialResult = union(enum) {
-            array_of_Location: []Location,
-            array_of_DefinitionLink: []DefinitionLink,
+            array_of_Location: []const Location,
+            array_of_DefinitionLink: []const DefinitionLink,
         },
         .ErrorData = null,
         .registration = .{ .method = null, .Options = ImplementationRegistrationOptions },
     },
     // A request to resolve the type definition locations of a symbol at a given text
     // document position. The request's parameter is of type [TextDocumentPositionParams]
-    // (#TextDocumentPositionParams) the response is of type {@link Definition} or a
+    // (#TextDocumentPositionParams) the response is of type [Definition](#Definition) or a
     // Thenable that resolves to such.
     .{
         .method = "textDocument/typeDefinition",
-        .documentation = "A request to resolve the type definition locations of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPositionParams]\n(#TextDocumentPositionParams) the response is of type {@link Definition} or a\nThenable that resolves to such.",
+        .documentation = "A request to resolve the type definition locations of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPositionParams]\n(#TextDocumentPositionParams) the response is of type [Definition](#Definition) or a\nThenable that resolves to such.",
         .direction = .client_to_server,
         .Params = TypeDefinitionParams,
         .Result = ?union(enum) {
             Definition: Definition,
-            array_of_DefinitionLink: []DefinitionLink,
+            array_of_DefinitionLink: []const DefinitionLink,
         },
         .PartialResult = union(enum) {
-            array_of_Location: []Location,
-            array_of_DefinitionLink: []DefinitionLink,
+            array_of_Location: []const Location,
+            array_of_DefinitionLink: []const DefinitionLink,
         },
         .ErrorData = null,
         .registration = .{ .method = null, .Options = TypeDefinitionRegistrationOptions },
@@ -6999,7 +7011,7 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "The `workspace/workspaceFolders` is sent from the server to the client to fetch the open workspace folders.",
         .direction = .server_to_client,
         .Params = null,
-        .Result = ?[]WorkspaceFolder,
+        .Result = ?[]const WorkspaceFolder,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = null },
@@ -7015,37 +7027,45 @@ pub const request_metadata = [_]RequestMetadata{
         .method = "workspace/configuration",
         .documentation = "The 'workspace/configuration' request is sent from the server to the client to fetch a certain\nconfiguration setting.\n\nThis pull model replaces the old push model were the client signaled configuration change via an\nevent. If the server still needs to react to configuration changes (since the server caches the\nresult of `workspace/configuration` requests) the server should register for an empty configuration\nchange event and empty the cache if such an event is received.",
         .direction = .server_to_client,
-        .Params = ConfigurationParams,
-        .Result = []LSPAny,
+        .Params = struct {
+            // And ConfigurationParams
+            items: []const ConfigurationItem,
+            // And PartialResultParams
+            /// An optional token that a server can use to report partial results (e.g. streaming) to
+            /// the client.
+            /// field can be undefined, but this possible state is non-critical
+            partialResultToken: ?ProgressToken = null,
+        },
+        .Result = []const LSPAny,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = null },
     },
     // A request to list all color symbols found in a given text document. The request's
-    // parameter is of type {@link DocumentColorParams} the
-    // response is of type {@link ColorInformation ColorInformation[]} or a Thenable
+    // parameter is of type [DocumentColorParams](#DocumentColorParams) the
+    // response is of type [ColorInformation[]](#ColorInformation) or a Thenable
     // that resolves to such.
     .{
         .method = "textDocument/documentColor",
-        .documentation = "A request to list all color symbols found in a given text document. The request's\nparameter is of type {@link DocumentColorParams} the\nresponse is of type {@link ColorInformation ColorInformation[]} or a Thenable\nthat resolves to such.",
+        .documentation = "A request to list all color symbols found in a given text document. The request's\nparameter is of type [DocumentColorParams](#DocumentColorParams) the\nresponse is of type [ColorInformation[]](#ColorInformation) or a Thenable\nthat resolves to such.",
         .direction = .client_to_server,
         .Params = DocumentColorParams,
-        .Result = []ColorInformation,
-        .PartialResult = []ColorInformation,
+        .Result = []const ColorInformation,
+        .PartialResult = []const ColorInformation,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DocumentColorRegistrationOptions },
     },
     // A request to list all presentation for a color. The request's
-    // parameter is of type {@link ColorPresentationParams} the
-    // response is of type {@link ColorInformation ColorInformation[]} or a Thenable
+    // parameter is of type [ColorPresentationParams](#ColorPresentationParams) the
+    // response is of type [ColorInformation[]](#ColorInformation) or a Thenable
     // that resolves to such.
     .{
         .method = "textDocument/colorPresentation",
-        .documentation = "A request to list all presentation for a color. The request's\nparameter is of type {@link ColorPresentationParams} the\nresponse is of type {@link ColorInformation ColorInformation[]} or a Thenable\nthat resolves to such.",
+        .documentation = "A request to list all presentation for a color. The request's\nparameter is of type [ColorPresentationParams](#ColorPresentationParams) the\nresponse is of type [ColorInformation[]](#ColorInformation) or a Thenable\nthat resolves to such.",
         .direction = .client_to_server,
         .Params = ColorPresentationParams,
-        .Result = []ColorPresentation,
-        .PartialResult = []ColorPresentation,
+        .Result = []const ColorPresentation,
+        .PartialResult = []const ColorPresentation,
         .ErrorData = null,
         .registration = .{
             .method = null,
@@ -7061,51 +7081,51 @@ pub const request_metadata = [_]RequestMetadata{
         },
     },
     // A request to provide folding ranges in a document. The request's
-    // parameter is of type {@link FoldingRangeParams}, the
-    // response is of type {@link FoldingRangeList} or a Thenable
+    // parameter is of type [FoldingRangeParams](#FoldingRangeParams), the
+    // response is of type [FoldingRangeList](#FoldingRangeList) or a Thenable
     // that resolves to such.
     .{
         .method = "textDocument/foldingRange",
-        .documentation = "A request to provide folding ranges in a document. The request's\nparameter is of type {@link FoldingRangeParams}, the\nresponse is of type {@link FoldingRangeList} or a Thenable\nthat resolves to such.",
+        .documentation = "A request to provide folding ranges in a document. The request's\nparameter is of type [FoldingRangeParams](#FoldingRangeParams), the\nresponse is of type [FoldingRangeList](#FoldingRangeList) or a Thenable\nthat resolves to such.",
         .direction = .client_to_server,
         .Params = FoldingRangeParams,
-        .Result = ?[]FoldingRange,
-        .PartialResult = []FoldingRange,
+        .Result = ?[]const FoldingRange,
+        .PartialResult = []const FoldingRange,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = FoldingRangeRegistrationOptions },
     },
     // A request to resolve the type definition locations of a symbol at a given text
     // document position. The request's parameter is of type [TextDocumentPositionParams]
-    // (#TextDocumentPositionParams) the response is of type {@link Declaration}
-    // or a typed array of {@link DeclarationLink} or a Thenable that resolves
+    // (#TextDocumentPositionParams) the response is of type [Declaration](#Declaration)
+    // or a typed array of [DeclarationLink](#DeclarationLink) or a Thenable that resolves
     // to such.
     .{
         .method = "textDocument/declaration",
-        .documentation = "A request to resolve the type definition locations of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPositionParams]\n(#TextDocumentPositionParams) the response is of type {@link Declaration}\nor a typed array of {@link DeclarationLink} or a Thenable that resolves\nto such.",
+        .documentation = "A request to resolve the type definition locations of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPositionParams]\n(#TextDocumentPositionParams) the response is of type [Declaration](#Declaration)\nor a typed array of [DeclarationLink](#DeclarationLink) or a Thenable that resolves\nto such.",
         .direction = .client_to_server,
         .Params = DeclarationParams,
         .Result = ?union(enum) {
             Declaration: Declaration,
-            array_of_DeclarationLink: []DeclarationLink,
+            array_of_DeclarationLink: []const DeclarationLink,
         },
         .PartialResult = union(enum) {
-            array_of_Location: []Location,
-            array_of_DeclarationLink: []DeclarationLink,
+            array_of_Location: []const Location,
+            array_of_DeclarationLink: []const DeclarationLink,
         },
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DeclarationRegistrationOptions },
     },
     // A request to provide selection ranges in a document. The request's
-    // parameter is of type {@link SelectionRangeParams}, the
-    // response is of type {@link SelectionRange SelectionRange[]} or a Thenable
+    // parameter is of type [SelectionRangeParams](#SelectionRangeParams), the
+    // response is of type [SelectionRange[]](#SelectionRange[]) or a Thenable
     // that resolves to such.
     .{
         .method = "textDocument/selectionRange",
-        .documentation = "A request to provide selection ranges in a document. The request's\nparameter is of type {@link SelectionRangeParams}, the\nresponse is of type {@link SelectionRange SelectionRange[]} or a Thenable\nthat resolves to such.",
+        .documentation = "A request to provide selection ranges in a document. The request's\nparameter is of type [SelectionRangeParams](#SelectionRangeParams), the\nresponse is of type [SelectionRange[]](#SelectionRange[]) or a Thenable\nthat resolves to such.",
         .direction = .client_to_server,
         .Params = SelectionRangeParams,
-        .Result = ?[]SelectionRange,
-        .PartialResult = []SelectionRange,
+        .Result = ?[]const SelectionRange,
+        .PartialResult = []const SelectionRange,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = SelectionRangeRegistrationOptions },
     },
@@ -7130,7 +7150,7 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to result a `CallHierarchyItem` in a document at a given position.\nCan be used as an input to an incoming or outgoing call hierarchy.\n\n@since 3.16.0",
         .direction = .client_to_server,
         .Params = CallHierarchyPrepareParams,
-        .Result = ?[]CallHierarchyItem,
+        .Result = ?[]const CallHierarchyItem,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = CallHierarchyRegistrationOptions },
@@ -7143,8 +7163,8 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to resolve the incoming calls for a given `CallHierarchyItem`.\n\n@since 3.16.0",
         .direction = .client_to_server,
         .Params = CallHierarchyIncomingCallsParams,
-        .Result = ?[]CallHierarchyIncomingCall,
-        .PartialResult = []CallHierarchyIncomingCall,
+        .Result = ?[]const CallHierarchyIncomingCall,
+        .PartialResult = []const CallHierarchyIncomingCall,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = null },
     },
@@ -7156,8 +7176,8 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to resolve the outgoing calls for a given `CallHierarchyItem`.\n\n@since 3.16.0",
         .direction = .client_to_server,
         .Params = CallHierarchyOutgoingCallsParams,
-        .Result = ?[]CallHierarchyOutgoingCall,
-        .PartialResult = []CallHierarchyOutgoingCall,
+        .Result = ?[]const CallHierarchyOutgoingCall,
+        .PartialResult = []const CallHierarchyOutgoingCall,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = null },
     },
@@ -7204,7 +7224,7 @@ pub const request_metadata = [_]RequestMetadata{
     .{
         .method = "workspace/semanticTokens/refresh",
         .documentation = "@since 3.16.0",
-        .direction = .server_to_client,
+        .direction = .client_to_server,
         .Params = null,
         .Result = ?void,
         .PartialResult = null,
@@ -7283,15 +7303,15 @@ pub const request_metadata = [_]RequestMetadata{
         .registration = .{ .method = null, .Options = FileOperationRegistrationOptions },
     },
     // A request to get the moniker of a symbol at a given text document position.
-    // The request parameter is of type {@link TextDocumentPositionParams}.
-    // The response is of type {@link Moniker Moniker[]} or `null`.
+    // The request parameter is of type [TextDocumentPositionParams](#TextDocumentPositionParams).
+    // The response is of type [Moniker[]](#Moniker[]) or `null`.
     .{
         .method = "textDocument/moniker",
-        .documentation = "A request to get the moniker of a symbol at a given text document position.\nThe request parameter is of type {@link TextDocumentPositionParams}.\nThe response is of type {@link Moniker Moniker[]} or `null`.",
+        .documentation = "A request to get the moniker of a symbol at a given text document position.\nThe request parameter is of type [TextDocumentPositionParams](#TextDocumentPositionParams).\nThe response is of type [Moniker[]](#Moniker[]) or `null`.",
         .direction = .client_to_server,
         .Params = MonikerParams,
-        .Result = ?[]Moniker,
-        .PartialResult = []Moniker,
+        .Result = ?[]const Moniker,
+        .PartialResult = []const Moniker,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = MonikerRegistrationOptions },
     },
@@ -7304,7 +7324,7 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to result a `TypeHierarchyItem` in a document at a given position.\nCan be used as an input to a subtypes or supertypes type hierarchy.\n\n@since 3.17.0",
         .direction = .client_to_server,
         .Params = TypeHierarchyPrepareParams,
-        .Result = ?[]TypeHierarchyItem,
+        .Result = ?[]const TypeHierarchyItem,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = TypeHierarchyRegistrationOptions },
@@ -7317,8 +7337,8 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to resolve the supertypes for a given `TypeHierarchyItem`.\n\n@since 3.17.0",
         .direction = .client_to_server,
         .Params = TypeHierarchySupertypesParams,
-        .Result = ?[]TypeHierarchyItem,
-        .PartialResult = []TypeHierarchyItem,
+        .Result = ?[]const TypeHierarchyItem,
+        .PartialResult = []const TypeHierarchyItem,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = null },
     },
@@ -7330,23 +7350,23 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to resolve the subtypes for a given `TypeHierarchyItem`.\n\n@since 3.17.0",
         .direction = .client_to_server,
         .Params = TypeHierarchySubtypesParams,
-        .Result = ?[]TypeHierarchyItem,
-        .PartialResult = []TypeHierarchyItem,
+        .Result = ?[]const TypeHierarchyItem,
+        .PartialResult = []const TypeHierarchyItem,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = null },
     },
     // A request to provide inline values in a document. The request's parameter is of
-    // type {@link InlineValueParams}, the response is of type
-    // {@link InlineValue InlineValue[]} or a Thenable that resolves to such.
+    // type [InlineValueParams](#InlineValueParams), the response is of type
+    // [InlineValue[]](#InlineValue[]) or a Thenable that resolves to such.
     //
     // @since 3.17.0
     .{
         .method = "textDocument/inlineValue",
-        .documentation = "A request to provide inline values in a document. The request's parameter is of\ntype {@link InlineValueParams}, the response is of type\n{@link InlineValue InlineValue[]} or a Thenable that resolves to such.\n\n@since 3.17.0",
+        .documentation = "A request to provide inline values in a document. The request's parameter is of\ntype [InlineValueParams](#InlineValueParams), the response is of type\n[InlineValue[]](#InlineValue[]) or a Thenable that resolves to such.\n\n@since 3.17.0",
         .direction = .client_to_server,
         .Params = InlineValueParams,
-        .Result = ?[]InlineValue,
-        .PartialResult = []InlineValue,
+        .Result = ?[]const InlineValue,
+        .PartialResult = []const InlineValue,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = InlineValueRegistrationOptions },
     },
@@ -7354,7 +7374,7 @@ pub const request_metadata = [_]RequestMetadata{
     .{
         .method = "workspace/inlineValue/refresh",
         .documentation = "@since 3.17.0",
-        .direction = .server_to_client,
+        .direction = .client_to_server,
         .Params = null,
         .Result = ?void,
         .PartialResult = null,
@@ -7362,28 +7382,28 @@ pub const request_metadata = [_]RequestMetadata{
         .registration = .{ .method = null, .Options = null },
     },
     // A request to provide inlay hints in a document. The request's parameter is of
-    // type {@link InlayHintsParams}, the response is of type
-    // {@link InlayHint InlayHint[]} or a Thenable that resolves to such.
+    // type [InlayHintsParams](#InlayHintsParams), the response is of type
+    // [InlayHint[]](#InlayHint[]) or a Thenable that resolves to such.
     //
     // @since 3.17.0
     .{
         .method = "textDocument/inlayHint",
-        .documentation = "A request to provide inlay hints in a document. The request's parameter is of\ntype {@link InlayHintsParams}, the response is of type\n{@link InlayHint InlayHint[]} or a Thenable that resolves to such.\n\n@since 3.17.0",
+        .documentation = "A request to provide inlay hints in a document. The request's parameter is of\ntype [InlayHintsParams](#InlayHintsParams), the response is of type\n[InlayHint[]](#InlayHint[]) or a Thenable that resolves to such.\n\n@since 3.17.0",
         .direction = .client_to_server,
         .Params = InlayHintParams,
-        .Result = ?[]InlayHint,
-        .PartialResult = []InlayHint,
+        .Result = ?[]const InlayHint,
+        .PartialResult = []const InlayHint,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = InlayHintRegistrationOptions },
     },
     // A request to resolve additional properties for an inlay hint.
-    // The request's parameter is of type {@link InlayHint}, the response is
-    // of type {@link InlayHint} or a Thenable that resolves to such.
+    // The request's parameter is of type [InlayHint](#InlayHint), the response is
+    // of type [InlayHint](#InlayHint) or a Thenable that resolves to such.
     //
     // @since 3.17.0
     .{
         .method = "inlayHint/resolve",
-        .documentation = "A request to resolve additional properties for an inlay hint.\nThe request's parameter is of type {@link InlayHint}, the response is\nof type {@link InlayHint} or a Thenable that resolves to such.\n\n@since 3.17.0",
+        .documentation = "A request to resolve additional properties for an inlay hint.\nThe request's parameter is of type [InlayHint](#InlayHint), the response is\nof type [InlayHint](#InlayHint) or a Thenable that resolves to such.\n\n@since 3.17.0",
         .direction = .client_to_server,
         .Params = InlayHint,
         .Result = InlayHint,
@@ -7395,7 +7415,7 @@ pub const request_metadata = [_]RequestMetadata{
     .{
         .method = "workspace/inlayHint/refresh",
         .documentation = "@since 3.17.0",
-        .direction = .server_to_client,
+        .direction = .client_to_server,
         .Params = null,
         .Result = ?void,
         .PartialResult = null,
@@ -7434,7 +7454,7 @@ pub const request_metadata = [_]RequestMetadata{
     .{
         .method = "workspace/diagnostic/refresh",
         .documentation = "The diagnostic refresh request definition.\n\n@since 3.17.0",
-        .direction = .server_to_client,
+        .direction = .client_to_server,
         .Params = null,
         .Result = ?void,
         .PartialResult = null,
@@ -7467,12 +7487,12 @@ pub const request_metadata = [_]RequestMetadata{
     },
     // The initialize request is sent from the client to the server.
     // It is sent once as the request after starting up the server.
-    // The requests parameter is of type {@link InitializeParams}
-    // the response if of type {@link InitializeResult} of a Thenable that
+    // The requests parameter is of type [InitializeParams](#InitializeParams)
+    // the response if of type [InitializeResult](#InitializeResult) of a Thenable that
     // resolves to such.
     .{
         .method = "initialize",
-        .documentation = "The initialize request is sent from the client to the server.\nIt is sent once as the request after starting up the server.\nThe requests parameter is of type {@link InitializeParams}\nthe response if of type {@link InitializeResult} of a Thenable that\nresolves to such.",
+        .documentation = "The initialize request is sent from the client to the server.\nIt is sent once as the request after starting up the server.\nThe requests parameter is of type [InitializeParams](#InitializeParams)\nthe response if of type [InitializeResult](#InitializeResult) of a Thenable that\nresolves to such.",
         .direction = .client_to_server,
         .Params = InitializeParams,
         .Result = InitializeResult,
@@ -7517,39 +7537,39 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A document will save request is sent from the client to the server before\nthe document is actually saved. The request can return an array of TextEdits\nwhich will be applied to the text document before it is saved. Please note that\nclients might drop results if computing the text edits took too long or if a\nserver constantly fails on this request. This is done to keep the save fast and\nreliable.",
         .direction = .client_to_server,
         .Params = WillSaveTextDocumentParams,
-        .Result = ?[]TextEdit,
+        .Result = ?[]const TextEdit,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = TextDocumentRegistrationOptions },
     },
     // Request to request completion at a given text document position. The request's
-    // parameter is of type {@link TextDocumentPosition} the response
-    // is of type {@link CompletionItem CompletionItem[]} or {@link CompletionList}
+    // parameter is of type [TextDocumentPosition](#TextDocumentPosition) the response
+    // is of type [CompletionItem[]](#CompletionItem) or [CompletionList](#CompletionList)
     // or a Thenable that resolves to such.
     //
-    // The request can delay the computation of the {@link CompletionItem.detail `detail`}
-    // and {@link CompletionItem.documentation `documentation`} properties to the `completionItem/resolve`
+    // The request can delay the computation of the [`detail`](#CompletionItem.detail)
+    // and [`documentation`](#CompletionItem.documentation) properties to the `completionItem/resolve`
     // request. However, properties that are needed for the initial sorting and filtering, like `sortText`,
     // `filterText`, `insertText`, and `textEdit`, must not be changed during resolve.
     .{
         .method = "textDocument/completion",
-        .documentation = "Request to request completion at a given text document position. The request's\nparameter is of type {@link TextDocumentPosition} the response\nis of type {@link CompletionItem CompletionItem[]} or {@link CompletionList}\nor a Thenable that resolves to such.\n\nThe request can delay the computation of the {@link CompletionItem.detail `detail`}\nand {@link CompletionItem.documentation `documentation`} properties to the `completionItem/resolve`\nrequest. However, properties that are needed for the initial sorting and filtering, like `sortText`,\n`filterText`, `insertText`, and `textEdit`, must not be changed during resolve.",
+        .documentation = "Request to request completion at a given text document position. The request's\nparameter is of type [TextDocumentPosition](#TextDocumentPosition) the response\nis of type [CompletionItem[]](#CompletionItem) or [CompletionList](#CompletionList)\nor a Thenable that resolves to such.\n\nThe request can delay the computation of the [`detail`](#CompletionItem.detail)\nand [`documentation`](#CompletionItem.documentation) properties to the `completionItem/resolve`\nrequest. However, properties that are needed for the initial sorting and filtering, like `sortText`,\n`filterText`, `insertText`, and `textEdit`, must not be changed during resolve.",
         .direction = .client_to_server,
         .Params = CompletionParams,
         .Result = ?union(enum) {
-            array_of_CompletionItem: []CompletionItem,
+            array_of_CompletionItem: []const CompletionItem,
             CompletionList: CompletionList,
         },
-        .PartialResult = []CompletionItem,
+        .PartialResult = []const CompletionItem,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = CompletionRegistrationOptions },
     },
     // Request to resolve additional information for a given completion item.The request's
-    // parameter is of type {@link CompletionItem} the response
-    // is of type {@link CompletionItem} or a Thenable that resolves to such.
+    // parameter is of type [CompletionItem](#CompletionItem) the response
+    // is of type [CompletionItem](#CompletionItem) or a Thenable that resolves to such.
     .{
         .method = "completionItem/resolve",
-        .documentation = "Request to resolve additional information for a given completion item.The request's\nparameter is of type {@link CompletionItem} the response\nis of type {@link CompletionItem} or a Thenable that resolves to such.",
+        .documentation = "Request to resolve additional information for a given completion item.The request's\nparameter is of type [CompletionItem](#CompletionItem) the response\nis of type [CompletionItem](#CompletionItem) or a Thenable that resolves to such.",
         .direction = .client_to_server,
         .Params = CompletionItem,
         .Result = CompletionItem,
@@ -7558,11 +7578,11 @@ pub const request_metadata = [_]RequestMetadata{
         .registration = .{ .method = null, .Options = null },
     },
     // Request to request hover information at a given text document position. The request's
-    // parameter is of type {@link TextDocumentPosition} the response is of
-    // type {@link Hover} or a Thenable that resolves to such.
+    // parameter is of type [TextDocumentPosition](#TextDocumentPosition) the response is of
+    // type [Hover](#Hover) or a Thenable that resolves to such.
     .{
         .method = "textDocument/hover",
-        .documentation = "Request to request hover information at a given text document position. The request's\nparameter is of type {@link TextDocumentPosition} the response is of\ntype {@link Hover} or a Thenable that resolves to such.",
+        .documentation = "Request to request hover information at a given text document position. The request's\nparameter is of type [TextDocumentPosition](#TextDocumentPosition) the response is of\ntype [Hover](#Hover) or a Thenable that resolves to such.",
         .direction = .client_to_server,
         .Params = HoverParams,
         .Result = ?Hover,
@@ -7582,69 +7602,69 @@ pub const request_metadata = [_]RequestMetadata{
     },
     // A request to resolve the definition location of a symbol at a given text
     // document position. The request's parameter is of type [TextDocumentPosition]
-    // (#TextDocumentPosition) the response is of either type {@link Definition}
-    // or a typed array of {@link DefinitionLink} or a Thenable that resolves
+    // (#TextDocumentPosition) the response is of either type [Definition](#Definition)
+    // or a typed array of [DefinitionLink](#DefinitionLink) or a Thenable that resolves
     // to such.
     .{
         .method = "textDocument/definition",
-        .documentation = "A request to resolve the definition location of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPosition]\n(#TextDocumentPosition) the response is of either type {@link Definition}\nor a typed array of {@link DefinitionLink} or a Thenable that resolves\nto such.",
+        .documentation = "A request to resolve the definition location of a symbol at a given text\ndocument position. The request's parameter is of type [TextDocumentPosition]\n(#TextDocumentPosition) the response is of either type [Definition](#Definition)\nor a typed array of [DefinitionLink](#DefinitionLink) or a Thenable that resolves\nto such.",
         .direction = .client_to_server,
         .Params = DefinitionParams,
         .Result = ?union(enum) {
             Definition: Definition,
-            array_of_DefinitionLink: []DefinitionLink,
+            array_of_DefinitionLink: []const DefinitionLink,
         },
         .PartialResult = union(enum) {
-            array_of_Location: []Location,
-            array_of_DefinitionLink: []DefinitionLink,
+            array_of_Location: []const Location,
+            array_of_DefinitionLink: []const DefinitionLink,
         },
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DefinitionRegistrationOptions },
     },
     // A request to resolve project-wide references for the symbol denoted
     // by the given text document position. The request's parameter is of
-    // type {@link ReferenceParams} the response is of type
-    // {@link Location Location[]} or a Thenable that resolves to such.
+    // type [ReferenceParams](#ReferenceParams) the response is of type
+    // [Location[]](#Location) or a Thenable that resolves to such.
     .{
         .method = "textDocument/references",
-        .documentation = "A request to resolve project-wide references for the symbol denoted\nby the given text document position. The request's parameter is of\ntype {@link ReferenceParams} the response is of type\n{@link Location Location[]} or a Thenable that resolves to such.",
+        .documentation = "A request to resolve project-wide references for the symbol denoted\nby the given text document position. The request's parameter is of\ntype [ReferenceParams](#ReferenceParams) the response is of type\n[Location[]](#Location) or a Thenable that resolves to such.",
         .direction = .client_to_server,
         .Params = ReferenceParams,
-        .Result = ?[]Location,
-        .PartialResult = []Location,
+        .Result = ?[]const Location,
+        .PartialResult = []const Location,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = ReferenceRegistrationOptions },
     },
-    // Request to resolve a {@link DocumentHighlight} for a given
+    // Request to resolve a [DocumentHighlight](#DocumentHighlight) for a given
     // text document position. The request's parameter is of type [TextDocumentPosition]
     // (#TextDocumentPosition) the request response is of type [DocumentHighlight[]]
     // (#DocumentHighlight) or a Thenable that resolves to such.
     .{
         .method = "textDocument/documentHighlight",
-        .documentation = "Request to resolve a {@link DocumentHighlight} for a given\ntext document position. The request's parameter is of type [TextDocumentPosition]\n(#TextDocumentPosition) the request response is of type [DocumentHighlight[]]\n(#DocumentHighlight) or a Thenable that resolves to such.",
+        .documentation = "Request to resolve a [DocumentHighlight](#DocumentHighlight) for a given\ntext document position. The request's parameter is of type [TextDocumentPosition]\n(#TextDocumentPosition) the request response is of type [DocumentHighlight[]]\n(#DocumentHighlight) or a Thenable that resolves to such.",
         .direction = .client_to_server,
         .Params = DocumentHighlightParams,
-        .Result = ?[]DocumentHighlight,
-        .PartialResult = []DocumentHighlight,
+        .Result = ?[]const DocumentHighlight,
+        .PartialResult = []const DocumentHighlight,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DocumentHighlightRegistrationOptions },
     },
     // A request to list all symbols found in a given text document. The request's
-    // parameter is of type {@link TextDocumentIdentifier} the
-    // response is of type {@link SymbolInformation SymbolInformation[]} or a Thenable
+    // parameter is of type [TextDocumentIdentifier](#TextDocumentIdentifier) the
+    // response is of type [SymbolInformation[]](#SymbolInformation) or a Thenable
     // that resolves to such.
     .{
         .method = "textDocument/documentSymbol",
-        .documentation = "A request to list all symbols found in a given text document. The request's\nparameter is of type {@link TextDocumentIdentifier} the\nresponse is of type {@link SymbolInformation SymbolInformation[]} or a Thenable\nthat resolves to such.",
+        .documentation = "A request to list all symbols found in a given text document. The request's\nparameter is of type [TextDocumentIdentifier](#TextDocumentIdentifier) the\nresponse is of type [SymbolInformation[]](#SymbolInformation) or a Thenable\nthat resolves to such.",
         .direction = .client_to_server,
         .Params = DocumentSymbolParams,
         .Result = ?union(enum) {
-            array_of_SymbolInformation: []SymbolInformation,
-            array_of_DocumentSymbol: []DocumentSymbol,
+            array_of_SymbolInformation: []const SymbolInformation,
+            array_of_DocumentSymbol: []const DocumentSymbol,
         },
         .PartialResult = union(enum) {
-            array_of_SymbolInformation: []SymbolInformation,
-            array_of_DocumentSymbol: []DocumentSymbol,
+            array_of_SymbolInformation: []const SymbolInformation,
+            array_of_DocumentSymbol: []const DocumentSymbol,
         },
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DocumentSymbolRegistrationOptions },
@@ -7655,11 +7675,11 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to provide commands for the given text document and range.",
         .direction = .client_to_server,
         .Params = CodeActionParams,
-        .Result = ?[]union(enum) {
+        .Result = ?[]const union(enum) {
             Command: Command,
             CodeAction: CodeAction,
         },
-        .PartialResult = []union(enum) {
+        .PartialResult = []const union(enum) {
             Command: Command,
             CodeAction: CodeAction,
         },
@@ -7667,11 +7687,11 @@ pub const request_metadata = [_]RequestMetadata{
         .registration = .{ .method = null, .Options = CodeActionRegistrationOptions },
     },
     // Request to resolve additional information for a given code action.The request's
-    // parameter is of type {@link CodeAction} the response
-    // is of type {@link CodeAction} or a Thenable that resolves to such.
+    // parameter is of type [CodeAction](#CodeAction) the response
+    // is of type [CodeAction](#CodeAction) or a Thenable that resolves to such.
     .{
         .method = "codeAction/resolve",
-        .documentation = "Request to resolve additional information for a given code action.The request's\nparameter is of type {@link CodeAction} the response\nis of type {@link CodeAction} or a Thenable that resolves to such.",
+        .documentation = "Request to resolve additional information for a given code action.The request's\nparameter is of type [CodeAction](#CodeAction) the response\nis of type [CodeAction](#CodeAction) or a Thenable that resolves to such.",
         .direction = .client_to_server,
         .Params = CodeAction,
         .Result = CodeAction,
@@ -7680,8 +7700,8 @@ pub const request_metadata = [_]RequestMetadata{
         .registration = .{ .method = null, .Options = null },
     },
     // A request to list project-wide symbols matching the query string given
-    // by the {@link WorkspaceSymbolParams}. The response is
-    // of type {@link SymbolInformation SymbolInformation[]} or a Thenable that
+    // by the [WorkspaceSymbolParams](#WorkspaceSymbolParams). The response is
+    // of type [SymbolInformation[]](#SymbolInformation) or a Thenable that
     // resolves to such.
     //
     // @since 3.17.0 - support for WorkspaceSymbol in the returned data. Clients
@@ -7690,16 +7710,16 @@ pub const request_metadata = [_]RequestMetadata{
     //
     .{
         .method = "workspace/symbol",
-        .documentation = "A request to list project-wide symbols matching the query string given\nby the {@link WorkspaceSymbolParams}. The response is\nof type {@link SymbolInformation SymbolInformation[]} or a Thenable that\nresolves to such.\n\n@since 3.17.0 - support for WorkspaceSymbol in the returned data. Clients\n need to advertise support for WorkspaceSymbols via the client capability\n `workspace.symbol.resolveSupport`.\n",
+        .documentation = "A request to list project-wide symbols matching the query string given\nby the [WorkspaceSymbolParams](#WorkspaceSymbolParams). The response is\nof type [SymbolInformation[]](#SymbolInformation) or a Thenable that\nresolves to such.\n\n@since 3.17.0 - support for WorkspaceSymbol in the returned data. Clients\n need to advertise support for WorkspaceSymbols via the client capability\n `workspace.symbol.resolveSupport`.\n",
         .direction = .client_to_server,
         .Params = WorkspaceSymbolParams,
         .Result = ?union(enum) {
-            array_of_SymbolInformation: []SymbolInformation,
-            array_of_WorkspaceSymbol: []WorkspaceSymbol,
+            array_of_SymbolInformation: []const SymbolInformation,
+            array_of_WorkspaceSymbol: []const WorkspaceSymbol,
         },
         .PartialResult = union(enum) {
-            array_of_SymbolInformation: []SymbolInformation,
-            array_of_WorkspaceSymbol: []WorkspaceSymbol,
+            array_of_SymbolInformation: []const SymbolInformation,
+            array_of_WorkspaceSymbol: []const WorkspaceSymbol,
         },
         .ErrorData = null,
         .registration = .{ .method = null, .Options = WorkspaceSymbolRegistrationOptions },
@@ -7724,8 +7744,8 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to provide code lens for the given text document.",
         .direction = .client_to_server,
         .Params = CodeLensParams,
-        .Result = ?[]CodeLens,
-        .PartialResult = []CodeLens,
+        .Result = ?[]const CodeLens,
+        .PartialResult = []const CodeLens,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = CodeLensRegistrationOptions },
     },
@@ -7759,17 +7779,17 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to provide document links",
         .direction = .client_to_server,
         .Params = DocumentLinkParams,
-        .Result = ?[]DocumentLink,
-        .PartialResult = []DocumentLink,
+        .Result = ?[]const DocumentLink,
+        .PartialResult = []const DocumentLink,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DocumentLinkRegistrationOptions },
     },
     // Request to resolve additional information for a given document link. The request's
-    // parameter is of type {@link DocumentLink} the response
-    // is of type {@link DocumentLink} or a Thenable that resolves to such.
+    // parameter is of type [DocumentLink](#DocumentLink) the response
+    // is of type [DocumentLink](#DocumentLink) or a Thenable that resolves to such.
     .{
         .method = "documentLink/resolve",
-        .documentation = "Request to resolve additional information for a given document link. The request's\nparameter is of type {@link DocumentLink} the response\nis of type {@link DocumentLink} or a Thenable that resolves to such.",
+        .documentation = "Request to resolve additional information for a given document link. The request's\nparameter is of type [DocumentLink](#DocumentLink) the response\nis of type [DocumentLink](#DocumentLink) or a Thenable that resolves to such.",
         .direction = .client_to_server,
         .Params = DocumentLink,
         .Result = DocumentLink,
@@ -7783,7 +7803,7 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to to format a whole document.",
         .direction = .client_to_server,
         .Params = DocumentFormattingParams,
-        .Result = ?[]TextEdit,
+        .Result = ?[]const TextEdit,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DocumentFormattingRegistrationOptions },
@@ -7794,7 +7814,7 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to to format a range in a document.",
         .direction = .client_to_server,
         .Params = DocumentRangeFormattingParams,
-        .Result = ?[]TextEdit,
+        .Result = ?[]const TextEdit,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DocumentRangeFormattingRegistrationOptions },
@@ -7805,7 +7825,7 @@ pub const request_metadata = [_]RequestMetadata{
         .documentation = "A request to format a document on type.",
         .direction = .client_to_server,
         .Params = DocumentOnTypeFormattingParams,
-        .Result = ?[]TextEdit,
+        .Result = ?[]const TextEdit,
         .PartialResult = null,
         .ErrorData = null,
         .registration = .{ .method = null, .Options = DocumentOnTypeFormattingRegistrationOptions },
