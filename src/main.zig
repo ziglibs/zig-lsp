@@ -7,15 +7,16 @@ pub const Handler = struct {
 
     done: bool = false,
 
-    // pub fn initialize(
-    //     handler: *Handler,
-    //     id: connection.lsp.RequestId,
-    //     params: connection.lsp.InitializeParams,
-    // ) connection.lsp.InitializeResult {
-    //     return .{
-    //         .capabilities = .{},
-    //     };
-    // }
+    pub fn @"window/logMessage"(handler: *Handler, params: lsp.LogMessageParams) !void {
+        _ = handler;
+        const logMessage = std.log.scoped(.logMessage);
+        switch (params.type) {
+            .Error => logMessage.err("{s}", .{params.message}),
+            .Warning => logMessage.warn("{s}", .{params.message}),
+            .Info => logMessage.info("{s}", .{params.message}),
+            .Log => logMessage.debug("{s}", .{params.message}),
+        }
+    }
 };
 
 pub fn main() !void {
@@ -66,17 +67,14 @@ pub fn main() !void {
         },
     }, .{ .onResponse = cb.res, .onError = cb.err });
 
-    while (!handler.done) {
-        try conn.accept();
-    }
-    handler.done = false;
+    try conn.acceptUntilResponse();
 
     try conn.notify("textDocument/didOpen", .{
         .textDocument = .{
             .uri = "file:///file.js",
             .languageId = "js",
             .version = 123,
-            .text = 
+            .text =
             \\/**
             \\ * @type {number}
             \\ */

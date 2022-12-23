@@ -199,10 +199,29 @@ pub fn Connection(
 
                 @panic("Received response to non-existent request");
             } else if (maybe_method) |method| {
+                inline for (lsp.notification_metadata) |notif| {
+                    if (@hasDecl(HandlerType, notif.method)) {
+                        if (std.mem.eql(u8, notif.method, method.String)) {
+                            const value = try tres.parse(NotificationParams(notif.method), tree.Object.get("params").?, allocator);
+                            try @field(HandlerType, notif.method)(conn.handler, value);
+                            return;
+                        }
+                    }
+                }
+
                 std.log.info("Notifications not handled: {s}", .{method.String});
+
                 // @panic("TODO: Handle notification");
             } else {
                 @panic("Invalid JSON-RPC message.");
+            }
+        }
+
+        pub fn acceptUntilResponse(conn: *Self) !void {
+            const initial_size = conn.callback_map.size;
+            while (true) {
+                try conn.accept();
+                if (initial_size != conn.callback_map.size) return;
             }
         }
 
