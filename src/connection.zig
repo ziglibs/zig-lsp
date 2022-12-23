@@ -180,13 +180,14 @@ pub fn Connection(
             const maybe_method = tree.Object.get("method");
 
             if (maybe_id != null and maybe_method != null) {
-                const id = maybe_id.?;
+                const id = try tres.parse(lsp.RequestId, maybe_id.?, allocator);
                 const method = maybe_method.?.String;
 
                 inline for (lsp.request_metadata) |req| {
                     if (@hasDecl(ContextType, req.method)) {
-                        if (std.mem.eql(u8, req.method, method.String)) {
-                            const value = try tres.parse(NotificationParams(req.method), tree.Object.get("params").?, allocator);
+                        if (std.mem.eql(u8, req.method, method)) {
+                            @setEvalBranchQuota(100_000);
+                            const value = try tres.parse(RequestParams(req.method), tree.Object.get("params").?, allocator);
                             try conn.respond(req.method, id, try @field(ContextType, req.method)(conn, id, value));
                             return;
                         }

@@ -27,7 +27,8 @@ pub const Context = struct {
 pub fn main() !void {
     const allocator = std.heap.page_allocator;
 
-    var process = std.ChildProcess.init(&.{ "typescript-language-server", "--stdio" }, allocator);
+    // var process = std.ChildProcess.init(&.{ "typescript-language-server", "--stdio" }, allocator);
+    var process = std.ChildProcess.init(&.{ "C:\\Programming\\Zig\\zls\\zig-out\\bin\\zls.exe", "--enable-debug-log" }, allocator);
 
     process.stdin_behavior = .Pipe;
     process.stdout_behavior = .Pipe;
@@ -73,46 +74,46 @@ pub fn main() !void {
 
     try conn.acceptUntilResponse();
 
-    try conn.notify("textDocument/didOpen", .{
-        .textDocument = .{
-            .uri = "file:///file.js",
-            .languageId = "js",
-            .version = 123,
-            .text =
-            \\/**
-            \\ * @type {number}
-            \\ */
-            \\var abc = 123;
-            ,
-        },
-    });
+    // try conn.notify("textDocument/didOpen", .{
+    //     .textDocument = .{
+    //         .uri = "file:///file.js",
+    //         .languageId = "js",
+    //         .version = 123,
+    //         .text =
+    //         \\/**
+    //         \\ * @type {number}
+    //         \\ */
+    //         \\var abc = 123;
+    //         ,
+    //     },
+    // });
 
-    const cb2 = struct {
-        pub fn res(_: *Connection, result: connection.RequestResult("textDocument/documentSymbol")) !void {
-            std.log.info("bruh {any}", .{result.?.array_of_DocumentSymbol});
-        }
+    // const cb2 = struct {
+    //     pub fn res(_: *Connection, result: connection.RequestResult("textDocument/documentSymbol")) !void {
+    //         std.log.info("bruh {any}", .{result.?.array_of_DocumentSymbol});
+    //     }
 
-        pub fn err(_: *Connection) !void {}
-    };
+    //     pub fn err(_: *Connection) !void {}
+    // };
 
-    try conn.request("textDocument/documentSymbol", .{
-        .textDocument = .{
-            .uri = "file:///file.js",
-        },
-    }, .{
-        .onResponse = cb2.res,
-        .onError = cb2.err,
-    });
+    // try conn.request("textDocument/documentSymbol", .{
+    //     .textDocument = .{
+    //         .uri = "file:///file.js",
+    //     },
+    // }, .{
+    //     .onResponse = cb2.res,
+    //     .onError = cb2.err,
+    // });
 
-    try conn.acceptUntilResponse();
+    // try conn.acceptUntilResponse();
 
-    try conn.notify("workspace/didChangeConfiguration", .{
-        .settings = .Null,
-    });
+    // try conn.notify("workspace/didChangeConfiguration", .{
+    //     .settings = .Null,
+    // });
 
-    while (true) {
-        try conn.accept();
-    }
+    // while (true) {
+    //     try conn.accept();
+    // }
 
     // const cb = struct {
     //     pub fn res(context: *Context, result: lsp.InitializeResult) !void {
