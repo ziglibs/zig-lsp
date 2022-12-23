@@ -33,14 +33,14 @@ const StoredCallback = struct {
     onError: *const fn () void,
 };
 pub fn RequestCallback(
-    comptime HandlerType: type,
+    comptime ConnectionType: type,
     comptime method: []const u8,
 ) type {
     return struct {
         const Self = @This();
 
-        const OnResponse = *const fn (handler: *HandlerType, result: RequestResult(method)) anyerror!void;
-        const OnError = *const fn (handler: *HandlerType) anyerror!void;
+        const OnResponse = *const fn (conn: *ConnectionType, result: RequestResult(method)) anyerror!void;
+        const OnError = *const fn (conn: *ConnectionType) anyerror!void;
 
         onResponse: OnResponse,
         onError: OnError,
@@ -62,10 +62,14 @@ pub fn RequestCallback(
     };
 }
 
+pub fn connection(allocator: std.mem.Allocator, reader: anytype, writer: anytype, context: anytype) Connection(@TypeOf(reader), @TypeOf(writer), @TypeOf(context)) {
+    return Connection(@TypeOf(reader), @TypeOf(writer), @TypeOf(context)).init(allocator, reader, writer, context);
+}
+
 pub fn Connection(
     comptime ReaderType: type,
     comptime WriterType: type,
-    comptime HandlerType: type,
+    comptime ContextType: type,
 ) type {
     return struct {
         const Self = @This();
@@ -73,7 +77,7 @@ pub fn Connection(
         allocator: std.mem.Allocator,
         reader: ReaderType,
         writer: WriterType,
-        handler: *HandlerType,
+        context: *ContextType,
 
         id: usize = 0,
         write_buffer: std.ArrayListUnmanaged(u8) = .{},
@@ -85,13 +89,13 @@ pub fn Connection(
             allocator: std.mem.Allocator,
             reader: ReaderType,
             writer: WriterType,
-            handler: *HandlerType,
+            context: *ContextType,
         ) Self {
             return .{
                 .allocator = allocator,
                 .reader = reader,
                 .writer = writer,
-                .handler = handler,
+                .context = context,
             };
         }
 
@@ -124,7 +128,7 @@ pub fn Connection(
             conn: *Self,
             comptime method: []const u8,
             params: RequestParams(method),
-            callback: RequestCallback(HandlerType, method),
+            callback: RequestCallback(Self, method),
         ) !void {
             try conn.send(.{
                 .jsonrpc = "2.0",
@@ -146,7 +150,7 @@ pub fn Connection(
         //     const entry = conn.callback_map.fetchRemove(id) orelse @panic("nothing!");
         //     inline for (lsp.request_metadata) |req| {
         //         if (std.mem.eql(u8, req.method, entry.value.method)) {
-        //             try (RequestCallback(HandlerType, req.method).unstore(entry.value).onResponse(&conn.handler, undefined));
+        //             try (RequestCallback(ContextType, req.method).unstore(entry.value).onResponse(&conn.context, undefined));
         //         }
         //     }
         // }
@@ -182,7 +186,6 @@ pub fn Connection(
 
                 // try conn.handleRequest(allocator, tree, id, method);
             } else if (maybe_id) |id| {
-                std.log.info("Received response {d}", .{maybe_id.?.Integer});
                 @setEvalBranchQuota(100_000);
 
                 // TODO: Handle errors
@@ -192,7 +195,7 @@ pub fn Connection(
                 inline for (lsp.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
                         const value = try tres.parse(RequestResult(req.method), tree.Object.get("result").?, allocator);
-                        try (RequestCallback(HandlerType, req.method).unstore(entry.value).onResponse(conn.handler, value));
+                        try (RequestCallback(Self, req.method).unstore(entry.value).onResponse(conn, value));
                         return;
                     }
                 }
@@ -200,10 +203,10 @@ pub fn Connection(
                 @panic("Received response to non-existent request");
             } else if (maybe_method) |method| {
                 inline for (lsp.notification_metadata) |notif| {
-                    if (@hasDecl(HandlerType, notif.method)) {
+                    if (@hasDecl(ContextType, notif.method)) {
                         if (std.mem.eql(u8, notif.method, method.String)) {
                             const value = try tres.parse(NotificationParams(notif.method), tree.Object.get("params").?, allocator);
-                            try @field(HandlerType, notif.method)(conn.handler, value);
+                            try @field(ContextType, notif.method)(conn, value);
                             return;
                         }
                     }
@@ -233,14 +236,14 @@ pub fn Connection(
             method: []const u8,
         ) !void {
             inline for (lsp.request_metadata) |entry| {
-                if (@hasDecl(HandlerType, entry.method)) {
-                    const handler_func = @field(HandlerType, entry.method);
-                    const func_info = @Type(handler_func).Fn;
+                if (@hasDecl(ContextType, entry.method)) {
+                    const context_func = @field(ContextType, entry.method);
+                    const func_info = @Type(context_func).Fn;
 
                     const params = func_info.params;
                     if (params.len != 3) @compileError("Handler function has invalid number of parameters");
-                    const handler_param_type = params[0].type;
-                    if (handler_param_type != *HandlerType) @compileError("First parameter of all handlers should be the handler instance");
+                    const context_param_type = params[0].type;
+                    if (context_param_type != *ContextType) @compileError("First parameter of all contexts should be the context instance");
                     const id_type = params[1].type;
                     if (id != lsp.RequestId) @compileError("Expected RequestId found " ++ @typeName(id_type));
                     const params_type = params[2].type;
@@ -249,7 +252,7 @@ pub fn Connection(
                     // TODO: Handle errors
                     if (func_info.return_type != entry.Result) @compileError("Expected " ++ @typeName(entry.Result) ++ " found " ++ @typeName(func_info.return_type));
 
-                    const output = handler_func(conn.handler, id, try tres.parse(entry.Params, value, arena));
+                    const output = context_func(conn.context, id, try tres.parse(entry.Params, value, arena));
                     std.log.info("{s}", .{output});
                 } else {
                     // TODO: Return error unimplemented
@@ -257,7 +260,7 @@ pub fn Connection(
                 }
             }
 
-            // TODO: Support custom method handlers
+            // TODO: Support custom method contexts
             std.log.err("Encountered unknown method: {s}", .{method});
             @panic("Unknown");
         }

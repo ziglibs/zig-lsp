@@ -2,13 +2,16 @@ const std = @import("std");
 const lsp = @import("lsp.zig");
 const connection = @import("connection.zig");
 
-pub const Handler = struct {
+const Connection = connection.Connection(
+    std.fs.File.Reader,
+    std.fs.File.Writer,
+    Context,
+);
+
+pub const Context = struct {
     pub const Error = error{};
 
-    done: bool = false,
-
-    pub fn @"window/logMessage"(handler: *Handler, params: lsp.LogMessageParams) !void {
-        _ = handler;
+    pub fn @"window/logMessage"(_: *Connection, params: lsp.LogMessageParams) !void {
         const logMessage = std.log.scoped(.logMessage);
         switch (params.type) {
             .Error => logMessage.err("{s}", .{params.message}),
@@ -17,6 +20,8 @@ pub const Handler = struct {
             .Log => logMessage.debug("{s}", .{params.message}),
         }
     }
+
+    pub fn @"textDocument/publishDiagnostics"(_: *Connection, _: lsp.PublishDiagnosticsParams) !void {}
 };
 
 pub fn main() !void {
@@ -32,29 +37,22 @@ pub fn main() !void {
 
     var reader = process.stdout.?.reader();
     var writer = process.stdin.?.writer();
-    const Connection = connection.Connection(
-        @TypeOf(reader),
-        @TypeOf(writer),
-        Handler,
-    );
 
-    var handler = Handler{};
+    var context = Context{};
     var conn = Connection.init(
         allocator,
         reader,
         writer,
-        &handler,
+        &context,
     );
 
     const cb = struct {
-        pub fn res(h: *Handler, result: lsp.InitializeResult) !void {
+        pub fn res(conn_: *Connection, result: lsp.InitializeResult) !void {
             std.log.info("bruh {any}", .{result});
-            h.done = true;
+            try conn_.notify("initialized", .{});
         }
 
-        pub fn err(h: *Handler) !void {
-            _ = h;
-        }
+        pub fn err(_: *Connection) !void {}
     };
 
     try conn.request("initialize", .{
@@ -62,6 +60,12 @@ pub fn main() !void {
             .textDocument = .{
                 .documentSymbol = .{
                     .hierarchicalDocumentSymbolSupport = true,
+                },
+            },
+            .workspace = .{
+                .configuration = true,
+                .didChangeConfiguration = .{
+                    .dynamicRegistration = true,
                 },
             },
         },
@@ -84,14 +88,11 @@ pub fn main() !void {
     });
 
     const cb2 = struct {
-        pub fn res(h: *Handler, result: connection.RequestResult("textDocument/documentSymbol")) !void {
+        pub fn res(_: *Connection, result: connection.RequestResult("textDocument/documentSymbol")) !void {
             std.log.info("bruh {any}", .{result.?.array_of_DocumentSymbol});
-            h.done = true;
         }
 
-        pub fn err(h: *Handler) !void {
-            _ = h;
-        }
+        pub fn err(_: *Connection) !void {}
     };
 
     try conn.request("textDocument/documentSymbol", .{
@@ -103,20 +104,25 @@ pub fn main() !void {
         .onError = cb2.err,
     });
 
-    while (!handler.done) {
+    try conn.acceptUntilResponse();
+
+    try conn.notify("workspace/didChangeConfiguration", .{
+        .settings = .Null,
+    });
+
+    while (true) {
         try conn.accept();
     }
-    handler.done = false;
 
     // const cb = struct {
-    //     pub fn res(handler: *Handler, result: lsp.InitializeResult) !void {
+    //     pub fn res(context: *Context, result: lsp.InitializeResult) !void {
     //         std.log.info("bruh", .{});
-    //         _ = handler;
+    //         _ = context;
     //         _ = result;
     //     }
 
-    //     pub fn err(handler: *Handler) !void {
-    //         _ = handler;
+    //     pub fn err(context: *Context) !void {
+    //         _ = context;
     //     }
     // };
 
