@@ -78,6 +78,7 @@ pub fn Connection(
         reader: ReaderType,
         writer: WriterType,
         context: *ContextType,
+        _resdata: *anyopaque = undefined,
 
         id: usize = 0,
         write_buffer: std.ArrayListUnmanaged(u8) = .{},
@@ -142,6 +143,29 @@ pub fn Connection(
             conn.id +%= 1;
         }
 
+        pub fn requestSync(
+            conn: *Self,
+            arena: std.mem.Allocator,
+            comptime method: []const u8,
+            params: RequestParams(method),
+        ) !RequestResult(method) {
+            var resdata: RequestResult(method) = undefined;
+            conn._resdata = &resdata;
+
+            const cb = struct {
+                pub fn res(conn_: *Self, result: RequestResult(method)) !void {
+                    @ptrCast(*RequestResult(method), @alignCast(@alignOf(RequestResult(method)), conn_._resdata)).* = result;
+                }
+
+                pub fn err(_: *Self) !void {}
+            };
+
+            try conn.request(method, params, .{ .onResponse = cb.res, .onError = cb.err });
+            try conn.acceptUntilResponse(arena);
+
+            return resdata;
+        }
+
         pub fn respond(
             conn: *Self,
             comptime method: []const u8,
@@ -155,11 +179,11 @@ pub fn Connection(
             });
         }
 
-        pub fn accept(conn: *Self) !void {
-            var arena = std.heap.ArenaAllocator.init(conn.allocator);
-            defer arena.deinit();
-
-            const allocator = arena.allocator();
+        pub fn accept(conn: *Self, arena: std.mem.Allocator) !void {
+            // var arena = std.heap.ArenaAllocator.init(conn.allocator);
+            // defer arena.deinit();
+            // const allocator = arena.allocator();
+            const allocator = arena;
 
             const header = try Header.decode(allocator, conn.reader);
 
@@ -236,10 +260,10 @@ pub fn Connection(
             }
         }
 
-        pub fn acceptUntilResponse(conn: *Self) !void {
+        pub fn acceptUntilResponse(conn: *Self, arena: std.mem.Allocator) !void {
             const initial_size = conn.callback_map.size;
             while (true) {
-                try conn.accept();
+                try conn.accept(arena);
                 if (initial_size != conn.callback_map.size) return;
             }
         }

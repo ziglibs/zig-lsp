@@ -47,16 +47,36 @@ pub fn main() !void {
         &context,
     );
 
-    const cb = struct {
-        pub fn res(conn_: *Connection, result: lsp.InitializeResult) !void {
-            std.log.info("bruh {any}", .{result});
-            try conn_.notify("initialized", .{});
-        }
+    // const cb = struct {
+    //     pub fn res(_: *Connection, result: lsp.InitializeResult) !void {
+    //         std.log.info("bruh {any}", .{result});
+    //     }
 
-        pub fn err(_: *Connection) !void {}
-    };
+    //     pub fn err(_: *Connection) !void {}
+    // };
+    // _ = .{cb};
 
-    try conn.request("initialize", .{
+    // try conn.request("initialize", .{
+    //     .capabilities = .{
+    //         .textDocument = .{
+    //             .documentSymbol = .{
+    //                 .hierarchicalDocumentSymbolSupport = true,
+    //             },
+    //         },
+    //         .workspace = .{
+    //             .configuration = true,
+    //             .didChangeConfiguration = .{
+    //                 .dynamicRegistration = true,
+    //             },
+    //         },
+    //     },
+    // }, .{ .onResponse = cb.res, .onError = cb.err });
+    var arena = std.heap.ArenaAllocator.init(std.heap.page_allocator);
+    defer arena.deinit();
+
+    const arena_allocator = arena.allocator();
+
+    std.log.info("{any}", .{try conn.requestSync(arena_allocator, "initialize", .{
         .capabilities = .{
             .textDocument = .{
                 .documentSymbol = .{
@@ -70,9 +90,10 @@ pub fn main() !void {
                 },
             },
         },
-    }, .{ .onResponse = cb.res, .onError = cb.err });
+    })});
+    // try conn.notify("initialized", .{});
 
-    try conn.acceptUntilResponse();
+    // try conn.acceptUntilResponse();
 
     // try conn.notify("textDocument/didOpen", .{
     //     .textDocument = .{
