@@ -134,16 +134,20 @@ pub const DocumentDiagnosticReport = union(enum) {
 pub const PrepareRenameResult = union(enum) {
     Range: Range,
     literal_1: struct {
+        pub const tres_null_meaning = .{};
+
         range: Range,
         placeholder: []const u8,
     },
     literal_2: struct {
+        pub const tres_null_meaning = .{};
+
         defaultBehavior: bool,
     },
 };
 
 pub const ProgressToken = union(enum) {
-    integer: i64,
+    integer: i32,
     string: []const u8,
 };
 
@@ -169,17 +173,22 @@ pub const WorkspaceDocumentDiagnosticReport = union(enum) {
 /// it is considered to be the full content of the document.
 pub const TextDocumentContentChangeEvent = union(enum) {
     literal_0: struct {
+        pub const tres_null_meaning = .{
+            .rangeLength = .field,
+        };
+
         /// The range of the document that changed.
         range: Range,
         /// The optional length of the range that got replaced.
         ///
         /// @deprecated use range instead.
-        /// field can be undefined, but this possible state is non-critical
-        rangeLength: ?u64 = null,
+        rangeLength: ?u32 = null,
         /// The new text for the provided range.
         text: []const u8,
     },
     literal_1: struct {
+        pub const tres_null_meaning = .{};
+
         /// The new text of the whole document.
         text: []const u8,
     },
@@ -200,6 +209,8 @@ pub const TextDocumentContentChangeEvent = union(enum) {
 pub const MarkedString = union(enum) {
     string: []const u8,
     literal_1: struct {
+        pub const tres_null_meaning = .{};
+
         language: []const u8,
         value: []const u8,
     },
@@ -240,31 +251,40 @@ pub const GlobPattern = union(enum) {
 /// @since 3.17.0
 pub const TextDocumentFilter = union(enum) {
     literal_0: struct {
+        pub const tres_null_meaning = .{
+            .scheme = .field,
+            .pattern = .field,
+        };
+
         /// A language id, like `typescript`.
         language: []const u8,
         /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
-        /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern, like `*.{ts,js}`.
-        /// field can be undefined, but this possible state is non-critical
         pattern: ?[]const u8 = null,
     },
     literal_1: struct {
+        pub const tres_null_meaning = .{
+            .language = .field,
+            .pattern = .field,
+        };
+
         /// A language id, like `typescript`.
-        /// field can be undefined, but this possible state is non-critical
         language: ?[]const u8 = null,
         /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         scheme: []const u8,
         /// A glob pattern, like `*.{ts,js}`.
-        /// field can be undefined, but this possible state is non-critical
         pattern: ?[]const u8 = null,
     },
     literal_2: struct {
+        pub const tres_null_meaning = .{
+            .language = .field,
+            .scheme = .field,
+        };
+
         /// A language id, like `typescript`.
-        /// field can be undefined, but this possible state is non-critical
         language: ?[]const u8 = null,
         /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
-        /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern, like `*.{ts,js}`.
         pattern: []const u8,
@@ -278,31 +298,40 @@ pub const TextDocumentFilter = union(enum) {
 /// @since 3.17.0
 pub const NotebookDocumentFilter = union(enum) {
     literal_0: struct {
+        pub const tres_null_meaning = .{
+            .scheme = .field,
+            .pattern = .field,
+        };
+
         /// The type of the enclosing notebook.
         notebookType: []const u8,
         /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
-        /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern.
-        /// field can be undefined, but this possible state is non-critical
         pattern: ?[]const u8 = null,
     },
     literal_1: struct {
+        pub const tres_null_meaning = .{
+            .notebookType = .field,
+            .pattern = .field,
+        };
+
         /// The type of the enclosing notebook.
-        /// field can be undefined, but this possible state is non-critical
         notebookType: ?[]const u8 = null,
         /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
         scheme: []const u8,
         /// A glob pattern.
-        /// field can be undefined, but this possible state is non-critical
         pattern: ?[]const u8 = null,
     },
     literal_2: struct {
+        pub const tres_null_meaning = .{
+            .notebookType = .field,
+            .scheme = .field,
+        };
+
         /// The type of the enclosing notebook.
-        /// field can be undefined, but this possible state is non-critical
         notebookType: ?[]const u8 = null,
         /// A Uri [scheme](#Uri.scheme), like `file` or `untitled`.
-        /// field can be undefined, but this possible state is non-critical
         scheme: ?[]const u8 = null,
         /// A glob pattern.
         pattern: []const u8,
@@ -393,7 +422,7 @@ pub const DocumentDiagnosticReportKind = enum {
 };
 
 /// Predefined error codes.
-pub const ErrorCodes = enum(i64) {
+pub const ErrorCodes = enum(i32) {
     ParseError = -32700,
     InvalidRequest = -32600,
     MethodNotFound = -32601,
@@ -405,7 +434,7 @@ pub const ErrorCodes = enum(i64) {
     UnknownErrorCode = -32001,
 };
 
-pub const LSPErrorCodes = enum(i64) {
+pub const LSPErrorCodes = enum(i32) {
     /// A request failed but it was syntactically correct, e.g the
     /// method name was known and the parameters were valid. The error
     /// message should contain human readable information about why
@@ -446,7 +475,7 @@ pub const FoldingRangeKind = enum {
 };
 
 /// A symbol kind.
-pub const SymbolKind = enum(u64) {
+pub const SymbolKind = enum(u32) {
     File = 1,
     Module = 2,
     Namespace = 3,
@@ -478,7 +507,7 @@ pub const SymbolKind = enum(u64) {
 /// Symbol tags are extra annotations that tweak the rendering of a symbol.
 ///
 /// @since 3.16
-pub const SymbolTag = enum(u64) {
+pub const SymbolTag = enum(u32) {
     /// Render a symbol as obsolete, usually using a strike-out.
     Deprecated = 1,
     placeholder__, // fixes alignment issue
@@ -520,7 +549,7 @@ pub const MonikerKind = enum {
 /// Inlay hint kinds.
 ///
 /// @since 3.17.0
-pub const InlayHintKind = enum(u64) {
+pub const InlayHintKind = enum(u32) {
     /// An inlay hint that for a type annotation.
     Type = 1,
     /// An inlay hint that is for a parameter.
@@ -528,7 +557,7 @@ pub const InlayHintKind = enum(u64) {
 };
 
 /// The message type
-pub const MessageType = enum(u64) {
+pub const MessageType = enum(u32) {
     /// An error message.
     Error = 1,
     /// A warning message.
@@ -541,7 +570,7 @@ pub const MessageType = enum(u64) {
 
 /// Defines how the host (editor) should sync
 /// document changes to the language server.
-pub const TextDocumentSyncKind = enum(u64) {
+pub const TextDocumentSyncKind = enum(u32) {
     /// Documents should not be synced at all.
     None = 0,
     /// Documents are synced by always sending the full content
@@ -554,7 +583,7 @@ pub const TextDocumentSyncKind = enum(u64) {
 };
 
 /// Represents reasons why a text document is saved.
-pub const TextDocumentSaveReason = enum(u64) {
+pub const TextDocumentSaveReason = enum(u32) {
     /// Manually triggered, e.g. by the user pressing save, by starting debugging,
     /// or by an API call.
     Manual = 1,
@@ -565,7 +594,7 @@ pub const TextDocumentSaveReason = enum(u64) {
 };
 
 /// The kind of a completion entry.
-pub const CompletionItemKind = enum(u64) {
+pub const CompletionItemKind = enum(u32) {
     Text = 1,
     Method = 2,
     Function = 3,
@@ -597,7 +626,7 @@ pub const CompletionItemKind = enum(u64) {
 /// item.
 ///
 /// @since 3.15.0
-pub const CompletionItemTag = enum(u64) {
+pub const CompletionItemTag = enum(u32) {
     /// Render a completion as obsolete, usually using a strike-out.
     Deprecated = 1,
     placeholder__, // fixes alignment issue
@@ -605,7 +634,7 @@ pub const CompletionItemTag = enum(u64) {
 
 /// Defines whether the insert text in a completion item should be interpreted as
 /// plain text or a snippet.
-pub const InsertTextFormat = enum(u64) {
+pub const InsertTextFormat = enum(u32) {
     /// The primary text to be inserted is treated as a plain string.
     PlainText = 1,
     /// The primary text to be inserted is treated as a snippet.
@@ -623,7 +652,7 @@ pub const InsertTextFormat = enum(u64) {
 /// item insertion.
 ///
 /// @since 3.16.0
-pub const InsertTextMode = enum(u64) {
+pub const InsertTextMode = enum(u32) {
     /// The insertion or replace strings is taken as it is. If the
     /// value is multi line the lines below the cursor will be
     /// inserted using the indentation defined in the string value.
@@ -641,7 +670,7 @@ pub const InsertTextMode = enum(u64) {
 };
 
 /// A document highlight kind.
-pub const DocumentHighlightKind = enum(u64) {
+pub const DocumentHighlightKind = enum(u32) {
     /// A textual occurrence.
     Text = 1,
     /// Read-access of a symbol, like reading a variable.
@@ -653,21 +682,6 @@ pub const DocumentHighlightKind = enum(u64) {
 /// A set of predefined code action kinds
 pub const CodeActionKind = enum {
     pub const tres_string_enum = {};
-
-    pub fn tresParse(json_value: std.json.Value, _: ?std.mem.Allocator) !CodeActionKind {
-        const str = json_value.String;
-        if (str.len == 0) return .empty;
-        return std.meta.stringToEnum(CodeActionKind, str) orelse {
-            return error.InvalidEnumTag;
-        };
-    }
-
-    pub fn jsonStringify(value: CodeActionKind, options: std.json.StringifyOptions, writer: anytype) !void {
-        if (value == .empty) {
-            return try tres.stringify("", options, writer);
-        }
-        return try tres.stringify(@tagName(value), options, writer);
-    }
 
     /// Empty kind.
     empty,
@@ -718,6 +732,13 @@ pub const CodeActionKind = enum {
     ///
     /// @since 3.15.0
     @"source.fixAll",
+
+    pub fn tresParse(json_value: std.json.Value, maybe_allocator: ?std.mem.Allocator) error{InvalidEnumTag}!@This() {
+        _ = maybe_allocator;
+        if (json_value != .String) return error.InvalidEnumTag;
+        if (json_value.String.len == 0) return .empty;
+        return std.meta.stringToEnum(@This(), json_value.String) orelse return error.InvalidEnumTag;
+    }
 };
 
 pub const TraceValues = enum {
@@ -767,7 +788,7 @@ pub const PositionEncodingKind = enum {
 };
 
 /// The file event type
-pub const FileChangeType = enum(u64) {
+pub const FileChangeType = enum(u32) {
     /// The file got created.
     Created = 1,
     /// The file got changed.
@@ -776,7 +797,7 @@ pub const FileChangeType = enum(u64) {
     Deleted = 3,
 };
 
-pub const WatchKind = enum(u64) {
+pub const WatchKind = enum(u32) {
     /// Interested in create events.
     Create = 1,
     /// Interested in change events
@@ -786,7 +807,7 @@ pub const WatchKind = enum(u64) {
 };
 
 /// The diagnostic's severity.
-pub const DiagnosticSeverity = enum(u64) {
+pub const DiagnosticSeverity = enum(u32) {
     /// Reports an error.
     Error = 1,
     /// Reports a warning.
@@ -800,7 +821,7 @@ pub const DiagnosticSeverity = enum(u64) {
 /// The diagnostic tags.
 ///
 /// @since 3.15.0
-pub const DiagnosticTag = enum(u64) {
+pub const DiagnosticTag = enum(u32) {
     /// Unused or unnecessary code.
     ///
     /// Clients are allowed to render diagnostics with this tag faded out instead of having
@@ -813,7 +834,7 @@ pub const DiagnosticTag = enum(u64) {
 };
 
 /// How a completion was triggered
-pub const CompletionTriggerKind = enum(u64) {
+pub const CompletionTriggerKind = enum(u32) {
     /// Completion was triggered by typing an identifier (24x7 code
     /// complete), manual invocation (e.g Ctrl+Space) or via API.
     Invoked = 1,
@@ -827,7 +848,7 @@ pub const CompletionTriggerKind = enum(u64) {
 /// How a signature help was triggered.
 ///
 /// @since 3.15.0
-pub const SignatureHelpTriggerKind = enum(u64) {
+pub const SignatureHelpTriggerKind = enum(u32) {
     /// Signature help was invoked manually by the user or by a command.
     Invoked = 1,
     /// Signature help was triggered by a trigger character.
@@ -839,7 +860,7 @@ pub const SignatureHelpTriggerKind = enum(u64) {
 /// The reason why code actions were requested.
 ///
 /// @since 3.17.0
-pub const CodeActionTriggerKind = enum(u64) {
+pub const CodeActionTriggerKind = enum(u32) {
     /// Code actions were explicitly requested by the user or by an extension.
     Invoked = 1,
     /// Code actions were requested automatically.
@@ -865,7 +886,7 @@ pub const FileOperationPatternKind = enum {
 /// A notebook cell kind.
 ///
 /// @since 3.17.0
-pub const NotebookCellKind = enum(u64) {
+pub const NotebookCellKind = enum(u32) {
     /// A markup-cell is formatted source that is used for display.
     Markup = 1,
     /// A code-cell is source code.
@@ -901,7 +922,7 @@ pub const FailureHandlingKind = enum {
     undo,
 };
 
-pub const PrepareSupportDefaultBehavior = enum(u64) {
+pub const PrepareSupportDefaultBehavior = enum(u32) {
     /// The client's default behavior is to select the identifier
     /// according the to language's syntax rule.
     Identifier = 1,
@@ -918,6 +939,17 @@ pub const TokenFormat = enum {
 // Structures
 
 pub const ImplementationParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -926,24 +958,38 @@ pub const ImplementationParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// Represents a location inside a resource, such as a line
 /// inside a text file.
 pub const Location = struct {
+    pub const tres_null_meaning = .{};
+
     uri: DocumentUri,
     range: Range,
 };
 
 pub const ImplementationRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends ImplementationOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -951,17 +997,26 @@ pub const ImplementationRegistrationOptions = struct {
 
     // Extends ImplementationOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 pub const TypeDefinitionParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -970,17 +1025,29 @@ pub const TypeDefinitionParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 pub const TypeDefinitionRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends TypeDefinitionOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -988,18 +1055,18 @@ pub const TypeDefinitionRegistrationOptions = struct {
 
     // Extends TypeDefinitionOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 /// A workspace folder inside a client.
 pub const WorkspaceFolder = struct {
+    pub const tres_null_meaning = .{};
+
     /// The associated URI for this workspace folder.
     uri: URI,
     /// The name of the workspace folder. Used to refer to this
@@ -1009,40 +1076,56 @@ pub const WorkspaceFolder = struct {
 
 /// The parameters of a `workspace/didChangeWorkspaceFolders` notification.
 pub const DidChangeWorkspaceFoldersParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The actual workspace folder change event.
     event: WorkspaceFoldersChangeEvent,
 };
 
 /// The parameters of a configuration request.
 pub const ConfigurationParams = struct {
+    pub const tres_null_meaning = .{};
+
     items: []const ConfigurationItem,
 };
 
 pub const PartialResultParams = struct {
+    pub const tres_null_meaning = .{
+        .partialResultToken = .field,
+    };
+
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// Parameters for a [DocumentColorRequest](#DocumentColorRequest).
 pub const DocumentColorParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// Represents a color range from a document.
 pub const ColorInformation = struct {
+    pub const tres_null_meaning = .{};
+
     /// The range in the document where this color appears.
     range: Range,
     /// The actual color value for this color range.
@@ -1050,6 +1133,20 @@ pub const ColorInformation = struct {
 };
 
 pub const DocumentColorRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DocumentColorOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1057,18 +1154,25 @@ pub const DocumentColorRegistrationOptions = struct {
 
     // Extends DocumentColorOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 /// Parameters for a [ColorPresentationRequest](#ColorPresentationRequest).
 pub const ColorPresentationParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The color to request presentations for.
@@ -1077,17 +1181,20 @@ pub const ColorPresentationParams = struct {
     range: Range,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 pub const ColorPresentation = struct {
+    pub const tres_null_meaning = .{
+        .textEdit = .field,
+        .additionalTextEdits = .field,
+    };
+
     /// The label of this color presentation. It will be shown on the color
     /// picker header. By default this is also the text that is inserted when selecting
     /// this color presentation.
@@ -1095,21 +1202,26 @@ pub const ColorPresentation = struct {
     /// An [edit](#TextEdit) which is applied to a document when selecting
     /// this presentation for the color.  When `falsy` the [label](#ColorPresentation.label)
     /// is used.
-    /// field can be undefined, but this possible state is non-critical
     textEdit: ?TextEdit = null,
     /// An optional array of additional [text edits](#TextEdit) that are applied when
     /// selecting this color presentation. Edits must not overlap with the main [edit](#ColorPresentation.textEdit) nor with themselves.
-    /// field can be undefined, but this possible state is non-critical
     additionalTextEdits: ?[]const TextEdit = null,
 };
 
 pub const WorkDoneProgressOptions = struct {
-    /// field can be undefined, but this possible state is non-critical
+    pub const tres_null_meaning = .{
+        .workDoneProgress = .field,
+    };
+
     workDoneProgress: ?bool = null,
 };
 
 /// General text document registration options.
 pub const TextDocumentRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+        .documentSelector = .value,
+    };
+
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
     documentSelector: ?DocumentSelector = null,
@@ -1117,50 +1229,74 @@ pub const TextDocumentRegistrationOptions = struct {
 
 /// Parameters for a [FoldingRangeRequest](#FoldingRangeRequest).
 pub const FoldingRangeParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// Represents a folding range. To be valid, start and end line must be bigger than zero and smaller
 /// than the number of lines in the document. Clients are free to ignore invalid ranges.
 pub const FoldingRange = struct {
+    pub const tres_null_meaning = .{
+        .startCharacter = .field,
+        .endCharacter = .field,
+        .kind = .field,
+        .collapsedText = .field,
+    };
+
     /// The zero-based start line of the range to fold. The folded area starts after the line's last character.
     /// To be valid, the end must be zero or larger and smaller than the number of lines in the document.
-    startLine: u64,
+    startLine: u32,
     /// The zero-based character offset from where the folded range starts. If not defined, defaults to the length of the start line.
-    /// field can be undefined, but this possible state is non-critical
-    startCharacter: ?u64 = null,
+    startCharacter: ?u32 = null,
     /// The zero-based end line of the range to fold. The folded area ends with the line's last character.
     /// To be valid, the end must be zero or larger and smaller than the number of lines in the document.
-    endLine: u64,
+    endLine: u32,
     /// The zero-based character offset before the folded range ends. If not defined, defaults to the length of the end line.
-    /// field can be undefined, but this possible state is non-critical
-    endCharacter: ?u64 = null,
+    endCharacter: ?u32 = null,
     /// Describes the kind of the folding range such as `comment' or 'region'. The kind
     /// is used to categorize folding ranges and used by commands like 'Fold all comments'.
     /// See [FoldingRangeKind](#FoldingRangeKind) for an enumeration of standardized kinds.
-    /// field can be undefined, but this possible state is non-critical
     kind: ?FoldingRangeKind = null,
     /// The text that the client should show when the specified range is
     /// collapsed. If not defined or not supported by the client, a default
     /// will be chosen by the client.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     collapsedText: ?[]const u8 = null,
 };
 
 pub const FoldingRangeRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends FoldingRangeOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1168,17 +1304,26 @@ pub const FoldingRangeRegistrationOptions = struct {
 
     // Extends FoldingRangeOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 pub const DeclarationParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1187,20 +1332,31 @@ pub const DeclarationParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 pub const DeclarationRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends DeclarationOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends DeclarationOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Extends TextDocumentRegistrationOptions
@@ -1211,42 +1367,64 @@ pub const DeclarationRegistrationOptions = struct {
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 /// A parameter literal used in selection range requests.
 pub const SelectionRangeParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The positions inside the text document.
     positions: []const Position,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// A selection range represents a part of a selection hierarchy. A selection range
 /// may have a parent selection range that contains it.
 pub const SelectionRange = struct {
+    pub const tres_null_meaning = .{
+        .parent = .field,
+    };
+
     /// The [range](#Range) of this selection range.
     range: Range,
     /// The parent selection range containing this range. Therefore `parent.range` must contain `this.range`.
-    /// field can be undefined, but this possible state is non-critical
-    parent: ?*const SelectionRange = null,
+    parent: ?*SelectionRange = null,
 };
 
 pub const SelectionRangeRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends SelectionRangeOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends SelectionRangeOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Extends TextDocumentRegistrationOptions
@@ -1257,16 +1435,19 @@ pub const SelectionRangeRegistrationOptions = struct {
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 pub const WorkDoneProgressCreateParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The token to be used to report progress.
     token: ProgressToken,
 };
 
 pub const WorkDoneProgressCancelParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The token to be used to report progress.
     token: ProgressToken,
 };
@@ -1275,6 +1456,14 @@ pub const WorkDoneProgressCancelParams = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyPrepareParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1283,7 +1472,6 @@ pub const CallHierarchyPrepareParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
@@ -1292,15 +1480,19 @@ pub const CallHierarchyPrepareParams = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyItem = struct {
+    pub const tres_null_meaning = .{
+        .tags = .field,
+        .detail = .field,
+        .data = .field,
+    };
+
     /// The name of this item.
     name: []const u8,
     /// The kind of this item.
     kind: SymbolKind,
     /// Tags for this item.
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const SymbolTag = null,
     /// More detail for this item, e.g. the signature of a function.
-    /// field can be undefined, but this possible state is non-critical
     detail: ?[]const u8 = null,
     /// The resource identifier of this item.
     uri: DocumentUri,
@@ -1311,7 +1503,6 @@ pub const CallHierarchyItem = struct {
     selectionRange: Range,
     /// A data entry field that is preserved between a call hierarchy prepare and
     /// incoming calls or outgoing calls requests.
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
@@ -1319,6 +1510,20 @@ pub const CallHierarchyItem = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends CallHierarchyOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1326,13 +1531,11 @@ pub const CallHierarchyRegistrationOptions = struct {
 
     // Extends CallHierarchyOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
@@ -1340,16 +1543,23 @@ pub const CallHierarchyRegistrationOptions = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyIncomingCallsParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     item: CallHierarchyItem,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -1357,6 +1567,8 @@ pub const CallHierarchyIncomingCallsParams = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyIncomingCall = struct {
+    pub const tres_null_meaning = .{};
+
     /// The item that makes the call.
     from: CallHierarchyItem,
     /// The ranges at which the calls appear. This is relative to the caller
@@ -1368,16 +1580,23 @@ pub const CallHierarchyIncomingCall = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyOutgoingCallsParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     item: CallHierarchyItem,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -1385,6 +1604,8 @@ pub const CallHierarchyOutgoingCallsParams = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyOutgoingCall = struct {
+    pub const tres_null_meaning = .{};
+
     /// The item that is called.
     to: CallHierarchyItem,
     /// The range at which this item is called. This is the range relative to the caller, e.g the item
@@ -1395,39 +1616,67 @@ pub const CallHierarchyOutgoingCall = struct {
 
 /// @since 3.16.0
 pub const SemanticTokensParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokens = struct {
+    pub const tres_null_meaning = .{
+        .resultId = .field,
+    };
+
     /// An optional result id. If provided and clients support delta updating
     /// the client will include the result id in the next semantic token request.
     /// A server can then instead of computing all semantic tokens again simply
     /// send a delta.
-    /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual tokens.
-    data: []const u64,
+    data: []const u32,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensPartialResult = struct {
-    data: []const u64,
+    pub const tres_null_meaning = .{};
+
+    data: []const u32,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends SemanticTokensOptions
+        .range = .field,
+        .full = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1438,34 +1687,44 @@ pub const SemanticTokensRegistrationOptions = struct {
     legend: SemanticTokensLegend,
     /// Server supports providing semantic tokens for a specific range
     /// of a document.
-    /// field can be undefined, but this possible state is non-critical
     range: ?union(enum) {
         bool: bool,
-        literal_1: struct {},
+        literal_1: struct {
+            pub const tres_null_meaning = .{};
+        },
     } = null,
     /// Server supports providing semantic tokens for a full document.
-    /// field can be undefined, but this possible state is non-critical
     full: ?union(enum) {
         bool: bool,
         literal_1: struct {
+            pub const tres_null_meaning = .{
+                .delta = .field,
+            };
+
             /// The server supports deltas for full documents.
-            /// field can be undefined, but this possible state is non-critical
             delta: ?bool = null,
         },
     } = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensDeltaParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The result id of a previous response. The result Id can either point to a full response
@@ -1473,19 +1732,20 @@ pub const SemanticTokensDeltaParams = struct {
     previousResultId: []const u8,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensDelta = struct {
-    /// field can be undefined, but this possible state is non-critical
+    pub const tres_null_meaning = .{
+        .resultId = .field,
+    };
+
     resultId: ?[]const u8 = null,
     /// The semantic token edits to transform a previous result into a new result.
     edits: []const SemanticTokensEdit,
@@ -1493,24 +1753,33 @@ pub const SemanticTokensDelta = struct {
 
 /// @since 3.16.0
 pub const SemanticTokensDeltaPartialResult = struct {
+    pub const tres_null_meaning = .{};
+
     edits: []const SemanticTokensEdit,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensRangeParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The range the semantic tokens are requested for.
     range: Range,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -1518,24 +1787,27 @@ pub const SemanticTokensRangeParams = struct {
 ///
 /// @since 3.16.0
 pub const ShowDocumentParams = struct {
+    pub const tres_null_meaning = .{
+        .external = .field,
+        .takeFocus = .field,
+        .selection = .field,
+    };
+
     /// The document uri to show.
     uri: URI,
     /// Indicates to show the resource in an external program.
     /// To show for example `https://code.visualstudio.com/`
     /// in the default WEB browser set `external` to `true`.
-    /// field can be undefined, but this possible state is non-critical
     external: ?bool = null,
     /// An optional property to indicate whether the editor
     /// showing the document should take focus or not.
     /// Clients might ignore this property if an external
     /// program is started.
-    /// field can be undefined, but this possible state is non-critical
     takeFocus: ?bool = null,
     /// An optional selection range if the document is a text
     /// document. Clients might ignore the property if an
     /// external program is started or the file is not a text
     /// file.
-    /// field can be undefined, but this possible state is non-critical
     selection: ?Range = null,
 };
 
@@ -1543,11 +1815,21 @@ pub const ShowDocumentParams = struct {
 ///
 /// @since 3.16.0
 pub const ShowDocumentResult = struct {
+    pub const tres_null_meaning = .{};
+
     /// A boolean indicating if the show was successful.
     success: bool,
 };
 
 pub const LinkedEditingRangeParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1556,7 +1838,6 @@ pub const LinkedEditingRangeParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
@@ -1564,17 +1845,34 @@ pub const LinkedEditingRangeParams = struct {
 ///
 /// @since 3.16.0
 pub const LinkedEditingRanges = struct {
+    pub const tres_null_meaning = .{
+        .wordPattern = .field,
+    };
+
     /// A list of ranges that can be edited together. The ranges must have
     /// identical length and contain identical text content. The ranges cannot overlap.
     ranges: []const Range,
     /// An optional word pattern (regular expression) that describes valid contents for
     /// the given ranges. If no pattern is provided, the client configuration's word
     /// pattern will be used.
-    /// field can be undefined, but this possible state is non-critical
     wordPattern: ?[]const u8 = null,
 };
 
 pub const LinkedEditingRangeRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends LinkedEditingRangeOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1582,13 +1880,11 @@ pub const LinkedEditingRangeRegistrationOptions = struct {
 
     // Extends LinkedEditingRangeOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
@@ -1597,6 +1893,8 @@ pub const LinkedEditingRangeRegistrationOptions = struct {
 ///
 /// @since 3.16.0
 pub const CreateFilesParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// An array of all files/folders created in this operation.
     files: []const FileCreate,
 };
@@ -1614,8 +1912,13 @@ pub const CreateFilesParams = struct {
 /// cause failure of the operation. How the client recovers from the failure is described by
 /// the client capability: `workspace.workspaceEdit.failureHandling`
 pub const WorkspaceEdit = struct {
+    pub const tres_null_meaning = .{
+        .changes = .field,
+        .documentChanges = .field,
+        .changeAnnotations = .field,
+    };
+
     /// Holds changes to existing resources.
-    /// field can be undefined, but this possible state is non-critical
     changes: ?Map(DocumentUri, []const TextEdit) = null,
     /// Depending on the client capability `workspace.workspaceEdit.resourceOperations` document changes
     /// are either an array of `TextDocumentEdit`s to express changes to n different text documents
@@ -1627,7 +1930,6 @@ pub const WorkspaceEdit = struct {
     ///
     /// If a client neither supports `documentChanges` nor `workspace.workspaceEdit.resourceOperations` then
     /// only plain `TextEdit`s using the `changes` property are supported.
-    /// field can be undefined, but this possible state is non-critical
     documentChanges: ?[]const union(enum) {
         TextDocumentEdit: TextDocumentEdit,
         CreateFile: CreateFile,
@@ -1640,7 +1942,6 @@ pub const WorkspaceEdit = struct {
     /// Whether clients honor this property depends on the client capability `workspace.changeAnnotationSupport`.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     changeAnnotations: ?Map(ChangeAnnotationIdentifier, ChangeAnnotation) = null,
 };
 
@@ -1648,6 +1949,8 @@ pub const WorkspaceEdit = struct {
 ///
 /// @since 3.16.0
 pub const FileOperationRegistrationOptions = struct {
+    pub const tres_null_meaning = .{};
+
     /// The actual filters.
     filters: []const FileOperationFilter,
 };
@@ -1657,6 +1960,8 @@ pub const FileOperationRegistrationOptions = struct {
 ///
 /// @since 3.16.0
 pub const RenameFilesParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// An array of all files/folders renamed in this operation. When a folder is renamed, only
     /// the folder will be included, and not its children.
     files: []const FileRename,
@@ -1667,11 +1972,24 @@ pub const RenameFilesParams = struct {
 ///
 /// @since 3.16.0
 pub const DeleteFilesParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// An array of all files/folders deleted in this operation.
     files: []const FileDelete,
 };
 
 pub const MonikerParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1680,13 +1998,11 @@ pub const MonikerParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -1694,6 +2010,10 @@ pub const MonikerParams = struct {
 ///
 /// @since 3.16.0
 pub const Moniker = struct {
+    pub const tres_null_meaning = .{
+        .kind = .field,
+    };
+
     /// The scheme of the moniker. For example tsc or .Net
     scheme: []const u8,
     /// The identifier of the moniker. The value is opaque in LSIF however
@@ -1702,11 +2022,21 @@ pub const Moniker = struct {
     /// The scope in which the moniker is unique
     unique: UniquenessLevel,
     /// The moniker kind if known.
-    /// field can be undefined, but this possible state is non-critical
     kind: ?MonikerKind = null,
 };
 
 pub const MonikerRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends MonikerOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1714,7 +2044,6 @@ pub const MonikerRegistrationOptions = struct {
 
     // Extends MonikerOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -1722,6 +2051,14 @@ pub const MonikerRegistrationOptions = struct {
 ///
 /// @since 3.17.0
 pub const TypeHierarchyPrepareParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -1730,21 +2067,24 @@ pub const TypeHierarchyPrepareParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// @since 3.17.0
 pub const TypeHierarchyItem = struct {
+    pub const tres_null_meaning = .{
+        .tags = .field,
+        .detail = .field,
+        .data = .field,
+    };
+
     /// The name of this item.
     name: []const u8,
     /// The kind of this item.
     kind: SymbolKind,
     /// Tags for this item.
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const SymbolTag = null,
     /// More detail for this item, e.g. the signature of a function.
-    /// field can be undefined, but this possible state is non-critical
     detail: ?[]const u8 = null,
     /// The resource identifier of this item.
     uri: DocumentUri,
@@ -1759,7 +2099,6 @@ pub const TypeHierarchyItem = struct {
     /// supertypes or subtypes requests. It could also be used to identify the
     /// type hierarchy in the server, helping improve the performance on
     /// resolving supertypes and subtypes.
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
@@ -1767,6 +2106,20 @@ pub const TypeHierarchyItem = struct {
 ///
 /// @since 3.17.0
 pub const TypeHierarchyRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends TypeHierarchyOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1774,13 +2127,11 @@ pub const TypeHierarchyRegistrationOptions = struct {
 
     // Extends TypeHierarchyOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
@@ -1788,16 +2139,23 @@ pub const TypeHierarchyRegistrationOptions = struct {
 ///
 /// @since 3.17.0
 pub const TypeHierarchySupertypesParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     item: TypeHierarchyItem,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -1805,16 +2163,23 @@ pub const TypeHierarchySupertypesParams = struct {
 ///
 /// @since 3.17.0
 pub const TypeHierarchySubtypesParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     item: TypeHierarchyItem,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -1822,6 +2187,12 @@ pub const TypeHierarchySubtypesParams = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The document range for which inline values should be computed.
@@ -1831,7 +2202,6 @@ pub const InlineValueParams = struct {
     context: InlineValueContext,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
@@ -1839,9 +2209,22 @@ pub const InlineValueParams = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends InlineValueOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends InlineValueOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Extends TextDocumentRegistrationOptions
@@ -1852,7 +2235,6 @@ pub const InlineValueRegistrationOptions = struct {
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
@@ -1860,13 +2242,18 @@ pub const InlineValueRegistrationOptions = struct {
 ///
 /// @since 3.17.0
 pub const InlayHintParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The document range for which inlay hints should be computed.
     range: Range,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
@@ -1874,6 +2261,15 @@ pub const InlayHintParams = struct {
 ///
 /// @since 3.17.0
 pub const InlayHint = struct {
+    pub const tres_null_meaning = .{
+        .kind = .field,
+        .textEdits = .field,
+        .tooltip = .field,
+        .paddingLeft = .field,
+        .paddingRight = .field,
+        .data = .field,
+    };
+
     /// The position of this hint.
     position: Position,
     /// The label of this hint. A human readable string or an array of
@@ -1886,17 +2282,14 @@ pub const InlayHint = struct {
     },
     /// The kind of this hint. Can be omitted in which case the client
     /// should fall back to a reasonable default.
-    /// field can be undefined, but this possible state is non-critical
     kind: ?InlayHintKind = null,
     /// Optional text edits that are performed when accepting this inlay hint.
     ///
     /// *Note* that edits are expected to change the document so that the inlay
     /// hint (or its nearest variant) is now part of the document and the inlay
     /// hint itself is now obsolete.
-    /// field can be undefined, but this possible state is non-critical
     textEdits: ?[]const TextEdit = null,
     /// The tooltip text when you hover over this item.
-    /// field can be undefined, but this possible state is non-critical
     tooltip: ?union(enum) {
         string: []const u8,
         MarkupContent: MarkupContent,
@@ -1906,18 +2299,15 @@ pub const InlayHint = struct {
     /// Note: Padding should use the editor's background color, not the
     /// background color of the hint itself. That means padding can be used
     /// to visually align/separate an inlay hint.
-    /// field can be undefined, but this possible state is non-critical
     paddingLeft: ?bool = null,
     /// Render padding after the hint.
     ///
     /// Note: Padding should use the editor's background color, not the
     /// background color of the hint itself. That means padding can be used
     /// to visually align/separate an inlay hint.
-    /// field can be undefined, but this possible state is non-critical
     paddingRight: ?bool = null,
     /// A data entry field that is preserved on an inlay hint between
     /// a `textDocument/inlayHint` and a `inlayHint/resolve` request.
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
@@ -1925,13 +2315,26 @@ pub const InlayHint = struct {
 ///
 /// @since 3.17.0
 pub const InlayHintRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends InlayHintOptions
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends InlayHintOptions
     /// The server provides support to resolve additional
     /// information for an inlay hint item.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Extends TextDocumentRegistrationOptions
@@ -1942,7 +2345,6 @@ pub const InlayHintRegistrationOptions = struct {
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
@@ -1950,23 +2352,30 @@ pub const InlayHintRegistrationOptions = struct {
 ///
 /// @since 3.17.0
 pub const DocumentDiagnosticParams = struct {
+    pub const tres_null_meaning = .{
+        .identifier = .field,
+        .previousResultId = .field,
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The additional identifier  provided during registration.
-    /// field can be undefined, but this possible state is non-critical
     identifier: ?[]const u8 = null,
     /// The result id of a previous response if provided.
-    /// field can be undefined, but this possible state is non-critical
     previousResultId: ?[]const u8 = null,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -1974,6 +2383,8 @@ pub const DocumentDiagnosticParams = struct {
 ///
 /// @since 3.17.0
 pub const DocumentDiagnosticReportPartialResult = struct {
+    pub const tres_null_meaning = .{};
+
     relatedDocuments: Map(DocumentUri, union(enum) {
         FullDocumentDiagnosticReport: FullDocumentDiagnosticReport,
         UnchangedDocumentDiagnosticReport: UnchangedDocumentDiagnosticReport,
@@ -1984,6 +2395,8 @@ pub const DocumentDiagnosticReportPartialResult = struct {
 ///
 /// @since 3.17.0
 pub const DiagnosticServerCancellationData = struct {
+    pub const tres_null_meaning = .{};
+
     retriggerRequest: bool,
 };
 
@@ -1991,6 +2404,21 @@ pub const DiagnosticServerCancellationData = struct {
 ///
 /// @since 3.17.0
 pub const DiagnosticRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DiagnosticOptions
+        .identifier = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -1999,7 +2427,6 @@ pub const DiagnosticRegistrationOptions = struct {
     // Extends DiagnosticOptions
     /// An optional identifier under which the diagnostics are
     /// managed by the client.
-    /// field can be undefined, but this possible state is non-critical
     identifier: ?[]const u8 = null,
     /// Whether the language has inter file dependencies meaning that
     /// editing code in one file can result in a different diagnostic
@@ -2009,13 +2436,11 @@ pub const DiagnosticRegistrationOptions = struct {
     /// The server provides support for workspace diagnostics as well.
     workspaceDiagnostics: bool,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
@@ -2023,21 +2448,28 @@ pub const DiagnosticRegistrationOptions = struct {
 ///
 /// @since 3.17.0
 pub const WorkspaceDiagnosticParams = struct {
+    pub const tres_null_meaning = .{
+        .identifier = .field,
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The additional identifier provided during registration.
-    /// field can be undefined, but this possible state is non-critical
     identifier: ?[]const u8 = null,
     /// The currently known diagnostic reports with their
     /// previous result ids.
     previousResultIds: []const PreviousResultId,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -2045,6 +2477,8 @@ pub const WorkspaceDiagnosticParams = struct {
 ///
 /// @since 3.17.0
 pub const WorkspaceDiagnosticReport = struct {
+    pub const tres_null_meaning = .{};
+
     items: []const WorkspaceDocumentDiagnosticReport,
 };
 
@@ -2052,6 +2486,8 @@ pub const WorkspaceDiagnosticReport = struct {
 ///
 /// @since 3.17.0
 pub const WorkspaceDiagnosticReportPartialResult = struct {
+    pub const tres_null_meaning = .{};
+
     items: []const WorkspaceDocumentDiagnosticReport,
 };
 
@@ -2059,6 +2495,8 @@ pub const WorkspaceDiagnosticReportPartialResult = struct {
 ///
 /// @since 3.17.0
 pub const DidOpenNotebookDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The notebook document that got opened.
     notebookDocument: NotebookDocument,
     /// The text documents that represent the content
@@ -2070,6 +2508,8 @@ pub const DidOpenNotebookDocumentParams = struct {
 ///
 /// @since 3.17.0
 pub const DidChangeNotebookDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The notebook document that did change. The version number points
     /// to the version after all provided changes have been applied. If
     /// only the text document content of a cell changes the notebook version
@@ -2095,6 +2535,8 @@ pub const DidChangeNotebookDocumentParams = struct {
 ///
 /// @since 3.17.0
 pub const DidSaveNotebookDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The notebook document that got saved.
     notebookDocument: NotebookDocumentIdentifier,
 };
@@ -2103,6 +2545,8 @@ pub const DidSaveNotebookDocumentParams = struct {
 ///
 /// @since 3.17.0
 pub const DidCloseNotebookDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The notebook document that got closed.
     notebookDocument: NotebookDocumentIdentifier,
     /// The text documents that represent the content
@@ -2111,30 +2555,54 @@ pub const DidCloseNotebookDocumentParams = struct {
 };
 
 pub const RegistrationParams = struct {
+    pub const tres_null_meaning = .{};
+
     registrations: []const Registration,
 };
 
 pub const UnregistrationParams = struct {
+    pub const tres_null_meaning = .{};
+
     unregisterations: []const Unregistration,
 };
 
 pub const InitializeParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends _InitializeParams
+        .processId = .value,
+        .clientInfo = .field,
+        .locale = .field,
+        .rootPath = .dual,
+        .rootUri = .value,
+        .initializationOptions = .field,
+        .trace = .field,
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Extends WorkspaceFoldersInitializeParams
+        .workspaceFolders = .dual,
+    };
+
     // Extends _InitializeParams
     /// The process Id of the parent process that started
     /// the server.
     ///
     /// Is `null` if the process has not been started by another process.
     /// If the parent process is not alive then the server should exit.
-    processId: ?i64 = null,
+    processId: ?i32 = null,
     /// Information about the client
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     clientInfo: ?struct {
+        pub const tres_null_meaning = .{
+            .version = .field,
+        };
+
         /// The name of the client as defined by the client.
         name: []const u8,
         /// The client's version as defined by the client.
-        /// field can be undefined, but this possible state is non-critical
         version: ?[]const u8 = null,
     } = null,
     /// The locale the client is currently showing the user interface
@@ -2145,14 +2613,12 @@ pub const InitializeParams = struct {
     /// (See https://en.wikipedia.org/wiki/IETF_language_tag)
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     locale: ?[]const u8 = null,
     /// The rootPath of the workspace. Is null
     /// if no folder is open.
     ///
     /// @deprecated in favour of rootUri.
-    /// field can be undefined, but this possible state is non-critical
-    rootPath: ?[]const u8 = null,
+    rootPath: ??[]const u8 = null,
     /// The rootUri of the workspace. Is null if no
     /// folder is open. If both `rootPath` and `rootUri` are set
     /// `rootUri` wins.
@@ -2162,10 +2628,8 @@ pub const InitializeParams = struct {
     /// The capabilities provided by the client (editor or tool)
     capabilities: ClientCapabilities,
     /// User provided initialization options.
-    /// field can be undefined, but this possible state is non-critical
     initializationOptions: ?LSPAny = null,
     /// The initial trace setting. If omitted trace is disabled ('off').
-    /// field can be undefined, but this possible state is non-critical
     trace: ?enum {
         pub const tres_string_enum = {};
         off,
@@ -2175,7 +2639,6 @@ pub const InitializeParams = struct {
     } = null,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Extends WorkspaceFoldersInitializeParams
@@ -2186,23 +2649,28 @@ pub const InitializeParams = struct {
     /// configured.
     ///
     /// @since 3.6.0
-    /// field can be undefined, but this possible state is non-critical
-    workspaceFolders: ?[]const WorkspaceFolder = null,
+    workspaceFolders: ??[]const WorkspaceFolder = null,
 };
 
 /// The result returned from an initialize request.
 pub const InitializeResult = struct {
+    pub const tres_null_meaning = .{
+        .serverInfo = .field,
+    };
+
     /// The capabilities the language server provides.
     capabilities: ServerCapabilities,
     /// Information about the server.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     serverInfo: ?struct {
+        pub const tres_null_meaning = .{
+            .version = .field,
+        };
+
         /// The name of the server as defined by the server.
         name: []const u8,
         /// The server's version as defined by the server.
-        /// field can be undefined, but this possible state is non-critical
         version: ?[]const u8 = null,
     } = null,
 };
@@ -2210,6 +2678,8 @@ pub const InitializeResult = struct {
 /// The data type of the ResponseError if the
 /// initialize request fails.
 pub const InitializeError = struct {
+    pub const tres_null_meaning = .{};
+
     /// Indicates whether the client execute the following retry logic:
     /// (1) show the message provided by the ResponseError to the user
     /// (2) user selects retry or cancel
@@ -2217,16 +2687,23 @@ pub const InitializeError = struct {
     retry: bool,
 };
 
-pub const InitializedParams = struct {};
+pub const InitializedParams = struct {
+    pub const tres_null_meaning = .{};
+};
 
 /// The parameters of a change configuration notification.
 pub const DidChangeConfigurationParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The actual changed settings
     settings: LSPAny,
 };
 
 pub const DidChangeConfigurationRegistrationOptions = struct {
-    /// field can be undefined, but this possible state is non-critical
+    pub const tres_null_meaning = .{
+        .section = .field,
+    };
+
     section: ?union(enum) {
         string: []const u8,
         array_of_string: []const []const u8,
@@ -2235,6 +2712,8 @@ pub const DidChangeConfigurationRegistrationOptions = struct {
 
 /// The parameters of a notification message.
 pub const ShowMessageParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The message type. See {@link MessageType}
     type: MessageType,
     /// The actual message.
@@ -2242,22 +2721,29 @@ pub const ShowMessageParams = struct {
 };
 
 pub const ShowMessageRequestParams = struct {
+    pub const tres_null_meaning = .{
+        .actions = .field,
+    };
+
     /// The message type. See {@link MessageType}
     type: MessageType,
     /// The actual message.
     message: []const u8,
     /// The message action items to present.
-    /// field can be undefined, but this possible state is non-critical
     actions: ?[]const MessageActionItem = null,
 };
 
 pub const MessageActionItem = struct {
+    pub const tres_null_meaning = .{};
+
     /// A short title like 'Retry', 'Open Log' etc.
     title: []const u8,
 };
 
 /// The log message parameters.
 pub const LogMessageParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The message type. See {@link MessageType}
     type: MessageType,
     /// The actual message.
@@ -2266,12 +2752,16 @@ pub const LogMessageParams = struct {
 
 /// The parameters sent in an open text document notification
 pub const DidOpenTextDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The document that was opened.
     textDocument: TextDocumentItem,
 };
 
 /// The change text document notification's parameters.
 pub const DidChangeTextDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The document that did change. The version number points
     /// to the version after all provided content changes have
     /// been applied.
@@ -2292,6 +2782,12 @@ pub const DidChangeTextDocumentParams = struct {
 
 /// Describe options to be used when registered for text document change events.
 pub const TextDocumentChangeRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+    };
+
     /// How documents are synced to the server.
     syncKind: TextDocumentSyncKind,
     // Extends TextDocumentRegistrationOptions
@@ -2302,22 +2798,36 @@ pub const TextDocumentChangeRegistrationOptions = struct {
 
 /// The parameters sent in a close text document notification
 pub const DidCloseTextDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The document that was closed.
     textDocument: TextDocumentIdentifier,
 };
 
 /// The parameters sent in a save text document notification
 pub const DidSaveTextDocumentParams = struct {
+    pub const tres_null_meaning = .{
+        .text = .field,
+    };
+
     /// The document that was saved.
     textDocument: TextDocumentIdentifier,
     /// Optional the content when saved. Depends on the includeText value
     /// when the save notification was requested.
-    /// field can be undefined, but this possible state is non-critical
     text: ?[]const u8 = null,
 };
 
 /// Save registration options.
 pub const TextDocumentSaveRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends SaveOptions
+        .includeText = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2325,12 +2835,13 @@ pub const TextDocumentSaveRegistrationOptions = struct {
 
     // Extends SaveOptions
     /// The client is supposed to include the content on save.
-    /// field can be undefined, but this possible state is non-critical
     includeText: ?bool = null,
 };
 
 /// The parameters sent in a will save text document notification.
 pub const WillSaveTextDocumentParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The document that will be saved.
     textDocument: TextDocumentIdentifier,
     /// The 'TextDocumentSaveReason'.
@@ -2339,6 +2850,8 @@ pub const WillSaveTextDocumentParams = struct {
 
 /// A text edit applicable to a text document.
 pub const TextEdit = struct {
+    pub const tres_null_meaning = .{};
+
     /// The range of the text document to be manipulated. To insert
     /// text into a document create a range where start === end.
     range: Range,
@@ -2349,34 +2862,52 @@ pub const TextEdit = struct {
 
 /// The watched files change notification's parameters.
 pub const DidChangeWatchedFilesParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The actual file events.
     changes: []const FileEvent,
 };
 
 /// Describe options to be used when registered for text document change events.
 pub const DidChangeWatchedFilesRegistrationOptions = struct {
+    pub const tres_null_meaning = .{};
+
     /// The watchers to register.
     watchers: []const FileSystemWatcher,
 };
 
 /// The publish diagnostic notification's parameters.
 pub const PublishDiagnosticsParams = struct {
+    pub const tres_null_meaning = .{
+        .version = .field,
+    };
+
     /// The URI for which diagnostic information is reported.
     uri: DocumentUri,
     /// Optional the version number of the document the diagnostics are published for.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
-    version: ?i64 = null,
+    version: ?i32 = null,
     /// An array of diagnostic information items.
     diagnostics: []const Diagnostic,
 };
 
 /// Completion parameters
 pub const CompletionParams = struct {
+    pub const tres_null_meaning = .{
+        .context = .field,
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The completion context. This is only available it the client specifies
     /// to send this using the client capability `textDocument.completion.contextSupport === true`
-    /// field can be undefined, but this possible state is non-critical
     context: ?CompletionContext = null,
     // Extends TextDocumentPositionParams
     /// The text document.
@@ -2386,19 +2917,38 @@ pub const CompletionParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// A completion item represents a text snippet that is
 /// proposed to complete text that is being typed.
 pub const CompletionItem = struct {
+    pub const tres_null_meaning = .{
+        .labelDetails = .field,
+        .kind = .field,
+        .tags = .field,
+        .detail = .field,
+        .documentation = .field,
+        .deprecated = .field,
+        .preselect = .field,
+        .sortText = .field,
+        .filterText = .field,
+        .insertText = .field,
+        .insertTextFormat = .field,
+        .insertTextMode = .field,
+        .textEdit = .field,
+        .textEditText = .field,
+        .additionalTextEdits = .field,
+        .commitCharacters = .field,
+        .command = .field,
+        .data = .field,
+    };
+
     /// The label of this completion item.
     ///
     /// The label property is also by default the text that
@@ -2410,47 +2960,38 @@ pub const CompletionItem = struct {
     /// Additional details for the label
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     labelDetails: ?CompletionItemLabelDetails = null,
     /// The kind of this completion item. Based of the kind
     /// an icon is chosen by the editor.
-    /// field can be undefined, but this possible state is non-critical
     kind: ?CompletionItemKind = null,
     /// Tags for this completion item.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const CompletionItemTag = null,
     /// A human-readable string with additional information
     /// about this item, like type or symbol information.
-    /// field can be undefined, but this possible state is non-critical
     detail: ?[]const u8 = null,
     /// A human-readable string that represents a doc-comment.
-    /// field can be undefined, but this possible state is non-critical
     documentation: ?union(enum) {
         string: []const u8,
         MarkupContent: MarkupContent,
     } = null,
     /// Indicates if this item is deprecated.
     /// @deprecated Use `tags` instead.
-    /// field can be undefined, but this possible state is non-critical
     deprecated: ?bool = null,
     /// Select this item when showing.
     ///
     /// *Note* that only one completion item can be selected and that the
     /// tool / client decides which item that is. The rule is that the *first*
     /// item of those that match best is selected.
-    /// field can be undefined, but this possible state is non-critical
     preselect: ?bool = null,
     /// A string that should be used when comparing this item
     /// with other items. When `falsy` the [label](#CompletionItem.label)
     /// is used.
-    /// field can be undefined, but this possible state is non-critical
     sortText: ?[]const u8 = null,
     /// A string that should be used when filtering a set of
     /// completion items. When `falsy` the [label](#CompletionItem.label)
     /// is used.
-    /// field can be undefined, but this possible state is non-critical
     filterText: ?[]const u8 = null,
     /// A string that should be inserted into a document when selecting
     /// this completion. When `falsy` the [label](#CompletionItem.label)
@@ -2463,7 +3004,6 @@ pub const CompletionItem = struct {
     /// `console` is provided it will only insert `sole`. Therefore it is
     /// recommended to use `textEdit` instead since it avoids additional client
     /// side interpretation.
-    /// field can be undefined, but this possible state is non-critical
     insertText: ?[]const u8 = null,
     /// The format of the insert text. The format applies to both the
     /// `insertText` property and the `newText` property of a provided
@@ -2471,14 +3011,12 @@ pub const CompletionItem = struct {
     ///
     /// Please note that the insertTextFormat doesn't apply to
     /// `additionalTextEdits`.
-    /// field can be undefined, but this possible state is non-critical
     insertTextFormat: ?InsertTextFormat = null,
     /// How whitespace and indentation is handled during completion
     /// item insertion. If not provided the clients default value depends on
     /// the `textDocument.completion.insertTextMode` client capability.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     insertTextMode: ?InsertTextMode = null,
     /// An [edit](#TextEdit) which is applied to a document when selecting
     /// this completion. When an edit is provided the value of
@@ -2500,7 +3038,6 @@ pub const CompletionItem = struct {
     /// contained and starting at the same position.
     ///
     /// @since 3.16.0 additional type `InsertReplaceEdit`
-    /// field can be undefined, but this possible state is non-critical
     textEdit: ?union(enum) {
         TextEdit: TextEdit,
         InsertReplaceEdit: InsertReplaceEdit,
@@ -2515,7 +3052,6 @@ pub const CompletionItem = struct {
     /// property is used as a text.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     textEditText: ?[]const u8 = null,
     /// An optional array of additional [text edits](#TextEdit) that are applied when
     /// selecting this completion. Edits must not overlap (including the same insert position)
@@ -2524,27 +3060,27 @@ pub const CompletionItem = struct {
     /// Additional text edits should be used to change text unrelated to the current cursor position
     /// (for example adding an import statement at the top of the file if the completion item will
     /// insert an unqualified type).
-    /// field can be undefined, but this possible state is non-critical
     additionalTextEdits: ?[]const TextEdit = null,
     /// An optional set of characters that when pressed while this completion is active will accept it first and
     /// then type that character. *Note* that all commit characters should have `length=1` and that superfluous
     /// characters will be ignored.
-    /// field can be undefined, but this possible state is non-critical
     commitCharacters: ?[]const []const u8 = null,
     /// An optional [command](#Command) that is executed *after* inserting this completion. *Note* that
     /// additional modifications to the current document should be described with the
     /// [additionalTextEdits](#CompletionItem.additionalTextEdits)-property.
-    /// field can be undefined, but this possible state is non-critical
     command: ?Command = null,
     /// A data entry field that is preserved on a completion item between a
     /// [CompletionRequest](#CompletionRequest) and a [CompletionResolveRequest](#CompletionResolveRequest).
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
 /// Represents a collection of [completion items](#CompletionItem) to be presented
 /// in the editor.
 pub const CompletionList = struct {
+    pub const tres_null_meaning = .{
+        .itemDefaults = .field,
+    };
+
     /// This list it not complete. Further typing results in recomputing this list.
     ///
     /// Recomputed lists have all their items replaced (not appended) in the
@@ -2563,20 +3099,27 @@ pub const CompletionList = struct {
     /// capability.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     itemDefaults: ?struct {
+        pub const tres_null_meaning = .{
+            .commitCharacters = .field,
+            .editRange = .field,
+            .insertTextFormat = .field,
+            .insertTextMode = .field,
+            .data = .field,
+        };
+
         /// A default commit character set.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         commitCharacters: ?[]const []const u8 = null,
         /// A default edit range.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         editRange: ?union(enum) {
             Range: Range,
             literal_1: struct {
+                pub const tres_null_meaning = .{};
+
                 insert: Range,
                 replace: Range,
             },
@@ -2584,17 +3127,14 @@ pub const CompletionList = struct {
         /// A default insert text format.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         insertTextFormat: ?InsertTextFormat = null,
         /// A default insert text mode.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         insertTextMode: ?InsertTextMode = null,
         /// A default data value.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         data: ?LSPAny = null,
     } = null,
     /// The completion items.
@@ -2603,6 +3143,21 @@ pub const CompletionList = struct {
 
 /// Registration options for a [CompletionRequest](#CompletionRequest).
 pub const CompletionRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends CompletionOptions
+        .triggerCharacters = .field,
+        .allCommitCharacters = .field,
+        .resolveProvider = .field,
+        .completionItem = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2617,7 +3172,6 @@ pub const CompletionRegistrationOptions = struct {
     ///
     /// If code complete should automatically be trigger on characters not being valid inside
     /// an identifier (for example `.` in JavaScript) list them in `triggerCharacters`.
-    /// field can be undefined, but this possible state is non-critical
     triggerCharacters: ?[]const []const u8 = null,
     /// The list of all possible characters that commit a completion. This field can be used
     /// if clients don't support individual commit characters per completion item. See
@@ -2627,33 +3181,40 @@ pub const CompletionRegistrationOptions = struct {
     /// completion item the ones on the completion item win.
     ///
     /// @since 3.2.0
-    /// field can be undefined, but this possible state is non-critical
     allCommitCharacters: ?[]const []const u8 = null,
     /// The server provides support to resolve additional
     /// information for a completion item.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     /// The server supports the following `CompletionItem` specific
     /// capabilities.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     completionItem: ?struct {
+        pub const tres_null_meaning = .{
+            .labelDetailsSupport = .field,
+        };
+
         /// The server has support for completion item label
         /// details (see also `CompletionItemLabelDetails`) when
         /// receiving a completion item in a resolve call.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         labelDetailsSupport: ?bool = null,
     } = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Parameters for a [HoverRequest](#HoverRequest).
 pub const HoverParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -2662,12 +3223,15 @@ pub const HoverParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// The result of a hover request.
 pub const Hover = struct {
+    pub const tres_null_meaning = .{
+        .range = .field,
+    };
+
     /// The hover's content
     contents: union(enum) {
         MarkupContent: MarkupContent,
@@ -2676,12 +3240,22 @@ pub const Hover = struct {
     },
     /// An optional range inside the text document that is used to
     /// visualize the hover, e.g. by changing the background color.
-    /// field can be undefined, but this possible state is non-critical
     range: ?Range = null,
 };
 
 /// Registration options for a [HoverRequest](#HoverRequest).
 pub const HoverRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends HoverOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2689,17 +3263,24 @@ pub const HoverRegistrationOptions = struct {
 
     // Extends HoverOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Parameters for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpParams = struct {
+    pub const tres_null_meaning = .{
+        .context = .field,
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The signature help context. This is only available if the client specifies
     /// to send this using the client capability `textDocument.signatureHelp.contextSupport === true`
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     context: ?SignatureHelpContext = null,
     // Extends TextDocumentPositionParams
     /// The text document.
@@ -2709,7 +3290,6 @@ pub const SignatureHelpParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
@@ -2717,6 +3297,11 @@ pub const SignatureHelpParams = struct {
 /// callable. There can be multiple signature but only one
 /// active and only one active parameter.
 pub const SignatureHelp = struct {
+    pub const tres_null_meaning = .{
+        .activeSignature = .field,
+        .activeParameter = .field,
+    };
+
     /// One or more signatures.
     signatures: []const SignatureInformation,
     /// The active signature. If omitted or the value lies outside the
@@ -2728,8 +3313,7 @@ pub const SignatureHelp = struct {
     ///
     /// In future version of the protocol this property might become
     /// mandatory to better express this.
-    /// field can be undefined, but this possible state is non-critical
-    activeSignature: ?u64 = null,
+    activeSignature: ?u32 = null,
     /// The active parameter of the active signature. If omitted or the value
     /// lies outside the range of `signatures[activeSignature].parameters`
     /// defaults to 0 if the active signature has parameters. If
@@ -2737,12 +3321,24 @@ pub const SignatureHelp = struct {
     /// In future version of the protocol this property might become
     /// mandatory to better express the active parameter if the
     /// active signature does have any.
-    /// field can be undefined, but this possible state is non-critical
-    activeParameter: ?u64 = null,
+    activeParameter: ?u32 = null,
 };
 
 /// Registration options for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends SignatureHelpOptions
+        .triggerCharacters = .field,
+        .retriggerCharacters = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2750,7 +3346,6 @@ pub const SignatureHelpRegistrationOptions = struct {
 
     // Extends SignatureHelpOptions
     /// List of characters that trigger signature help automatically.
-    /// field can be undefined, but this possible state is non-critical
     triggerCharacters: ?[]const []const u8 = null,
     /// List of characters that re-trigger signature help.
     ///
@@ -2758,15 +3353,24 @@ pub const SignatureHelpRegistrationOptions = struct {
     /// are also counted as re-trigger characters.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     retriggerCharacters: ?[]const []const u8 = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Parameters for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -2775,18 +3379,27 @@ pub const DefinitionParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// Registration options for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DefinitionOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2794,12 +3407,22 @@ pub const DefinitionRegistrationOptions = struct {
 
     // Extends DefinitionOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Parameters for a [ReferencesRequest](#ReferencesRequest).
 pub const ReferenceParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     context: ReferenceContext,
     // Extends TextDocumentPositionParams
     /// The text document.
@@ -2809,18 +3432,27 @@ pub const ReferenceParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// Registration options for a [ReferencesRequest](#ReferencesRequest).
 pub const ReferenceRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends ReferenceOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2828,12 +3460,22 @@ pub const ReferenceRegistrationOptions = struct {
 
     // Extends ReferenceOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Parameters for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -2842,13 +3484,11 @@ pub const DocumentHighlightParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -2856,15 +3496,29 @@ pub const DocumentHighlightParams = struct {
 /// special attention. Usually a document highlight is visualized by changing
 /// the background color of its range.
 pub const DocumentHighlight = struct {
+    pub const tres_null_meaning = .{
+        .kind = .field,
+    };
+
     /// The range this highlight applies to.
     range: Range,
     /// The highlight kind, default is [text](#DocumentHighlightKind.Text).
-    /// field can be undefined, but this possible state is non-critical
     kind: ?DocumentHighlightKind = null,
 };
 
 /// Registration options for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DocumentHighlightOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2872,33 +3526,46 @@ pub const DocumentHighlightRegistrationOptions = struct {
 
     // Extends DocumentHighlightOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Parameters for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// Represents information about programming constructs like variables, classes,
 /// interfaces etc.
 pub const SymbolInformation = struct {
+    pub const tres_null_meaning = .{
+        .deprecated = .field,
+
+        // Extends BaseSymbolInformation
+        .tags = .field,
+        .containerName = .field,
+    };
+
     /// Indicates if this symbol is deprecated.
     ///
     /// @deprecated Use tags instead
-    /// field can be undefined, but this possible state is non-critical
     deprecated: ?bool = null,
     /// The location of this symbol. The location's range is used by a tool
     /// to reveal the location in the editor. If the symbol is selected in the
@@ -2918,13 +3585,11 @@ pub const SymbolInformation = struct {
     /// Tags for this symbol.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const SymbolTag = null,
     /// The name of the symbol containing this symbol. This information is for
     /// user interface purposes (e.g. to render a qualifier in the user interface
     /// if necessary). It can't be used to re-infer a hierarchy for the document
     /// symbols.
-    /// field can be undefined, but this possible state is non-critical
     containerName: ?[]const u8 = null,
 };
 
@@ -2933,23 +3598,27 @@ pub const SymbolInformation = struct {
 /// have two ranges: one that encloses its definition and one that points to
 /// its most interesting range, e.g. the range of an identifier.
 pub const DocumentSymbol = struct {
+    pub const tres_null_meaning = .{
+        .detail = .field,
+        .tags = .field,
+        .deprecated = .field,
+        .children = .field,
+    };
+
     /// The name of this symbol. Will be displayed in the user interface and therefore must not be
     /// an empty string or a string only consisting of white spaces.
     name: []const u8,
     /// More detail for this symbol, e.g the signature of a function.
-    /// field can be undefined, but this possible state is non-critical
     detail: ?[]const u8 = null,
     /// The kind of this symbol.
     kind: SymbolKind,
     /// Tags for this document symbol.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const SymbolTag = null,
     /// Indicates if this symbol is deprecated.
     ///
     /// @deprecated Use tags instead
-    /// field can be undefined, but this possible state is non-critical
     deprecated: ?bool = null,
     /// The range enclosing this symbol not including leading/trailing whitespace but everything else
     /// like comments. This information is typically used to determine if the clients cursor is
@@ -2959,12 +3628,23 @@ pub const DocumentSymbol = struct {
     /// Must be contained by the `range`.
     selectionRange: Range,
     /// Children of this symbol, e.g. properties of a class.
-    /// field can be undefined, but this possible state is non-critical
     children: ?[]const DocumentSymbol = null,
 };
 
 /// Registration options for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DocumentSymbolOptions
+        .label = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -2975,15 +3655,22 @@ pub const DocumentSymbolRegistrationOptions = struct {
     /// are shown for the same document.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     label: ?[]const u8 = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters of a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The document in which the command was invoked.
     textDocument: TextDocumentIdentifier,
     /// The range for which the command was invoked.
@@ -2992,13 +3679,11 @@ pub const CodeActionParams = struct {
     context: CodeActionContext,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -3007,13 +3692,16 @@ pub const CodeActionParams = struct {
 /// an array of arguments which will be passed to the command handler
 /// function when invoked.
 pub const Command = struct {
+    pub const tres_null_meaning = .{
+        .arguments = .field,
+    };
+
     /// Title of the command, like `save`.
     title: []const u8,
     /// The identifier of the actual command handler.
     command: []const u8,
     /// Arguments that the command handler should be
     /// invoked with.
-    /// field can be undefined, but this possible state is non-critical
     arguments: ?[]const LSPAny = null,
 };
 
@@ -3022,15 +3710,23 @@ pub const Command = struct {
 ///
 /// A CodeAction must set either `edit` and/or a `command`. If both are supplied, the `edit` is applied first, then the `command` is executed.
 pub const CodeAction = struct {
+    pub const tres_null_meaning = .{
+        .kind = .field,
+        .diagnostics = .field,
+        .isPreferred = .field,
+        .disabled = .field,
+        .edit = .field,
+        .command = .field,
+        .data = .field,
+    };
+
     /// A short, human-readable, title for this code action.
     title: []const u8,
     /// The kind of the code action.
     ///
     /// Used to filter code actions.
-    /// field can be undefined, but this possible state is non-critical
     kind: ?CodeActionKind = null,
     /// The diagnostics that this code action resolves.
-    /// field can be undefined, but this possible state is non-critical
     diagnostics: ?[]const Diagnostic = null,
     /// Marks this as a preferred action. Preferred actions are used by the `auto fix` command and can be targeted
     /// by keybindings.
@@ -3039,7 +3735,6 @@ pub const CodeAction = struct {
     /// A refactoring should be marked preferred if it is the most reasonable choice of actions to take.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     isPreferred: ?bool = null,
     /// Marks that the code action cannot currently be applied.
     ///
@@ -3056,31 +3751,42 @@ pub const CodeAction = struct {
     ///     error message with `reason` in the editor.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     disabled: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// Human readable description of why the code action is currently disabled.
         ///
         /// This is displayed in the code actions UI.
         reason: []const u8,
     } = null,
     /// The workspace edit this code action performs.
-    /// field can be undefined, but this possible state is non-critical
     edit: ?WorkspaceEdit = null,
     /// A command this code action executes. If a code action
     /// provides an edit and a command, first the edit is
     /// executed and then the command.
-    /// field can be undefined, but this possible state is non-critical
     command: ?Command = null,
     /// A data entry field that is preserved on a code action between
     /// a `textDocument/codeAction` and a `codeAction/resolve` request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
 /// Registration options for a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends CodeActionOptions
+        .codeActionKinds = .field,
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -3091,33 +3797,37 @@ pub const CodeActionRegistrationOptions = struct {
     ///
     /// The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server
     /// may list out every specific kind they provide.
-    /// field can be undefined, but this possible state is non-critical
     codeActionKinds: ?[]const CodeActionKind = null,
     /// The server provides support to resolve additional
     /// information for a code action.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters of a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// A query string to filter symbols by. Clients may send an empty
     /// string here to request all symbols.
     query: []const u8,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -3127,6 +3837,14 @@ pub const WorkspaceSymbolParams = struct {
 ///
 /// @since 3.17.0
 pub const WorkspaceSymbol = struct {
+    pub const tres_null_meaning = .{
+        .data = .field,
+
+        // Extends BaseSymbolInformation
+        .tags = .field,
+        .containerName = .field,
+    };
+
     /// The location of the symbol. Whether a server is allowed to
     /// return a location without a range depends on the client
     /// capability `workspace.symbol.resolveSupport`.
@@ -3135,12 +3853,13 @@ pub const WorkspaceSymbol = struct {
     location: union(enum) {
         Location: Location,
         literal_1: struct {
+            pub const tres_null_meaning = .{};
+
             uri: DocumentUri,
         },
     },
     /// A data entry field that is preserved on a workspace symbol between a
     /// workspace symbol request and a workspace symbol resolve request.
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
     // Extends BaseSymbolInformation
     /// The name of this symbol.
@@ -3150,43 +3869,55 @@ pub const WorkspaceSymbol = struct {
     /// Tags for this symbol.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const SymbolTag = null,
     /// The name of the symbol containing this symbol. This information is for
     /// user interface purposes (e.g. to render a qualifier in the user interface
     /// if necessary). It can't be used to re-infer a hierarchy for the document
     /// symbols.
-    /// field can be undefined, but this possible state is non-critical
     containerName: ?[]const u8 = null,
 };
 
 /// Registration options for a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends WorkspaceSymbolOptions
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends WorkspaceSymbolOptions
     /// The server provides support to resolve additional
     /// information for a workspace symbol.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters of a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The document to request code lens for.
     textDocument: TextDocumentIdentifier,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
@@ -3196,20 +3927,35 @@ pub const CodeLensParams = struct {
 /// A code lens is _unresolved_ when no command is associated to it. For performance
 /// reasons the creation of a code lens and resolving should be done in two stages.
 pub const CodeLens = struct {
+    pub const tres_null_meaning = .{
+        .command = .field,
+        .data = .field,
+    };
+
     /// The range in which this code lens is valid. Should only span a single line.
     range: Range,
     /// The command this code lens represents.
-    /// field can be undefined, but this possible state is non-critical
     command: ?Command = null,
     /// A data entry field that is preserved on a code lens item between
     /// a [CodeLensRequest](#CodeLensRequest) and a [CodeLensResolveRequest]
     /// (#CodeLensResolveRequest)
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
 /// Registration options for a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends CodeLensOptions
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -3217,36 +3963,46 @@ pub const CodeLensRegistrationOptions = struct {
 
     // Extends CodeLensOptions
     /// Code lens has a resolve provider as well.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters of a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+
+        // Uses mixin PartialResultParams
+        .partialResultToken = .field,
+    };
+
     /// The document to provide document links for.
     textDocument: TextDocumentIdentifier,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 
     // Uses mixin PartialResultParams
     /// An optional token that a server can use to report partial results (e.g. streaming) to
     /// the client.
-    /// field can be undefined, but this possible state is non-critical
     partialResultToken: ?ProgressToken = null,
 };
 
 /// A document link is a range in a text document that links to an internal or external resource, like another
 /// text document or a web site.
 pub const DocumentLink = struct {
+    pub const tres_null_meaning = .{
+        .target = .field,
+        .tooltip = .field,
+        .data = .field,
+    };
+
     /// The range this link applies to.
     range: Range,
     /// The uri this link points to. If missing a resolve request is sent later.
-    /// field can be undefined, but this possible state is non-critical
     target: ?[]const u8 = null,
     /// The tooltip text when you hover over this link.
     ///
@@ -3255,16 +4011,26 @@ pub const DocumentLink = struct {
     /// user settings, and localization.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     tooltip: ?[]const u8 = null,
     /// A data entry field that is preserved on a document link between a
     /// DocumentLinkRequest and a DocumentLinkResolveRequest.
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
 /// Registration options for a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DocumentLinkOptions
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -3272,27 +4038,41 @@ pub const DocumentLinkRegistrationOptions = struct {
 
     // Extends DocumentLinkOptions
     /// Document links have a resolve provider as well.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters of a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The document to format.
     textDocument: TextDocumentIdentifier,
     /// The format options.
     options: FormattingOptions,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// Registration options for a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DocumentFormattingOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -3300,12 +4080,17 @@ pub const DocumentFormattingRegistrationOptions = struct {
 
     // Extends DocumentFormattingOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters of a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The document to format.
     textDocument: TextDocumentIdentifier,
     /// The range to format
@@ -3314,12 +4099,22 @@ pub const DocumentRangeFormattingParams = struct {
     options: FormattingOptions,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// Registration options for a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DocumentRangeFormattingOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -3327,12 +4122,13 @@ pub const DocumentRangeFormattingRegistrationOptions = struct {
 
     // Extends DocumentRangeFormattingOptions
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters of a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The document to format.
     textDocument: TextDocumentIdentifier,
     /// The position around which the on type formatting should happen.
@@ -3350,6 +4146,15 @@ pub const DocumentOnTypeFormattingParams = struct {
 
 /// Registration options for a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends DocumentOnTypeFormattingOptions
+        .moreTriggerCharacter = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -3359,12 +4164,17 @@ pub const DocumentOnTypeFormattingRegistrationOptions = struct {
     /// A character on which formatting should be triggered, like `{`.
     firstTriggerCharacter: []const u8,
     /// More trigger characters.
-    /// field can be undefined, but this possible state is non-critical
     moreTriggerCharacter: ?[]const []const u8 = null,
 };
 
 /// The parameters of a [RenameRequest](#RenameRequest).
 pub const RenameParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The document to rename.
     textDocument: TextDocumentIdentifier,
     /// The position at which this request was sent.
@@ -3375,12 +4185,23 @@ pub const RenameParams = struct {
     newName: []const u8,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// Registration options for a [RenameRequest](#RenameRequest).
 pub const RenameRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentRegistrationOptions
+        .documentSelector = .value,
+
+        // Extends RenameOptions
+        .prepareProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends TextDocumentRegistrationOptions
     /// A document selector to identify the scope of the registration. If set to null
     /// the document selector provided on the client side will be used.
@@ -3390,14 +4211,20 @@ pub const RenameRegistrationOptions = struct {
     /// Renames should be checked and tested before being executed.
     ///
     /// @since version 3.12.0
-    /// field can be undefined, but this possible state is non-critical
     prepareProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 pub const PrepareRenameParams = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentPositionParams
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     // Extends TextDocumentPositionParams
     /// The text document.
     textDocument: TextDocumentIdentifier,
@@ -3406,39 +4233,53 @@ pub const PrepareRenameParams = struct {
 
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// The parameters of a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandParams = struct {
+    pub const tres_null_meaning = .{
+        .arguments = .field,
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The identifier of the actual command handler.
     command: []const u8,
     /// Arguments that the command should be invoked with.
-    /// field can be undefined, but this possible state is non-critical
     arguments: ?[]const LSPAny = null,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// Registration options for a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends ExecuteCommandOptions
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Extends ExecuteCommandOptions
     /// The commands to be executed on the server
     commands: []const []const u8,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The parameters passed via a apply workspace edit request.
 pub const ApplyWorkspaceEditParams = struct {
+    pub const tres_null_meaning = .{
+        .label = .field,
+    };
+
     /// An optional label of the workspace edit. This label is
     /// presented in the user interface for example on an undo
     /// stack to undo the workspace edit.
-    /// field can be undefined, but this possible state is non-critical
     label: ?[]const u8 = null,
     /// The edits to apply.
     edit: WorkspaceEdit,
@@ -3448,21 +4289,30 @@ pub const ApplyWorkspaceEditParams = struct {
 ///
 /// @since 3.17 renamed from ApplyWorkspaceEditResponse
 pub const ApplyWorkspaceEditResult = struct {
+    pub const tres_null_meaning = .{
+        .failureReason = .field,
+        .failedChange = .field,
+    };
+
     /// Indicates whether the edit was applied or not.
     applied: bool,
     /// An optional textual description for why the edit was not applied.
     /// This may be used by the server for diagnostic logging or to provide
     /// a suitable error for a request that triggered the edit.
-    /// field can be undefined, but this possible state is non-critical
     failureReason: ?[]const u8 = null,
     /// Depending on the client's failure handling strategy `failedChange` might
     /// contain the index of the change that failed. This property is only available
     /// if the client signals a `failureHandlingStrategy` in its client capabilities.
-    /// field can be undefined, but this possible state is non-critical
-    failedChange: ?u64 = null,
+    failedChange: ?u32 = null,
 };
 
 pub const WorkDoneProgressBegin = struct {
+    pub const tres_null_meaning = .{
+        .cancellable = .field,
+        .message = .field,
+        .percentage = .field,
+    };
+
     comptime kind: []const u8 = "begin",
     /// Mandatory title of the progress operation. Used to briefly inform about
     /// the kind of operation being performed.
@@ -3472,14 +4322,12 @@ pub const WorkDoneProgressBegin = struct {
     /// Controls if a cancel button should show to allow the user to cancel the
     /// long running operation. Clients that don't support cancellation are allowed
     /// to ignore the setting.
-    /// field can be undefined, but this possible state is non-critical
     cancellable: ?bool = null,
     /// Optional, more detailed associated progress message. Contains
     /// complementary information to the `title`.
     ///
     /// Examples: "3/25 files", "project/src/module2", "node_modules/some_dep".
     /// If unset, the previous progress message (if any) is still valid.
-    /// field can be undefined, but this possible state is non-critical
     message: ?[]const u8 = null,
     /// Optional progress percentage to display (value 100 is considered 100%).
     /// If not provided infinite progress is assumed and clients are allowed
@@ -3487,24 +4335,27 @@ pub const WorkDoneProgressBegin = struct {
     ///
     /// The value should be steadily rising. Clients are free to ignore values
     /// that are not following this rule. The value range is [0, 100].
-    /// field can be undefined, but this possible state is non-critical
-    percentage: ?u64 = null,
+    percentage: ?u32 = null,
 };
 
 pub const WorkDoneProgressReport = struct {
+    pub const tres_null_meaning = .{
+        .cancellable = .field,
+        .message = .field,
+        .percentage = .field,
+    };
+
     comptime kind: []const u8 = "report",
     /// Controls enablement state of a cancel button.
     ///
     /// Clients that don't support cancellation or don't support controlling the button's
     /// enablement state are allowed to ignore the property.
-    /// field can be undefined, but this possible state is non-critical
     cancellable: ?bool = null,
     /// Optional, more detailed associated progress message. Contains
     /// complementary information to the `title`.
     ///
     /// Examples: "3/25 files", "project/src/module2", "node_modules/some_dep".
     /// If unset, the previous progress message (if any) is still valid.
-    /// field can be undefined, but this possible state is non-critical
     message: ?[]const u8 = null,
     /// Optional progress percentage to display (value 100 is considered 100%).
     /// If not provided infinite progress is assumed and clients are allowed
@@ -3512,37 +4363,48 @@ pub const WorkDoneProgressReport = struct {
     ///
     /// The value should be steadily rising. Clients are free to ignore values
     /// that are not following this rule. The value range is [0, 100]
-    /// field can be undefined, but this possible state is non-critical
-    percentage: ?u64 = null,
+    percentage: ?u32 = null,
 };
 
 pub const WorkDoneProgressEnd = struct {
+    pub const tres_null_meaning = .{
+        .message = .field,
+    };
+
     comptime kind: []const u8 = "end",
     /// Optional, a final message indicating to for example indicate the outcome
     /// of the operation.
-    /// field can be undefined, but this possible state is non-critical
     message: ?[]const u8 = null,
 };
 
 pub const SetTraceParams = struct {
+    pub const tres_null_meaning = .{};
+
     value: TraceValues,
 };
 
 pub const LogTraceParams = struct {
+    pub const tres_null_meaning = .{
+        .verbose = .field,
+    };
+
     message: []const u8,
-    /// field can be undefined, but this possible state is non-critical
     verbose: ?[]const u8 = null,
 };
 
 pub const CancelParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The request id to cancel.
     id: union(enum) {
-        integer: i64,
+        integer: i32,
         string: []const u8,
     },
 };
 
 pub const ProgressParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The progress token provided by the client or server.
     token: ProgressToken,
     /// The progress data.
@@ -3552,6 +4414,8 @@ pub const ProgressParams = struct {
 /// A parameter literal used in requests to pass a text document and a position inside that
 /// document.
 pub const TextDocumentPositionParams = struct {
+    pub const tres_null_meaning = .{};
+
     /// The text document.
     textDocument: TextDocumentIdentifier,
     /// The position inside the text document.
@@ -3559,19 +4423,25 @@ pub const TextDocumentPositionParams = struct {
 };
 
 pub const WorkDoneProgressParams = struct {
+    pub const tres_null_meaning = .{
+        .workDoneToken = .field,
+    };
+
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 /// Represents the connection of two locations. Provides additional metadata over normal [locations](#Location),
 /// including an origin range.
 pub const LocationLink = struct {
+    pub const tres_null_meaning = .{
+        .originSelectionRange = .field,
+    };
+
     /// Span of the origin of this link.
     ///
     /// Used as the underlined span for mouse interaction. Defaults to the word range at
     /// the definition position.
-    /// field can be undefined, but this possible state is non-critical
     originSelectionRange: ?Range = null,
     /// The target resource identifier of this link.
     targetUri: DocumentUri,
@@ -3596,6 +4466,8 @@ pub const LocationLink = struct {
 /// }
 /// ```
 pub const Range = struct {
+    pub const tres_null_meaning = .{};
+
     /// The range's start position.
     start: Position,
     /// The range's end position.
@@ -3603,28 +4475,43 @@ pub const Range = struct {
 };
 
 pub const ImplementationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Static registration options to be returned in the initialize
 /// request.
 pub const StaticRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+        .id = .field,
+    };
+
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 pub const TypeDefinitionOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The workspace folder change event.
 pub const WorkspaceFoldersChangeEvent = struct {
+    pub const tres_null_meaning = .{};
+
     /// The array of added workspace folders
     added: []const WorkspaceFolder,
     /// The array of the removed workspace folders
@@ -3632,47 +4519,69 @@ pub const WorkspaceFoldersChangeEvent = struct {
 };
 
 pub const ConfigurationItem = struct {
+    pub const tres_null_meaning = .{
+        .scopeUri = .field,
+        .section = .field,
+    };
+
     /// The scope to get the configuration section for.
-    /// field can be undefined, but this possible state is non-critical
     scopeUri: ?[]const u8 = null,
     /// The configuration section asked for.
-    /// field can be undefined, but this possible state is non-critical
     section: ?[]const u8 = null,
 };
 
 /// A literal to identify a text document in the client.
 pub const TextDocumentIdentifier = struct {
+    pub const tres_null_meaning = .{};
+
     /// The text document's uri.
     uri: DocumentUri,
 };
 
 /// Represents a color in RGBA space.
 pub const Color = struct {
+    pub const tres_null_meaning = .{};
+
     /// The red component of this color in the range [0-1].
-    red: u64,
+    red: f32,
     /// The green component of this color in the range [0-1].
-    green: u64,
+    green: f32,
     /// The blue component of this color in the range [0-1].
-    blue: u64,
+    blue: f32,
     /// The alpha component of this color in the range [0-1].
-    alpha: u64,
+    alpha: f32,
 };
 
 pub const DocumentColorOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 pub const FoldingRangeOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 pub const DeclarationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -3704,11 +4613,13 @@ pub const DeclarationOptions = struct {
 ///
 /// @since 3.17.0 - support for negotiated position encoding.
 pub const Position = struct {
+    pub const tres_null_meaning = .{};
+
     /// Line position in a document (zero-based).
     ///
     /// If a line number is greater than the number of lines in a document, it defaults back to the number of lines in the document.
     /// If a line number is negative, it defaults to 0.
-    line: u64,
+    line: u32,
     /// Character offset on a line in a document (zero-based).
     ///
     /// The meaning of this offset is determined by the negotiated
@@ -3716,12 +4627,17 @@ pub const Position = struct {
     ///
     /// If the character value is greater than the line length it defaults back to the
     /// line length.
-    character: u64,
+    character: u32,
 };
 
 pub const SelectionRangeOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -3729,51 +4645,74 @@ pub const SelectionRangeOptions = struct {
 ///
 /// @since 3.16.0
 pub const CallHierarchyOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensOptions = struct {
+    pub const tres_null_meaning = .{
+        .range = .field,
+        .full = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// The legend used by the server
     legend: SemanticTokensLegend,
     /// Server supports providing semantic tokens for a specific range
     /// of a document.
-    /// field can be undefined, but this possible state is non-critical
     range: ?union(enum) {
         bool: bool,
-        literal_1: struct {},
+        literal_1: struct {
+            pub const tres_null_meaning = .{};
+        },
     } = null,
     /// Server supports providing semantic tokens for a full document.
-    /// field can be undefined, but this possible state is non-critical
     full: ?union(enum) {
         bool: bool,
         literal_1: struct {
+            pub const tres_null_meaning = .{
+                .delta = .field,
+            };
+
             /// The server supports deltas for full documents.
-            /// field can be undefined, but this possible state is non-critical
             delta: ?bool = null,
         },
     } = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensEdit = struct {
+    pub const tres_null_meaning = .{
+        .data = .field,
+    };
+
     /// The start offset of the edit.
-    start: u64,
+    start: u32,
     /// The count of elements to remove.
-    deleteCount: u64,
+    deleteCount: u32,
     /// The elements to insert.
-    /// field can be undefined, but this possible state is non-critical
-    data: ?[]const u64 = null,
+    data: ?[]const u32 = null,
 };
 
 pub const LinkedEditingRangeOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -3781,6 +4720,8 @@ pub const LinkedEditingRangeOptions = struct {
 ///
 /// @since 3.16.0
 pub const FileCreate = struct {
+    pub const tres_null_meaning = .{};
+
     /// A file:// URI for the location of the file/folder being created.
     uri: []const u8,
 };
@@ -3790,6 +4731,8 @@ pub const FileCreate = struct {
 /// So the creator of a TextDocumentEdit doesn't need to sort the array of edits or do any
 /// kind of ordering. However the edits must be non overlapping.
 pub const TextDocumentEdit = struct {
+    pub const tres_null_meaning = .{};
+
     /// The text document to change.
     textDocument: OptionalVersionedTextDocumentIdentifier,
     /// The edits to be applied.
@@ -3804,23 +4747,35 @@ pub const TextDocumentEdit = struct {
 
 /// Create file operation.
 pub const CreateFile = struct {
+    pub const tres_null_meaning = .{
+        .options = .field,
+
+        // Extends ResourceOperation
+        .annotationId = .field,
+    };
+
     /// A create
     comptime kind: []const u8 = "create",
     /// The resource to create.
     uri: DocumentUri,
     /// Additional options
-    /// field can be undefined, but this possible state is non-critical
     options: ?CreateFileOptions = null,
     // Extends ResourceOperation
     /// An optional annotation identifier describing the operation.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     annotationId: ?ChangeAnnotationIdentifier = null,
 };
 
 /// Rename file operation
 pub const RenameFile = struct {
+    pub const tres_null_meaning = .{
+        .options = .field,
+
+        // Extends ResourceOperation
+        .annotationId = .field,
+    };
+
     /// A rename
     comptime kind: []const u8 = "rename",
     /// The old (existing) location.
@@ -3828,30 +4783,33 @@ pub const RenameFile = struct {
     /// The new location.
     newUri: DocumentUri,
     /// Rename options.
-    /// field can be undefined, but this possible state is non-critical
     options: ?RenameFileOptions = null,
     // Extends ResourceOperation
     /// An optional annotation identifier describing the operation.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     annotationId: ?ChangeAnnotationIdentifier = null,
 };
 
 /// Delete file operation
 pub const DeleteFile = struct {
+    pub const tres_null_meaning = .{
+        .options = .field,
+
+        // Extends ResourceOperation
+        .annotationId = .field,
+    };
+
     /// A delete
     comptime kind: []const u8 = "delete",
     /// The file to delete.
     uri: DocumentUri,
     /// Delete options.
-    /// field can be undefined, but this possible state is non-critical
     options: ?DeleteFileOptions = null,
     // Extends ResourceOperation
     /// An optional annotation identifier describing the operation.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     annotationId: ?ChangeAnnotationIdentifier = null,
 };
 
@@ -3859,16 +4817,19 @@ pub const DeleteFile = struct {
 ///
 /// @since 3.16.0
 pub const ChangeAnnotation = struct {
+    pub const tres_null_meaning = .{
+        .needsConfirmation = .field,
+        .description = .field,
+    };
+
     /// A human-readable string describing the actual change. The string
     /// is rendered prominent in the user interface.
     label: []const u8,
     /// A flag which indicates that user confirmation is needed
     /// before applying the change.
-    /// field can be undefined, but this possible state is non-critical
     needsConfirmation: ?bool = null,
     /// A human-readable string which is rendered less prominent in
     /// the user interface.
-    /// field can be undefined, but this possible state is non-critical
     description: ?[]const u8 = null,
 };
 
@@ -3877,8 +4838,11 @@ pub const ChangeAnnotation = struct {
 ///
 /// @since 3.16.0
 pub const FileOperationFilter = struct {
+    pub const tres_null_meaning = .{
+        .scheme = .field,
+    };
+
     /// A Uri scheme like `file` or `untitled`.
-    /// field can be undefined, but this possible state is non-critical
     scheme: ?[]const u8 = null,
     /// The actual file operation pattern.
     pattern: FileOperationPattern,
@@ -3888,6 +4852,8 @@ pub const FileOperationFilter = struct {
 ///
 /// @since 3.16.0
 pub const FileRename = struct {
+    pub const tres_null_meaning = .{};
+
     /// A file:// URI for the original location of the file/folder being renamed.
     oldUri: []const u8,
     /// A file:// URI for the new location of the file/folder being renamed.
@@ -3898,13 +4864,20 @@ pub const FileRename = struct {
 ///
 /// @since 3.16.0
 pub const FileDelete = struct {
+    pub const tres_null_meaning = .{};
+
     /// A file:// URI for the location of the file/folder being deleted.
     uri: []const u8,
 };
 
 pub const MonikerOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -3912,15 +4885,22 @@ pub const MonikerOptions = struct {
 ///
 /// @since 3.17.0
 pub const TypeHierarchyOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// @since 3.17.0
 pub const InlineValueContext = struct {
+    pub const tres_null_meaning = .{};
+
     /// The stack frame (as a DAP Id) where the execution has stopped.
-    frameId: i64,
+    frameId: i32,
     /// The document range where execution has stopped.
     /// Typically the end position of the range denotes the line where the inline values are shown.
     stoppedLocation: Range,
@@ -3930,6 +4910,8 @@ pub const InlineValueContext = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueText = struct {
+    pub const tres_null_meaning = .{};
+
     /// The document range for which the inline value applies.
     range: Range,
     /// The text of the inline value.
@@ -3942,11 +4924,14 @@ pub const InlineValueText = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueVariableLookup = struct {
+    pub const tres_null_meaning = .{
+        .variableName = .field,
+    };
+
     /// The document range for which the inline value applies.
     /// The range is used to extract the variable name from the underlying document.
     range: Range,
     /// If specified the name of the variable to look up.
-    /// field can be undefined, but this possible state is non-critical
     variableName: ?[]const u8 = null,
     /// How to perform the lookup.
     caseSensitiveLookup: bool,
@@ -3958,11 +4943,14 @@ pub const InlineValueVariableLookup = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueEvaluatableExpression = struct {
+    pub const tres_null_meaning = .{
+        .expression = .field,
+    };
+
     /// The document range for which the inline value applies.
     /// The range is used to extract the evaluatable expression from the underlying document.
     range: Range,
     /// If specified the expression overrides the extracted expression.
-    /// field can be undefined, but this possible state is non-critical
     expression: ?[]const u8 = null,
 };
 
@@ -3970,8 +4958,13 @@ pub const InlineValueEvaluatableExpression = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -3980,12 +4973,17 @@ pub const InlineValueOptions = struct {
 ///
 /// @since 3.17.0
 pub const InlayHintLabelPart = struct {
+    pub const tres_null_meaning = .{
+        .tooltip = .field,
+        .location = .field,
+        .command = .field,
+    };
+
     /// The value of this label part.
     value: []const u8,
     /// The tooltip text when you hover over this label part. Depending on
     /// the client capability `inlayHint.resolveSupport` clients might resolve
     /// this property late using the resolve request.
-    /// field can be undefined, but this possible state is non-critical
     tooltip: ?union(enum) {
         string: []const u8,
         MarkupContent: MarkupContent,
@@ -4001,13 +4999,11 @@ pub const InlayHintLabelPart = struct {
     ///
     /// Depending on the client capability `inlayHint.resolveSupport` clients
     /// might resolve this property late using the resolve request.
-    /// field can be undefined, but this possible state is non-critical
     location: ?Location = null,
     /// An optional command for this label part.
     ///
     /// Depending on the client capability `inlayHint.resolveSupport` clients
     /// might resolve this property late using the resolve request.
-    /// field can be undefined, but this possible state is non-critical
     command: ?Command = null,
 };
 
@@ -4034,6 +5030,8 @@ pub const InlayHintLabelPart = struct {
 /// *Please Note* that clients might sanitize the return markdown. A client could decide to
 /// remove HTML from the markdown to avoid script execution.
 pub const MarkupContent = struct {
+    pub const tres_null_meaning = .{};
+
     /// The type of the Markup
     kind: MarkupKind,
     /// The content itself
@@ -4044,12 +5042,17 @@ pub const MarkupContent = struct {
 ///
 /// @since 3.17.0
 pub const InlayHintOptions = struct {
+    pub const tres_null_meaning = .{
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// The server provides support to resolve additional
     /// information for an inlay hint item.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -4057,6 +5060,13 @@ pub const InlayHintOptions = struct {
 ///
 /// @since 3.17.0
 pub const RelatedFullDocumentDiagnosticReport = struct {
+    pub const tres_null_meaning = .{
+        .relatedDocuments = .field,
+
+        // Extends FullDocumentDiagnosticReport
+        .resultId = .field,
+    };
+
     /// Diagnostics of related documents. This information is useful
     /// in programming languages where code in a file A can generate
     /// diagnostics in a file B which A depends on. An example of
@@ -4064,7 +5074,6 @@ pub const RelatedFullDocumentDiagnosticReport = struct {
     /// a.cpp and result in errors in a header file b.hpp.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     relatedDocuments: ?Map(DocumentUri, union(enum) {
         FullDocumentDiagnosticReport: FullDocumentDiagnosticReport,
         UnchangedDocumentDiagnosticReport: UnchangedDocumentDiagnosticReport,
@@ -4075,7 +5084,6 @@ pub const RelatedFullDocumentDiagnosticReport = struct {
     /// An optional result id. If provided it will
     /// be sent on the next diagnostic request for the
     /// same document.
-    /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual items.
     items: []const Diagnostic,
@@ -4085,6 +5093,13 @@ pub const RelatedFullDocumentDiagnosticReport = struct {
 ///
 /// @since 3.17.0
 pub const RelatedUnchangedDocumentDiagnosticReport = struct {
+    pub const tres_null_meaning = .{
+        .relatedDocuments = .field,
+
+        // Extends UnchangedDocumentDiagnosticReport
+
+    };
+
     /// Diagnostics of related documents. This information is useful
     /// in programming languages where code in a file A can generate
     /// diagnostics in a file B which A depends on. An example of
@@ -4092,7 +5107,6 @@ pub const RelatedUnchangedDocumentDiagnosticReport = struct {
     /// a.cpp and result in errors in a header file b.hpp.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     relatedDocuments: ?Map(DocumentUri, union(enum) {
         FullDocumentDiagnosticReport: FullDocumentDiagnosticReport,
         UnchangedDocumentDiagnosticReport: UnchangedDocumentDiagnosticReport,
@@ -4112,12 +5126,15 @@ pub const RelatedUnchangedDocumentDiagnosticReport = struct {
 ///
 /// @since 3.17.0
 pub const FullDocumentDiagnosticReport = struct {
+    pub const tres_null_meaning = .{
+        .resultId = .field,
+    };
+
     /// A full document diagnostic report.
     comptime kind: []const u8 = "full",
     /// An optional result id. If provided it will
     /// be sent on the next diagnostic request for the
     /// same document.
-    /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual items.
     items: []const Diagnostic,
@@ -4128,6 +5145,8 @@ pub const FullDocumentDiagnosticReport = struct {
 ///
 /// @since 3.17.0
 pub const UnchangedDocumentDiagnosticReport = struct {
+    pub const tres_null_meaning = .{};
+
     /// A document diagnostic report indicating
     /// no changes to the last result. A server can
     /// only return `unchanged` if result ids are
@@ -4142,9 +5161,15 @@ pub const UnchangedDocumentDiagnosticReport = struct {
 ///
 /// @since 3.17.0
 pub const DiagnosticOptions = struct {
+    pub const tres_null_meaning = .{
+        .identifier = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// An optional identifier under which the diagnostics are
     /// managed by the client.
-    /// field can be undefined, but this possible state is non-critical
     identifier: ?[]const u8 = null,
     /// Whether the language has inter file dependencies meaning that
     /// editing code in one file can result in a different diagnostic
@@ -4154,7 +5179,6 @@ pub const DiagnosticOptions = struct {
     /// The server provides support for workspace diagnostics as well.
     workspaceDiagnostics: bool,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -4162,6 +5186,8 @@ pub const DiagnosticOptions = struct {
 ///
 /// @since 3.17.0
 pub const PreviousResultId = struct {
+    pub const tres_null_meaning = .{};
+
     /// The URI for which the client knowns a
     /// result id.
     uri: DocumentUri,
@@ -4173,18 +5199,21 @@ pub const PreviousResultId = struct {
 ///
 /// @since 3.17.0
 pub const NotebookDocument = struct {
+    pub const tres_null_meaning = .{
+        .metadata = .field,
+    };
+
     /// The notebook document's uri.
     uri: URI,
     /// The type of the notebook.
     notebookType: []const u8,
     /// The version number of this document (it will increase after each
     /// change, including undo/redo).
-    version: i64,
+    version: i32,
     /// Additional metadata stored with the notebook
     /// document.
     ///
     /// Note: should always be an object literal (e.g. LSPObject)
-    /// field can be undefined, but this possible state is non-critical
     metadata: ?LSPObject = null,
     /// The cells of a notebook.
     cells: []const NotebookCell,
@@ -4193,13 +5222,15 @@ pub const NotebookDocument = struct {
 /// An item to transfer a text document from the client to the
 /// server.
 pub const TextDocumentItem = struct {
+    pub const tres_null_meaning = .{};
+
     /// The text document's uri.
     uri: DocumentUri,
     /// The text document's language identifier.
     languageId: []const u8,
     /// The version number of this document (it will increase after each
     /// change, including undo/redo).
-    version: i64,
+    version: i32,
     /// The content of the opened text document.
     text: []const u8,
 };
@@ -4208,8 +5239,10 @@ pub const TextDocumentItem = struct {
 ///
 /// @since 3.17.0
 pub const VersionedNotebookDocumentIdentifier = struct {
+    pub const tres_null_meaning = .{};
+
     /// The version number of this notebook document.
-    version: i64,
+    version: i32,
     /// The notebook document's uri.
     uri: URI,
 };
@@ -4218,34 +5251,45 @@ pub const VersionedNotebookDocumentIdentifier = struct {
 ///
 /// @since 3.17.0
 pub const NotebookDocumentChangeEvent = struct {
+    pub const tres_null_meaning = .{
+        .metadata = .field,
+        .cells = .field,
+    };
+
     /// The changed meta data if any.
     ///
     /// Note: should always be an object literal (e.g. LSPObject)
-    /// field can be undefined, but this possible state is non-critical
     metadata: ?LSPObject = null,
     /// Changes to cells
-    /// field can be undefined, but this possible state is non-critical
     cells: ?struct {
+        pub const tres_null_meaning = .{
+            .structure = .field,
+            .data = .field,
+            .textContent = .field,
+        };
+
         /// Changes to the cell structure to add or
         /// remove cells.
-        /// field can be undefined, but this possible state is non-critical
         structure: ?struct {
+            pub const tres_null_meaning = .{
+                .didOpen = .field,
+                .didClose = .field,
+            };
+
             /// The change to the cell array.
             array: NotebookCellArrayChange,
             /// Additional opened cell text documents.
-            /// field can be undefined, but this possible state is non-critical
             didOpen: ?[]const TextDocumentItem = null,
             /// Additional closed cell text documents.
-            /// field can be undefined, but this possible state is non-critical
             didClose: ?[]const TextDocumentIdentifier = null,
         } = null,
         /// Changes to notebook cells properties like its
         /// kind, execution summary or metadata.
-        /// field can be undefined, but this possible state is non-critical
         data: ?[]const NotebookCell = null,
         /// Changes to the text content of notebook cells.
-        /// field can be undefined, but this possible state is non-critical
         textContent: ?[]const struct {
+            pub const tres_null_meaning = .{};
+
             document: VersionedTextDocumentIdentifier,
             changes: []const TextDocumentContentChangeEvent,
         } = null,
@@ -4256,24 +5300,31 @@ pub const NotebookDocumentChangeEvent = struct {
 ///
 /// @since 3.17.0
 pub const NotebookDocumentIdentifier = struct {
+    pub const tres_null_meaning = .{};
+
     /// The notebook document's uri.
     uri: URI,
 };
 
 /// General parameters to to register for an notification or to register a provider.
 pub const Registration = struct {
+    pub const tres_null_meaning = .{
+        .registerOptions = .field,
+    };
+
     /// The id used to register the request. The id can be used to deregister
     /// the request again.
     id: []const u8,
     /// The method / capability to register for.
     method: []const u8,
     /// Options necessary for the registration.
-    /// field can be undefined, but this possible state is non-critical
     registerOptions: ?LSPAny = null,
 };
 
 /// General parameters to unregister a request or notification.
 pub const Unregistration = struct {
+    pub const tres_null_meaning = .{};
+
     /// The id used to unregister the request or notification. Usually an id
     /// provided during the register request.
     id: []const u8,
@@ -4283,21 +5334,36 @@ pub const Unregistration = struct {
 
 /// The initialize parameters
 pub const _InitializeParams = struct {
+    pub const tres_null_meaning = .{
+        .processId = .value,
+        .clientInfo = .field,
+        .locale = .field,
+        .rootPath = .dual,
+        .rootUri = .value,
+        .initializationOptions = .field,
+        .trace = .field,
+
+        // Uses mixin WorkDoneProgressParams
+        .workDoneToken = .field,
+    };
+
     /// The process Id of the parent process that started
     /// the server.
     ///
     /// Is `null` if the process has not been started by another process.
     /// If the parent process is not alive then the server should exit.
-    processId: ?i64 = null,
+    processId: ?i32 = null,
     /// Information about the client
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     clientInfo: ?struct {
+        pub const tres_null_meaning = .{
+            .version = .field,
+        };
+
         /// The name of the client as defined by the client.
         name: []const u8,
         /// The client's version as defined by the client.
-        /// field can be undefined, but this possible state is non-critical
         version: ?[]const u8 = null,
     } = null,
     /// The locale the client is currently showing the user interface
@@ -4308,14 +5374,12 @@ pub const _InitializeParams = struct {
     /// (See https://en.wikipedia.org/wiki/IETF_language_tag)
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     locale: ?[]const u8 = null,
     /// The rootPath of the workspace. Is null
     /// if no folder is open.
     ///
     /// @deprecated in favour of rootUri.
-    /// field can be undefined, but this possible state is non-critical
-    rootPath: ?[]const u8 = null,
+    rootPath: ??[]const u8 = null,
     /// The rootUri of the workspace. Is null if no
     /// folder is open. If both `rootPath` and `rootUri` are set
     /// `rootUri` wins.
@@ -4325,10 +5389,8 @@ pub const _InitializeParams = struct {
     /// The capabilities provided by the client (editor or tool)
     capabilities: ClientCapabilities,
     /// User provided initialization options.
-    /// field can be undefined, but this possible state is non-critical
     initializationOptions: ?LSPAny = null,
     /// The initial trace setting. If omitted trace is disabled ('off').
-    /// field can be undefined, but this possible state is non-critical
     trace: ?enum {
         pub const tres_string_enum = {};
         off,
@@ -4338,11 +5400,14 @@ pub const _InitializeParams = struct {
     } = null,
     // Uses mixin WorkDoneProgressParams
     /// An optional token that a server can use to report work done progress.
-    /// field can be undefined, but this possible state is non-critical
     workDoneToken: ?ProgressToken = null,
 };
 
 pub const WorkspaceFoldersInitializeParams = struct {
+    pub const tres_null_meaning = .{
+        .workspaceFolders = .dual,
+    };
+
     /// The workspace folders configured in the client when the server starts.
     ///
     /// This property is only available if the client supports workspace folders.
@@ -4350,13 +5415,50 @@ pub const WorkspaceFoldersInitializeParams = struct {
     /// configured.
     ///
     /// @since 3.6.0
-    /// field can be undefined, but this possible state is non-critical
-    workspaceFolders: ?[]const WorkspaceFolder = null,
+    workspaceFolders: ??[]const WorkspaceFolder = null,
 };
 
 /// Defines the capabilities provided by a language
 /// server.
 pub const ServerCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .positionEncoding = .field,
+        .textDocumentSync = .field,
+        .notebookDocumentSync = .field,
+        .completionProvider = .field,
+        .hoverProvider = .field,
+        .signatureHelpProvider = .field,
+        .declarationProvider = .field,
+        .definitionProvider = .field,
+        .typeDefinitionProvider = .field,
+        .implementationProvider = .field,
+        .referencesProvider = .field,
+        .documentHighlightProvider = .field,
+        .documentSymbolProvider = .field,
+        .codeActionProvider = .field,
+        .codeLensProvider = .field,
+        .documentLinkProvider = .field,
+        .colorProvider = .field,
+        .workspaceSymbolProvider = .field,
+        .documentFormattingProvider = .field,
+        .documentRangeFormattingProvider = .field,
+        .documentOnTypeFormattingProvider = .field,
+        .renameProvider = .field,
+        .foldingRangeProvider = .field,
+        .selectionRangeProvider = .field,
+        .executeCommandProvider = .field,
+        .callHierarchyProvider = .field,
+        .linkedEditingRangeProvider = .field,
+        .semanticTokensProvider = .field,
+        .monikerProvider = .field,
+        .typeHierarchyProvider = .field,
+        .inlineValueProvider = .field,
+        .inlayHintProvider = .field,
+        .diagnosticProvider = .field,
+        .workspace = .field,
+        .experimental = .field,
+    };
+
     /// The position encoding the server picked from the encodings offered
     /// by the client via the client capability `general.positionEncodings`.
     ///
@@ -4366,12 +5468,10 @@ pub const ServerCapabilities = struct {
     /// If omitted it defaults to 'utf-16'.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     positionEncoding: ?PositionEncodingKind = null,
     /// Defines how text documents are synced. Is either a detailed structure
     /// defining each notification or for backwards compatibility the
     /// TextDocumentSyncKind number.
-    /// field can be undefined, but this possible state is non-critical
     textDocumentSync: ?union(enum) {
         TextDocumentSyncOptions: TextDocumentSyncOptions,
         TextDocumentSyncKind: TextDocumentSyncKind,
@@ -4379,64 +5479,53 @@ pub const ServerCapabilities = struct {
     /// Defines how notebook documents are synced.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     notebookDocumentSync: ?union(enum) {
         NotebookDocumentSyncOptions: NotebookDocumentSyncOptions,
         NotebookDocumentSyncRegistrationOptions: NotebookDocumentSyncRegistrationOptions,
     } = null,
     /// The server provides completion support.
-    /// field can be undefined, but this possible state is non-critical
     completionProvider: ?CompletionOptions = null,
     /// The server provides hover support.
-    /// field can be undefined, but this possible state is non-critical
     hoverProvider: ?union(enum) {
         bool: bool,
         HoverOptions: HoverOptions,
     } = null,
     /// The server provides signature help support.
-    /// field can be undefined, but this possible state is non-critical
     signatureHelpProvider: ?SignatureHelpOptions = null,
     /// The server provides Goto Declaration support.
-    /// field can be undefined, but this possible state is non-critical
     declarationProvider: ?union(enum) {
         bool: bool,
         DeclarationOptions: DeclarationOptions,
         DeclarationRegistrationOptions: DeclarationRegistrationOptions,
     } = null,
     /// The server provides goto definition support.
-    /// field can be undefined, but this possible state is non-critical
     definitionProvider: ?union(enum) {
         bool: bool,
         DefinitionOptions: DefinitionOptions,
     } = null,
     /// The server provides Goto Type Definition support.
-    /// field can be undefined, but this possible state is non-critical
     typeDefinitionProvider: ?union(enum) {
         bool: bool,
         TypeDefinitionOptions: TypeDefinitionOptions,
         TypeDefinitionRegistrationOptions: TypeDefinitionRegistrationOptions,
     } = null,
     /// The server provides Goto Implementation support.
-    /// field can be undefined, but this possible state is non-critical
     implementationProvider: ?union(enum) {
         bool: bool,
         ImplementationOptions: ImplementationOptions,
         ImplementationRegistrationOptions: ImplementationRegistrationOptions,
     } = null,
     /// The server provides find references support.
-    /// field can be undefined, but this possible state is non-critical
     referencesProvider: ?union(enum) {
         bool: bool,
         ReferenceOptions: ReferenceOptions,
     } = null,
     /// The server provides document highlight support.
-    /// field can be undefined, but this possible state is non-critical
     documentHighlightProvider: ?union(enum) {
         bool: bool,
         DocumentHighlightOptions: DocumentHighlightOptions,
     } = null,
     /// The server provides document symbol support.
-    /// field can be undefined, but this possible state is non-critical
     documentSymbolProvider: ?union(enum) {
         bool: bool,
         DocumentSymbolOptions: DocumentSymbolOptions,
@@ -4444,74 +5533,61 @@ pub const ServerCapabilities = struct {
     /// The server provides code actions. CodeActionOptions may only be
     /// specified if the client states that it supports
     /// `codeActionLiteralSupport` in its initial `initialize` request.
-    /// field can be undefined, but this possible state is non-critical
     codeActionProvider: ?union(enum) {
         bool: bool,
         CodeActionOptions: CodeActionOptions,
     } = null,
     /// The server provides code lens.
-    /// field can be undefined, but this possible state is non-critical
     codeLensProvider: ?CodeLensOptions = null,
     /// The server provides document link support.
-    /// field can be undefined, but this possible state is non-critical
     documentLinkProvider: ?DocumentLinkOptions = null,
     /// The server provides color provider support.
-    /// field can be undefined, but this possible state is non-critical
     colorProvider: ?union(enum) {
         bool: bool,
         DocumentColorOptions: DocumentColorOptions,
         DocumentColorRegistrationOptions: DocumentColorRegistrationOptions,
     } = null,
     /// The server provides workspace symbol support.
-    /// field can be undefined, but this possible state is non-critical
     workspaceSymbolProvider: ?union(enum) {
         bool: bool,
         WorkspaceSymbolOptions: WorkspaceSymbolOptions,
     } = null,
     /// The server provides document formatting.
-    /// field can be undefined, but this possible state is non-critical
     documentFormattingProvider: ?union(enum) {
         bool: bool,
         DocumentFormattingOptions: DocumentFormattingOptions,
     } = null,
     /// The server provides document range formatting.
-    /// field can be undefined, but this possible state is non-critical
     documentRangeFormattingProvider: ?union(enum) {
         bool: bool,
         DocumentRangeFormattingOptions: DocumentRangeFormattingOptions,
     } = null,
     /// The server provides document formatting on typing.
-    /// field can be undefined, but this possible state is non-critical
     documentOnTypeFormattingProvider: ?DocumentOnTypeFormattingOptions = null,
     /// The server provides rename support. RenameOptions may only be
     /// specified if the client states that it supports
     /// `prepareSupport` in its initial `initialize` request.
-    /// field can be undefined, but this possible state is non-critical
     renameProvider: ?union(enum) {
         bool: bool,
         RenameOptions: RenameOptions,
     } = null,
     /// The server provides folding provider support.
-    /// field can be undefined, but this possible state is non-critical
     foldingRangeProvider: ?union(enum) {
         bool: bool,
         FoldingRangeOptions: FoldingRangeOptions,
         FoldingRangeRegistrationOptions: FoldingRangeRegistrationOptions,
     } = null,
     /// The server provides selection range support.
-    /// field can be undefined, but this possible state is non-critical
     selectionRangeProvider: ?union(enum) {
         bool: bool,
         SelectionRangeOptions: SelectionRangeOptions,
         SelectionRangeRegistrationOptions: SelectionRangeRegistrationOptions,
     } = null,
     /// The server provides execute command support.
-    /// field can be undefined, but this possible state is non-critical
     executeCommandProvider: ?ExecuteCommandOptions = null,
     /// The server provides call hierarchy support.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     callHierarchyProvider: ?union(enum) {
         bool: bool,
         CallHierarchyOptions: CallHierarchyOptions,
@@ -4520,7 +5596,6 @@ pub const ServerCapabilities = struct {
     /// The server provides linked editing range support.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     linkedEditingRangeProvider: ?union(enum) {
         bool: bool,
         LinkedEditingRangeOptions: LinkedEditingRangeOptions,
@@ -4529,7 +5604,6 @@ pub const ServerCapabilities = struct {
     /// The server provides semantic tokens support.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     semanticTokensProvider: ?union(enum) {
         SemanticTokensOptions: SemanticTokensOptions,
         SemanticTokensRegistrationOptions: SemanticTokensRegistrationOptions,
@@ -4537,7 +5611,6 @@ pub const ServerCapabilities = struct {
     /// The server provides moniker support.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     monikerProvider: ?union(enum) {
         bool: bool,
         MonikerOptions: MonikerOptions,
@@ -4546,7 +5619,6 @@ pub const ServerCapabilities = struct {
     /// The server provides type hierarchy support.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     typeHierarchyProvider: ?union(enum) {
         bool: bool,
         TypeHierarchyOptions: TypeHierarchyOptions,
@@ -4555,7 +5627,6 @@ pub const ServerCapabilities = struct {
     /// The server provides inline values.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     inlineValueProvider: ?union(enum) {
         bool: bool,
         InlineValueOptions: InlineValueOptions,
@@ -4564,7 +5635,6 @@ pub const ServerCapabilities = struct {
     /// The server provides inlay hints.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     inlayHintProvider: ?union(enum) {
         bool: bool,
         InlayHintOptions: InlayHintOptions,
@@ -4573,34 +5643,40 @@ pub const ServerCapabilities = struct {
     /// The server has support for pull model diagnostics.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     diagnosticProvider: ?union(enum) {
         DiagnosticOptions: DiagnosticOptions,
         DiagnosticRegistrationOptions: DiagnosticRegistrationOptions,
     } = null,
     /// Workspace specific server capabilities.
-    /// field can be undefined, but this possible state is non-critical
     workspace: ?struct {
+        pub const tres_null_meaning = .{
+            .workspaceFolders = .field,
+            .fileOperations = .field,
+        };
+
         /// The server supports workspace folder.
         ///
         /// @since 3.6.0
-        /// field can be undefined, but this possible state is non-critical
         workspaceFolders: ?WorkspaceFoldersServerCapabilities = null,
         /// The server is interested in notifications/requests for operations on files.
         ///
         /// @since 3.16.0
-        /// field can be undefined, but this possible state is non-critical
         fileOperations: ?FileOperationOptions = null,
     } = null,
     /// Experimental server capabilities.
-    /// field can be undefined, but this possible state is non-critical
     experimental: ?LSPAny = null,
 };
 
 /// A text document identifier to denote a specific version of a text document.
 pub const VersionedTextDocumentIdentifier = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextDocumentIdentifier
+
+    };
+
     /// The version number of this document.
-    version: i64,
+    version: i32,
     // Extends TextDocumentIdentifier
     /// The text document's uri.
     uri: DocumentUri,
@@ -4608,13 +5684,18 @@ pub const VersionedTextDocumentIdentifier = struct {
 
 /// Save options.
 pub const SaveOptions = struct {
+    pub const tres_null_meaning = .{
+        .includeText = .field,
+    };
+
     /// The client is supposed to include the content on save.
-    /// field can be undefined, but this possible state is non-critical
     includeText: ?bool = null,
 };
 
 /// An event describing a file change.
 pub const FileEvent = struct {
+    pub const tres_null_meaning = .{};
+
     /// The file's uri.
     uri: DocumentUri,
     /// The change type.
@@ -4622,6 +5703,10 @@ pub const FileEvent = struct {
 };
 
 pub const FileSystemWatcher = struct {
+    pub const tres_null_meaning = .{
+        .kind = .field,
+    };
+
     /// The glob pattern to watch. See {@link GlobPattern glob pattern} for more detail.
     ///
     /// @since 3.17.0 support for relative patterns.
@@ -4629,62 +5714,67 @@ pub const FileSystemWatcher = struct {
     /// The kind of events of interest. If omitted it defaults
     /// to WatchKind.Create | WatchKind.Change | WatchKind.Delete
     /// which is 7.
-    /// field can be undefined, but this possible state is non-critical
     kind: ?WatchKind = null,
 };
 
 /// Represents a diagnostic, such as a compiler error or warning. Diagnostic objects
 /// are only valid in the scope of a resource.
 pub const Diagnostic = struct {
+    pub const tres_null_meaning = .{
+        .severity = .field,
+        .code = .field,
+        .codeDescription = .field,
+        .source = .field,
+        .tags = .field,
+        .relatedInformation = .field,
+        .data = .field,
+    };
+
     /// The range at which the message applies
     range: Range,
     /// The diagnostic's severity. Can be omitted. If omitted it is up to the
     /// client to interpret diagnostics as error, warning, info or hint.
-    /// field can be undefined, but this possible state is non-critical
     severity: ?DiagnosticSeverity = null,
     /// The diagnostic's code, which usually appear in the user interface.
-    /// field can be undefined, but this possible state is non-critical
     code: ?union(enum) {
-        integer: i64,
+        integer: i32,
         string: []const u8,
     } = null,
     /// An optional property to describe the error code.
     /// Requires the code field (above) to be present/not null.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     codeDescription: ?CodeDescription = null,
     /// A human-readable string describing the source of this
     /// diagnostic, e.g. 'typescript' or 'super lint'. It usually
     /// appears in the user interface.
-    /// field can be undefined, but this possible state is non-critical
     source: ?[]const u8 = null,
     /// The diagnostic's message. It usually appears in the user interface
     message: []const u8,
     /// Additional metadata about the diagnostic.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const DiagnosticTag = null,
     /// An array of related diagnostic information, e.g. when symbol-names within
     /// a scope collide all definitions can be marked via this property.
-    /// field can be undefined, but this possible state is non-critical
     relatedInformation: ?[]const DiagnosticRelatedInformation = null,
     /// A data entry field that is preserved between a `textDocument/publishDiagnostics`
     /// notification and `textDocument/codeAction` request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     data: ?LSPAny = null,
 };
 
 /// Contains additional information about the context in which a completion request is triggered.
 pub const CompletionContext = struct {
+    pub const tres_null_meaning = .{
+        .triggerCharacter = .field,
+    };
+
     /// How the completion was triggered.
     triggerKind: CompletionTriggerKind,
     /// The trigger character (a single character) that has trigger code complete.
     /// Is undefined if `triggerKind !== CompletionTriggerKind.TriggerCharacter`
-    /// field can be undefined, but this possible state is non-critical
     triggerCharacter: ?[]const u8 = null,
 };
 
@@ -4692,13 +5782,16 @@ pub const CompletionContext = struct {
 ///
 /// @since 3.17.0
 pub const CompletionItemLabelDetails = struct {
+    pub const tres_null_meaning = .{
+        .detail = .field,
+        .description = .field,
+    };
+
     /// An optional string which is rendered less prominently directly after {@link CompletionItem.label label},
     /// without any spacing. Should be used for function signatures and type annotations.
-    /// field can be undefined, but this possible state is non-critical
     detail: ?[]const u8 = null,
     /// An optional string which is rendered less prominently after {@link CompletionItem.detail}. Should be used
     /// for fully qualified names and file paths.
-    /// field can be undefined, but this possible state is non-critical
     description: ?[]const u8 = null,
 };
 
@@ -4706,6 +5799,8 @@ pub const CompletionItemLabelDetails = struct {
 ///
 /// @since 3.16.0
 pub const InsertReplaceEdit = struct {
+    pub const tres_null_meaning = .{};
+
     /// The string to be inserted.
     newText: []const u8,
     /// The range if the insert is requested
@@ -4716,6 +5811,16 @@ pub const InsertReplaceEdit = struct {
 
 /// Completion options.
 pub const CompletionOptions = struct {
+    pub const tres_null_meaning = .{
+        .triggerCharacters = .field,
+        .allCommitCharacters = .field,
+        .resolveProvider = .field,
+        .completionItem = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// Most tools trigger completion request automatically without explicitly requesting
     /// it using a keyboard shortcut (e.g. Ctrl+Space). Typically they do so when the user
     /// starts to type an identifier. For example if the user types `c` in a JavaScript file
@@ -4724,7 +5829,6 @@ pub const CompletionOptions = struct {
     ///
     /// If code complete should automatically be trigger on characters not being valid inside
     /// an identifier (for example `.` in JavaScript) list them in `triggerCharacters`.
-    /// field can be undefined, but this possible state is non-critical
     triggerCharacters: ?[]const []const u8 = null,
     /// The list of all possible characters that commit a completion. This field can be used
     /// if clients don't support individual commit characters per completion item. See
@@ -4734,35 +5838,39 @@ pub const CompletionOptions = struct {
     /// completion item the ones on the completion item win.
     ///
     /// @since 3.2.0
-    /// field can be undefined, but this possible state is non-critical
     allCommitCharacters: ?[]const []const u8 = null,
     /// The server provides support to resolve additional
     /// information for a completion item.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     /// The server supports the following `CompletionItem` specific
     /// capabilities.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     completionItem: ?struct {
+        pub const tres_null_meaning = .{
+            .labelDetailsSupport = .field,
+        };
+
         /// The server has support for completion item label
         /// details (see also `CompletionItemLabelDetails`) when
         /// receiving a completion item in a resolve call.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         labelDetailsSupport: ?bool = null,
     } = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Hover options.
 pub const HoverOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
@@ -4770,12 +5878,16 @@ pub const HoverOptions = struct {
 ///
 /// @since 3.15.0
 pub const SignatureHelpContext = struct {
+    pub const tres_null_meaning = .{
+        .triggerCharacter = .field,
+        .activeSignatureHelp = .field,
+    };
+
     /// Action that caused signature help to be triggered.
     triggerKind: SignatureHelpTriggerKind,
     /// Character that caused signature help to be triggered.
     ///
     /// This is undefined when `triggerKind !== SignatureHelpTriggerKind.TriggerCharacter`
-    /// field can be undefined, but this possible state is non-critical
     triggerCharacter: ?[]const u8 = null,
     /// `true` if signature help was already showing when it was triggered.
     ///
@@ -4786,7 +5898,6 @@ pub const SignatureHelpContext = struct {
     ///
     /// The `activeSignatureHelp` has its `SignatureHelp.activeSignature` field updated based on
     /// the user navigating through available signatures.
-    /// field can be undefined, but this possible state is non-critical
     activeSignatureHelp: ?SignatureHelp = null,
 };
 
@@ -4794,32 +5905,42 @@ pub const SignatureHelpContext = struct {
 /// can have a label, like a function-name, a doc-comment, and
 /// a set of parameters.
 pub const SignatureInformation = struct {
+    pub const tres_null_meaning = .{
+        .documentation = .field,
+        .parameters = .field,
+        .activeParameter = .field,
+    };
+
     /// The label of this signature. Will be shown in
     /// the UI.
     label: []const u8,
     /// The human-readable doc-comment of this signature. Will be shown
     /// in the UI but can be omitted.
-    /// field can be undefined, but this possible state is non-critical
     documentation: ?union(enum) {
         string: []const u8,
         MarkupContent: MarkupContent,
     } = null,
     /// The parameters of this signature.
-    /// field can be undefined, but this possible state is non-critical
     parameters: ?[]const ParameterInformation = null,
     /// The index of the active parameter.
     ///
     /// If provided, this is used in place of `SignatureHelp.activeParameter`.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
-    activeParameter: ?u64 = null,
+    activeParameter: ?u32 = null,
 };
 
 /// Server Capabilities for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpOptions = struct {
+    pub const tres_null_meaning = .{
+        .triggerCharacters = .field,
+        .retriggerCharacters = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// List of characters that trigger signature help automatically.
-    /// field can be undefined, but this possible state is non-critical
     triggerCharacters: ?[]const []const u8 = null,
     /// List of characters that re-trigger signature help.
     ///
@@ -4827,43 +5948,63 @@ pub const SignatureHelpOptions = struct {
     /// are also counted as re-trigger characters.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     retriggerCharacters: ?[]const []const u8 = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Server Capabilities for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Value-object that contains additional information when
 /// requesting references.
 pub const ReferenceContext = struct {
+    pub const tres_null_meaning = .{};
+
     /// Include the declaration of the current symbol.
     includeDeclaration: bool,
 };
 
 /// Reference options.
 pub const ReferenceOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Provider options for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// A base for all symbol information.
 pub const BaseSymbolInformation = struct {
+    pub const tres_null_meaning = .{
+        .tags = .field,
+        .containerName = .field,
+    };
+
     /// The name of this symbol.
     name: []const u8,
     /// The kind of this symbol.
@@ -4871,32 +6012,40 @@ pub const BaseSymbolInformation = struct {
     /// Tags for this symbol.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     tags: ?[]const SymbolTag = null,
     /// The name of the symbol containing this symbol. This information is for
     /// user interface purposes (e.g. to render a qualifier in the user interface
     /// if necessary). It can't be used to re-infer a hierarchy for the document
     /// symbols.
-    /// field can be undefined, but this possible state is non-critical
     containerName: ?[]const u8 = null,
 };
 
 /// Provider options for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolOptions = struct {
+    pub const tres_null_meaning = .{
+        .label = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// A human-readable string that is shown when multiple outlines trees
     /// are shown for the same document.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     label: ?[]const u8 = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Contains additional diagnostic information about the context in which
 /// a [code action](#CodeActionProvider.provideCodeActions) is run.
 pub const CodeActionContext = struct {
+    pub const tres_null_meaning = .{
+        .only = .field,
+        .triggerKind = .field,
+    };
+
     /// An array of diagnostics known on the client side overlapping the range provided to the
     /// `textDocument/codeAction` request. They are provided so that the server knows which
     /// errors are currently presented to the user for the given range. There is no guarantee
@@ -4907,136 +6056,182 @@ pub const CodeActionContext = struct {
     ///
     /// Actions not of this kind are filtered out by the client before being shown. So servers
     /// can omit computing them.
-    /// field can be undefined, but this possible state is non-critical
     only: ?[]const CodeActionKind = null,
     /// The reason why code actions were requested.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     triggerKind: ?CodeActionTriggerKind = null,
 };
 
 /// Provider options for a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionOptions = struct {
+    pub const tres_null_meaning = .{
+        .codeActionKinds = .field,
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// CodeActionKinds that this server may return.
     ///
     /// The list of kinds may be generic, such as `CodeActionKind.Refactor`, or the server
     /// may list out every specific kind they provide.
-    /// field can be undefined, but this possible state is non-critical
     codeActionKinds: ?[]const CodeActionKind = null,
     /// The server provides support to resolve additional
     /// information for a code action.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Server capabilities for a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolOptions = struct {
+    pub const tres_null_meaning = .{
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// The server provides support to resolve additional
     /// information for a workspace symbol.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Code Lens provider options of a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensOptions = struct {
+    pub const tres_null_meaning = .{
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// Code lens has a resolve provider as well.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Provider options for a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkOptions = struct {
+    pub const tres_null_meaning = .{
+        .resolveProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// Document links have a resolve provider as well.
-    /// field can be undefined, but this possible state is non-critical
     resolveProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Value-object describing what options formatting should use.
 pub const FormattingOptions = struct {
+    pub const tres_null_meaning = .{
+        .trimTrailingWhitespace = .field,
+        .insertFinalNewline = .field,
+        .trimFinalNewlines = .field,
+    };
+
     /// Size of a tab in spaces.
-    tabSize: u64,
+    tabSize: u32,
     /// Prefer spaces over tabs.
     insertSpaces: bool,
     /// Trim trailing whitespace on a line.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     trimTrailingWhitespace: ?bool = null,
     /// Insert a newline character at the end of the file if one does not exist.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     insertFinalNewline: ?bool = null,
     /// Trim all newlines after the final newline at the end of the file.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     trimFinalNewlines: ?bool = null,
 };
 
 /// Provider options for a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Provider options for a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// Provider options for a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingOptions = struct {
+    pub const tres_null_meaning = .{
+        .moreTriggerCharacter = .field,
+    };
+
     /// A character on which formatting should be triggered, like `{`.
     firstTriggerCharacter: []const u8,
     /// More trigger characters.
-    /// field can be undefined, but this possible state is non-critical
     moreTriggerCharacter: ?[]const []const u8 = null,
 };
 
 /// Provider options for a [RenameRequest](#RenameRequest).
 pub const RenameOptions = struct {
+    pub const tres_null_meaning = .{
+        .prepareProvider = .field,
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// Renames should be checked and tested before being executed.
     ///
     /// @since version 3.12.0
-    /// field can be undefined, but this possible state is non-critical
     prepareProvider: ?bool = null,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// The server capabilities of a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Uses mixin WorkDoneProgressOptions
+        .workDoneProgress = .field,
+    };
+
     /// The commands to be executed on the server
     commands: []const []const u8,
     // Uses mixin WorkDoneProgressOptions
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensLegend = struct {
+    pub const tres_null_meaning = .{};
+
     /// The token types a server uses.
     tokenTypes: []const []const u8,
     /// The token modifiers a server uses.
@@ -5045,12 +6240,19 @@ pub const SemanticTokensLegend = struct {
 
 /// A text document identifier to optionally denote a specific version of a text document.
 pub const OptionalVersionedTextDocumentIdentifier = struct {
+    pub const tres_null_meaning = .{
+        .version = .value,
+
+        // Extends TextDocumentIdentifier
+
+    };
+
     /// The version number of this document. If a versioned text document identifier
     /// is sent from the server to the client and the file is not open in the editor
     /// (the server has not received an open notification before) the server can send
     /// `null` to indicate that the version is unknown and the content on disk is the
     /// truth (as specified with document content ownership).
-    version: ?i64 = null,
+    version: ?i32 = null,
     // Extends TextDocumentIdentifier
     /// The text document's uri.
     uri: DocumentUri,
@@ -5060,6 +6262,12 @@ pub const OptionalVersionedTextDocumentIdentifier = struct {
 ///
 /// @since 3.16.0.
 pub const AnnotatedTextEdit = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends TextEdit
+
+    };
+
     /// The actual identifier of the change annotation
     annotationId: ChangeAnnotationIdentifier,
     // Extends TextEdit
@@ -5073,42 +6281,54 @@ pub const AnnotatedTextEdit = struct {
 
 /// A generic resource operation.
 pub const ResourceOperation = struct {
+    pub const tres_null_meaning = .{
+        .annotationId = .field,
+    };
+
     /// The resource operation kind.
     kind: []const u8,
     /// An optional annotation identifier describing the operation.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     annotationId: ?ChangeAnnotationIdentifier = null,
 };
 
 /// Options to create a file.
 pub const CreateFileOptions = struct {
+    pub const tres_null_meaning = .{
+        .overwrite = .field,
+        .ignoreIfExists = .field,
+    };
+
     /// Overwrite existing file. Overwrite wins over `ignoreIfExists`
-    /// field can be undefined, but this possible state is non-critical
     overwrite: ?bool = null,
     /// Ignore if exists.
-    /// field can be undefined, but this possible state is non-critical
     ignoreIfExists: ?bool = null,
 };
 
 /// Rename file options
 pub const RenameFileOptions = struct {
+    pub const tres_null_meaning = .{
+        .overwrite = .field,
+        .ignoreIfExists = .field,
+    };
+
     /// Overwrite target if existing. Overwrite wins over `ignoreIfExists`
-    /// field can be undefined, but this possible state is non-critical
     overwrite: ?bool = null,
     /// Ignores if target exists.
-    /// field can be undefined, but this possible state is non-critical
     ignoreIfExists: ?bool = null,
 };
 
 /// Delete file options
 pub const DeleteFileOptions = struct {
+    pub const tres_null_meaning = .{
+        .recursive = .field,
+        .ignoreIfNotExists = .field,
+    };
+
     /// Delete the content recursively if a folder is denoted.
-    /// field can be undefined, but this possible state is non-critical
     recursive: ?bool = null,
     /// Ignore the operation if the file doesn't exist.
-    /// field can be undefined, but this possible state is non-critical
     ignoreIfNotExists: ?bool = null,
 };
 
@@ -5117,6 +6337,11 @@ pub const DeleteFileOptions = struct {
 ///
 /// @since 3.16.0
 pub const FileOperationPattern = struct {
+    pub const tres_null_meaning = .{
+        .matches = .field,
+        .options = .field,
+    };
+
     /// The glob pattern to match. Glob patterns can have the following syntax:
     /// - `*` to match one or more characters in a path segment
     /// - `?` to match on one character in a path segment
@@ -5128,10 +6353,8 @@ pub const FileOperationPattern = struct {
     /// Whether to match files or folders with this pattern.
     ///
     /// Matches both if undefined.
-    /// field can be undefined, but this possible state is non-critical
     matches: ?FileOperationPatternKind = null,
     /// Additional options used during matching.
-    /// field can be undefined, but this possible state is non-critical
     options: ?FileOperationPatternOptions = null,
 };
 
@@ -5139,18 +6362,24 @@ pub const FileOperationPattern = struct {
 ///
 /// @since 3.17.0
 pub const WorkspaceFullDocumentDiagnosticReport = struct {
+    pub const tres_null_meaning = .{
+        .version = .value,
+
+        // Extends FullDocumentDiagnosticReport
+        .resultId = .field,
+    };
+
     /// The URI for which diagnostic information is reported.
     uri: DocumentUri,
     /// The version number for which the diagnostics are reported.
     /// If the document is not marked as open `null` can be provided.
-    version: ?i64 = null,
+    version: ?i32 = null,
     // Extends FullDocumentDiagnosticReport
     /// A full document diagnostic report.
     comptime kind: []const u8 = "full",
     /// An optional result id. If provided it will
     /// be sent on the next diagnostic request for the
     /// same document.
-    /// field can be undefined, but this possible state is non-critical
     resultId: ?[]const u8 = null,
     /// The actual items.
     items: []const Diagnostic,
@@ -5160,11 +6389,18 @@ pub const WorkspaceFullDocumentDiagnosticReport = struct {
 ///
 /// @since 3.17.0
 pub const WorkspaceUnchangedDocumentDiagnosticReport = struct {
+    pub const tres_null_meaning = .{
+        .version = .value,
+
+        // Extends UnchangedDocumentDiagnosticReport
+
+    };
+
     /// The URI for which diagnostic information is reported.
     uri: DocumentUri,
     /// The version number for which the diagnostics are reported.
     /// If the document is not marked as open `null` can be provided.
-    version: ?i64 = null,
+    version: ?i32 = null,
     // Extends UnchangedDocumentDiagnosticReport
     /// A document diagnostic report indicating
     /// no changes to the last result. A server can
@@ -5184,6 +6420,11 @@ pub const WorkspaceUnchangedDocumentDiagnosticReport = struct {
 ///
 /// @since 3.17.0
 pub const NotebookCell = struct {
+    pub const tres_null_meaning = .{
+        .metadata = .field,
+        .executionSummary = .field,
+    };
+
     /// The cell's kind
     kind: NotebookCellKind,
     /// The URI of the cell's text document
@@ -5192,11 +6433,9 @@ pub const NotebookCell = struct {
     /// Additional metadata stored with the cell.
     ///
     /// Note: should always be an object literal (e.g. LSPObject)
-    /// field can be undefined, but this possible state is non-critical
     metadata: ?LSPObject = null,
     /// Additional execution summary information
     /// if supported by the client.
-    /// field can be undefined, but this possible state is non-critical
     executionSummary: ?ExecutionSummary = null,
 };
 
@@ -5205,61 +6444,70 @@ pub const NotebookCell = struct {
 ///
 /// @since 3.17.0
 pub const NotebookCellArrayChange = struct {
+    pub const tres_null_meaning = .{
+        .cells = .field,
+    };
+
     /// The start oftest of the cell that changed.
-    start: u64,
+    start: u32,
     /// The deleted cells
-    deleteCount: u64,
+    deleteCount: u32,
     /// The new cells, if any
-    /// field can be undefined, but this possible state is non-critical
     cells: ?[]const NotebookCell = null,
 };
 
 /// Defines the capabilities provided by the client.
 pub const ClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .workspace = .field,
+        .textDocument = .field,
+        .notebookDocument = .field,
+        .window = .field,
+        .general = .field,
+        .experimental = .field,
+    };
+
     /// Workspace specific client capabilities.
-    /// field can be undefined, but this possible state is non-critical
     workspace: ?WorkspaceClientCapabilities = null,
     /// Text document specific client capabilities.
-    /// field can be undefined, but this possible state is non-critical
     textDocument: ?TextDocumentClientCapabilities = null,
     /// Capabilities specific to the notebook document support.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     notebookDocument: ?NotebookDocumentClientCapabilities = null,
     /// Window specific client capabilities.
-    /// field can be undefined, but this possible state is non-critical
     window: ?WindowClientCapabilities = null,
     /// General client capabilities.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     general: ?GeneralClientCapabilities = null,
     /// Experimental client capabilities.
-    /// field can be undefined, but this possible state is non-critical
     experimental: ?LSPAny = null,
 };
 
 pub const TextDocumentSyncOptions = struct {
+    pub const tres_null_meaning = .{
+        .openClose = .field,
+        .change = .field,
+        .willSave = .field,
+        .willSaveWaitUntil = .field,
+        .save = .field,
+    };
+
     /// Open and close notifications are sent to the server. If omitted open close notification should not
     /// be sent.
-    /// field can be undefined, but this possible state is non-critical
     openClose: ?bool = null,
     /// Change notifications are sent to the server. See TextDocumentSyncKind.None, TextDocumentSyncKind.Full
     /// and TextDocumentSyncKind.Incremental. If omitted it defaults to TextDocumentSyncKind.None.
-    /// field can be undefined, but this possible state is non-critical
     change: ?TextDocumentSyncKind = null,
     /// If present will save notifications are sent to the server. If omitted the notification should not be
     /// sent.
-    /// field can be undefined, but this possible state is non-critical
     willSave: ?bool = null,
     /// If present will save wait until requests are sent to the server. If omitted the request should not be
     /// sent.
-    /// field can be undefined, but this possible state is non-critical
     willSaveWaitUntil: ?bool = null,
     /// If present save notifications are sent to the server. If omitted the notification should not be
     /// sent.
-    /// field can be undefined, but this possible state is non-critical
     save: ?union(enum) {
         bool: bool,
         SaveOptions: SaveOptions,
@@ -5280,9 +6528,17 @@ pub const TextDocumentSyncOptions = struct {
 ///
 /// @since 3.17.0
 pub const NotebookDocumentSyncOptions = struct {
+    pub const tres_null_meaning = .{
+        .save = .field,
+    };
+
     /// The notebooks to be synced
     notebookSelector: []const union(enum) {
         literal_0: struct {
+            pub const tres_null_meaning = .{
+                .cells = .field,
+            };
+
             /// The notebook to be synced If a string
             /// value is provided it matches against the
             /// notebook type. '*' matches every notebook.
@@ -5291,29 +6547,34 @@ pub const NotebookDocumentSyncOptions = struct {
                 NotebookDocumentFilter: NotebookDocumentFilter,
             },
             /// The cells of the matching notebook to be synced.
-            /// field can be undefined, but this possible state is non-critical
             cells: ?[]const struct {
+                pub const tres_null_meaning = .{};
+
                 language: []const u8,
             } = null,
         },
         literal_1: struct {
+            pub const tres_null_meaning = .{
+                .notebook = .field,
+            };
+
             /// The notebook to be synced If a string
             /// value is provided it matches against the
             /// notebook type. '*' matches every notebook.
-            /// field can be undefined, but this possible state is non-critical
             notebook: ?union(enum) {
                 string: []const u8,
                 NotebookDocumentFilter: NotebookDocumentFilter,
             } = null,
             /// The cells of the matching notebook to be synced.
             cells: []const struct {
+                pub const tres_null_meaning = .{};
+
                 language: []const u8,
             },
         },
     },
     /// Whether save notification should be forwarded to
     /// the server. Will only be honored if mode === `notebook`.
-    /// field can be undefined, but this possible state is non-critical
     save: ?bool = null,
 };
 
@@ -5321,10 +6582,23 @@ pub const NotebookDocumentSyncOptions = struct {
 ///
 /// @since 3.17.0
 pub const NotebookDocumentSyncRegistrationOptions = struct {
+    pub const tres_null_meaning = .{
+
+        // Extends NotebookDocumentSyncOptions
+        .save = .field,
+
+        // Uses mixin StaticRegistrationOptions
+        .id = .field,
+    };
+
     // Extends NotebookDocumentSyncOptions
     /// The notebooks to be synced
     notebookSelector: []const union(enum) {
         literal_0: struct {
+            pub const tres_null_meaning = .{
+                .cells = .field,
+            };
+
             /// The notebook to be synced If a string
             /// value is provided it matches against the
             /// notebook type. '*' matches every notebook.
@@ -5333,41 +6607,49 @@ pub const NotebookDocumentSyncRegistrationOptions = struct {
                 NotebookDocumentFilter: NotebookDocumentFilter,
             },
             /// The cells of the matching notebook to be synced.
-            /// field can be undefined, but this possible state is non-critical
             cells: ?[]const struct {
+                pub const tres_null_meaning = .{};
+
                 language: []const u8,
             } = null,
         },
         literal_1: struct {
+            pub const tres_null_meaning = .{
+                .notebook = .field,
+            };
+
             /// The notebook to be synced If a string
             /// value is provided it matches against the
             /// notebook type. '*' matches every notebook.
-            /// field can be undefined, but this possible state is non-critical
             notebook: ?union(enum) {
                 string: []const u8,
                 NotebookDocumentFilter: NotebookDocumentFilter,
             } = null,
             /// The cells of the matching notebook to be synced.
             cells: []const struct {
+                pub const tres_null_meaning = .{};
+
                 language: []const u8,
             },
         },
     },
     /// Whether save notification should be forwarded to
     /// the server. Will only be honored if mode === `notebook`.
-    /// field can be undefined, but this possible state is non-critical
     save: ?bool = null,
 
     // Uses mixin StaticRegistrationOptions
     /// The id used to register the request. The id can be used to deregister
     /// the request again. See also Registration#id.
-    /// field can be undefined, but this possible state is non-critical
     id: ?[]const u8 = null,
 };
 
 pub const WorkspaceFoldersServerCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .supported = .field,
+        .changeNotifications = .field,
+    };
+
     /// The server has support for workspace folders
-    /// field can be undefined, but this possible state is non-critical
     supported: ?bool = null,
     /// Whether the server wants to receive workspace folder
     /// change notifications.
@@ -5376,7 +6658,6 @@ pub const WorkspaceFoldersServerCapabilities = struct {
     /// under which the notification is registered on the client
     /// side. The ID can be used to unregister for these events
     /// using the `client/unregisterCapability` request.
-    /// field can be undefined, but this possible state is non-critical
     changeNotifications: ?union(enum) {
         string: []const u8,
         bool: bool,
@@ -5387,23 +6668,26 @@ pub const WorkspaceFoldersServerCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const FileOperationOptions = struct {
+    pub const tres_null_meaning = .{
+        .didCreate = .field,
+        .willCreate = .field,
+        .didRename = .field,
+        .willRename = .field,
+        .didDelete = .field,
+        .willDelete = .field,
+    };
+
     /// The server is interested in receiving didCreateFiles notifications.
-    /// field can be undefined, but this possible state is non-critical
     didCreate: ?FileOperationRegistrationOptions = null,
     /// The server is interested in receiving willCreateFiles requests.
-    /// field can be undefined, but this possible state is non-critical
     willCreate: ?FileOperationRegistrationOptions = null,
     /// The server is interested in receiving didRenameFiles notifications.
-    /// field can be undefined, but this possible state is non-critical
     didRename: ?FileOperationRegistrationOptions = null,
     /// The server is interested in receiving willRenameFiles requests.
-    /// field can be undefined, but this possible state is non-critical
     willRename: ?FileOperationRegistrationOptions = null,
     /// The server is interested in receiving didDeleteFiles file notifications.
-    /// field can be undefined, but this possible state is non-critical
     didDelete: ?FileOperationRegistrationOptions = null,
     /// The server is interested in receiving willDeleteFiles file requests.
-    /// field can be undefined, but this possible state is non-critical
     willDelete: ?FileOperationRegistrationOptions = null,
 };
 
@@ -5411,6 +6695,8 @@ pub const FileOperationOptions = struct {
 ///
 /// @since 3.16.0
 pub const CodeDescription = struct {
+    pub const tres_null_meaning = .{};
+
     /// An URI to open with more information about the diagnostic error.
     href: URI,
 };
@@ -5419,6 +6705,8 @@ pub const CodeDescription = struct {
 /// used to point to code locations that cause or related to a diagnostics, e.g when duplicating
 /// a symbol in a scope.
 pub const DiagnosticRelatedInformation = struct {
+    pub const tres_null_meaning = .{};
+
     /// The location of this related diagnostic information.
     location: Location,
     /// The message of this related diagnostic information.
@@ -5428,6 +6716,10 @@ pub const DiagnosticRelatedInformation = struct {
 /// Represents a parameter of a callable-signature. A parameter can
 /// have a label and a doc-comment.
 pub const ParameterInformation = struct {
+    pub const tres_null_meaning = .{
+        .documentation = .field,
+    };
+
     /// The label of this parameter information.
     ///
     /// Either a string or an inclusive start and exclusive end offsets within its containing
@@ -5438,11 +6730,10 @@ pub const ParameterInformation = struct {
     /// Its intended use case is to highlight the parameter label part in the `SignatureInformation.label`.
     label: union(enum) {
         string: []const u8,
-        tuple_1: std.meta.Tuple(&[_]type{ u64, u64 }),
+        tuple_1: struct { u32, u32 },
     },
     /// The human-readable doc-comment of this parameter. Will be shown
     /// in the UI but can be omitted.
-    /// field can be undefined, but this possible state is non-critical
     documentation: ?union(enum) {
         string: []const u8,
         MarkupContent: MarkupContent,
@@ -5454,6 +6745,10 @@ pub const ParameterInformation = struct {
 ///
 /// @since 3.17.0
 pub const NotebookCellTextDocumentFilter = struct {
+    pub const tres_null_meaning = .{
+        .language = .field,
+    };
+
     /// A filter that matches against the notebook
     /// containing the notebook cell. If a string
     /// value is provided it matches against the
@@ -5466,7 +6761,6 @@ pub const NotebookCellTextDocumentFilter = struct {
     ///
     /// Will be matched against the language id of the
     /// notebook cell document. '*' matches every language.
-    /// field can be undefined, but this possible state is non-critical
     language: ?[]const u8 = null,
 };
 
@@ -5474,211 +6768,223 @@ pub const NotebookCellTextDocumentFilter = struct {
 ///
 /// @since 3.16.0
 pub const FileOperationPatternOptions = struct {
+    pub const tres_null_meaning = .{
+        .ignoreCase = .field,
+    };
+
     /// The pattern should be matched ignoring casing.
-    /// field can be undefined, but this possible state is non-critical
     ignoreCase: ?bool = null,
 };
 
 pub const ExecutionSummary = struct {
+    pub const tres_null_meaning = .{
+        .success = .field,
+    };
+
     /// A strict monotonically increasing value
     /// indicating the execution order of a cell
     /// inside a notebook.
-    executionOrder: u64,
+    executionOrder: u32,
     /// Whether the execution was successful or
     /// not if known by the client.
-    /// field can be undefined, but this possible state is non-critical
     success: ?bool = null,
 };
 
 /// Workspace specific client capabilities.
 pub const WorkspaceClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .applyEdit = .field,
+        .workspaceEdit = .field,
+        .didChangeConfiguration = .field,
+        .didChangeWatchedFiles = .field,
+        .symbol = .field,
+        .executeCommand = .field,
+        .workspaceFolders = .field,
+        .configuration = .field,
+        .semanticTokens = .field,
+        .codeLens = .field,
+        .fileOperations = .field,
+        .inlineValue = .field,
+        .inlayHint = .field,
+        .diagnostics = .field,
+    };
+
     /// The client supports applying batch edits
     /// to the workspace by supporting the request
     /// 'workspace/applyEdit'
-    /// field can be undefined, but this possible state is non-critical
     applyEdit: ?bool = null,
     /// Capabilities specific to `WorkspaceEdit`s.
-    /// field can be undefined, but this possible state is non-critical
     workspaceEdit: ?WorkspaceEditClientCapabilities = null,
     /// Capabilities specific to the `workspace/didChangeConfiguration` notification.
-    /// field can be undefined, but this possible state is non-critical
     didChangeConfiguration: ?DidChangeConfigurationClientCapabilities = null,
     /// Capabilities specific to the `workspace/didChangeWatchedFiles` notification.
-    /// field can be undefined, but this possible state is non-critical
     didChangeWatchedFiles: ?DidChangeWatchedFilesClientCapabilities = null,
     /// Capabilities specific to the `workspace/symbol` request.
-    /// field can be undefined, but this possible state is non-critical
     symbol: ?WorkspaceSymbolClientCapabilities = null,
     /// Capabilities specific to the `workspace/executeCommand` request.
-    /// field can be undefined, but this possible state is non-critical
     executeCommand: ?ExecuteCommandClientCapabilities = null,
     /// The client has support for workspace folders.
     ///
     /// @since 3.6.0
-    /// field can be undefined, but this possible state is non-critical
     workspaceFolders: ?bool = null,
     /// The client supports `workspace/configuration` requests.
     ///
     /// @since 3.6.0
-    /// field can be undefined, but this possible state is non-critical
     configuration: ?bool = null,
     /// Capabilities specific to the semantic token requests scoped to the
     /// workspace.
     ///
     /// @since 3.16.0.
-    /// field can be undefined, but this possible state is non-critical
     semanticTokens: ?SemanticTokensWorkspaceClientCapabilities = null,
     /// Capabilities specific to the code lens requests scoped to the
     /// workspace.
     ///
     /// @since 3.16.0.
-    /// field can be undefined, but this possible state is non-critical
     codeLens: ?CodeLensWorkspaceClientCapabilities = null,
     /// The client has support for file notifications/requests for user operations on files.
     ///
     /// Since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     fileOperations: ?FileOperationClientCapabilities = null,
     /// Capabilities specific to the inline values requests scoped to the
     /// workspace.
     ///
     /// @since 3.17.0.
-    /// field can be undefined, but this possible state is non-critical
     inlineValue: ?InlineValueWorkspaceClientCapabilities = null,
     /// Capabilities specific to the inlay hint requests scoped to the
     /// workspace.
     ///
     /// @since 3.17.0.
-    /// field can be undefined, but this possible state is non-critical
     inlayHint: ?InlayHintWorkspaceClientCapabilities = null,
     /// Capabilities specific to the diagnostic requests scoped to the
     /// workspace.
     ///
     /// @since 3.17.0.
-    /// field can be undefined, but this possible state is non-critical
     diagnostics: ?DiagnosticWorkspaceClientCapabilities = null,
 };
 
 /// Text document specific client capabilities.
 pub const TextDocumentClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .synchronization = .field,
+        .completion = .field,
+        .hover = .field,
+        .signatureHelp = .field,
+        .declaration = .field,
+        .definition = .field,
+        .typeDefinition = .field,
+        .implementation = .field,
+        .references = .field,
+        .documentHighlight = .field,
+        .documentSymbol = .field,
+        .codeAction = .field,
+        .codeLens = .field,
+        .documentLink = .field,
+        .colorProvider = .field,
+        .formatting = .field,
+        .rangeFormatting = .field,
+        .onTypeFormatting = .field,
+        .rename = .field,
+        .foldingRange = .field,
+        .selectionRange = .field,
+        .publishDiagnostics = .field,
+        .callHierarchy = .field,
+        .semanticTokens = .field,
+        .linkedEditingRange = .field,
+        .moniker = .field,
+        .typeHierarchy = .field,
+        .inlineValue = .field,
+        .inlayHint = .field,
+        .diagnostic = .field,
+    };
+
     /// Defines which synchronization capabilities the client supports.
-    /// field can be undefined, but this possible state is non-critical
     synchronization: ?TextDocumentSyncClientCapabilities = null,
     /// Capabilities specific to the `textDocument/completion` request.
-    /// field can be undefined, but this possible state is non-critical
     completion: ?CompletionClientCapabilities = null,
     /// Capabilities specific to the `textDocument/hover` request.
-    /// field can be undefined, but this possible state is non-critical
     hover: ?HoverClientCapabilities = null,
     /// Capabilities specific to the `textDocument/signatureHelp` request.
-    /// field can be undefined, but this possible state is non-critical
     signatureHelp: ?SignatureHelpClientCapabilities = null,
     /// Capabilities specific to the `textDocument/declaration` request.
     ///
     /// @since 3.14.0
-    /// field can be undefined, but this possible state is non-critical
     declaration: ?DeclarationClientCapabilities = null,
     /// Capabilities specific to the `textDocument/definition` request.
-    /// field can be undefined, but this possible state is non-critical
     definition: ?DefinitionClientCapabilities = null,
     /// Capabilities specific to the `textDocument/typeDefinition` request.
     ///
     /// @since 3.6.0
-    /// field can be undefined, but this possible state is non-critical
     typeDefinition: ?TypeDefinitionClientCapabilities = null,
     /// Capabilities specific to the `textDocument/implementation` request.
     ///
     /// @since 3.6.0
-    /// field can be undefined, but this possible state is non-critical
     implementation: ?ImplementationClientCapabilities = null,
     /// Capabilities specific to the `textDocument/references` request.
-    /// field can be undefined, but this possible state is non-critical
     references: ?ReferenceClientCapabilities = null,
     /// Capabilities specific to the `textDocument/documentHighlight` request.
-    /// field can be undefined, but this possible state is non-critical
     documentHighlight: ?DocumentHighlightClientCapabilities = null,
     /// Capabilities specific to the `textDocument/documentSymbol` request.
-    /// field can be undefined, but this possible state is non-critical
     documentSymbol: ?DocumentSymbolClientCapabilities = null,
     /// Capabilities specific to the `textDocument/codeAction` request.
-    /// field can be undefined, but this possible state is non-critical
     codeAction: ?CodeActionClientCapabilities = null,
     /// Capabilities specific to the `textDocument/codeLens` request.
-    /// field can be undefined, but this possible state is non-critical
     codeLens: ?CodeLensClientCapabilities = null,
     /// Capabilities specific to the `textDocument/documentLink` request.
-    /// field can be undefined, but this possible state is non-critical
     documentLink: ?DocumentLinkClientCapabilities = null,
     /// Capabilities specific to the `textDocument/documentColor` and the
     /// `textDocument/colorPresentation` request.
     ///
     /// @since 3.6.0
-    /// field can be undefined, but this possible state is non-critical
     colorProvider: ?DocumentColorClientCapabilities = null,
     /// Capabilities specific to the `textDocument/formatting` request.
-    /// field can be undefined, but this possible state is non-critical
     formatting: ?DocumentFormattingClientCapabilities = null,
     /// Capabilities specific to the `textDocument/rangeFormatting` request.
-    /// field can be undefined, but this possible state is non-critical
     rangeFormatting: ?DocumentRangeFormattingClientCapabilities = null,
     /// Capabilities specific to the `textDocument/onTypeFormatting` request.
-    /// field can be undefined, but this possible state is non-critical
     onTypeFormatting: ?DocumentOnTypeFormattingClientCapabilities = null,
     /// Capabilities specific to the `textDocument/rename` request.
-    /// field can be undefined, but this possible state is non-critical
     rename: ?RenameClientCapabilities = null,
     /// Capabilities specific to the `textDocument/foldingRange` request.
     ///
     /// @since 3.10.0
-    /// field can be undefined, but this possible state is non-critical
     foldingRange: ?FoldingRangeClientCapabilities = null,
     /// Capabilities specific to the `textDocument/selectionRange` request.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     selectionRange: ?SelectionRangeClientCapabilities = null,
     /// Capabilities specific to the `textDocument/publishDiagnostics` notification.
-    /// field can be undefined, but this possible state is non-critical
     publishDiagnostics: ?PublishDiagnosticsClientCapabilities = null,
     /// Capabilities specific to the various call hierarchy requests.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     callHierarchy: ?CallHierarchyClientCapabilities = null,
     /// Capabilities specific to the various semantic token request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     semanticTokens: ?SemanticTokensClientCapabilities = null,
     /// Capabilities specific to the `textDocument/linkedEditingRange` request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     linkedEditingRange: ?LinkedEditingRangeClientCapabilities = null,
     /// Client capabilities specific to the `textDocument/moniker` request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     moniker: ?MonikerClientCapabilities = null,
     /// Capabilities specific to the various type hierarchy requests.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     typeHierarchy: ?TypeHierarchyClientCapabilities = null,
     /// Capabilities specific to the `textDocument/inlineValue` request.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     inlineValue: ?InlineValueClientCapabilities = null,
     /// Capabilities specific to the `textDocument/inlayHint` request.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     inlayHint: ?InlayHintClientCapabilities = null,
     /// Capabilities specific to the diagnostic pull model.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     diagnostic: ?DiagnosticClientCapabilities = null,
 };
 
@@ -5686,6 +6992,8 @@ pub const TextDocumentClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const NotebookDocumentClientCapabilities = struct {
+    pub const tres_null_meaning = .{};
+
     /// Capabilities specific to notebook document synchronization
     ///
     /// @since 3.17.0
@@ -5693,6 +7001,12 @@ pub const NotebookDocumentClientCapabilities = struct {
 };
 
 pub const WindowClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .workDoneProgress = .field,
+        .showMessage = .field,
+        .showDocument = .field,
+    };
+
     /// It indicates whether the client supports server initiated
     /// progress using the `window/workDoneProgress/create` request.
     ///
@@ -5702,17 +7016,14 @@ pub const WindowClientCapabilities = struct {
     /// capabilities.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     workDoneProgress: ?bool = null,
     /// Capabilities specific to the showMessage request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     showMessage: ?ShowMessageRequestClientCapabilities = null,
     /// Capabilities specific to the showDocument request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     showDocument: ?ShowDocumentClientCapabilities = null,
 };
 
@@ -5720,14 +7031,22 @@ pub const WindowClientCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const GeneralClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .staleRequestSupport = .field,
+        .regularExpressions = .field,
+        .markdown = .field,
+        .positionEncodings = .field,
+    };
+
     /// Client capability that signals how the client
     /// handles stale requests (e.g. a request
     /// for which the client will not process the response
     /// anymore since the information is outdated).
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     staleRequestSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The client will actively cancel the request.
         cancel: bool,
         /// The list of requests for which the client
@@ -5738,12 +7057,10 @@ pub const GeneralClientCapabilities = struct {
     /// Client capabilities specific to regular expressions.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     regularExpressions: ?RegularExpressionsClientCapabilities = null,
     /// Client capabilities specific to the client's markdown parser.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     markdown: ?MarkdownClientCapabilities = null,
     /// The position encodings supported by the client. Client and server
     /// have to agree on the same position encoding to ensure that offsets
@@ -5763,7 +7080,6 @@ pub const GeneralClientCapabilities = struct {
     /// side.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     positionEncodings: ?[]const PositionEncodingKind = null,
 };
 
@@ -5773,6 +7089,8 @@ pub const GeneralClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const RelativePattern = struct {
+    pub const tres_null_meaning = .{};
+
     /// A workspace folder or a base URI to which this pattern will be matched
     /// against relatively.
     baseUri: union(enum) {
@@ -5784,20 +7102,25 @@ pub const RelativePattern = struct {
 };
 
 pub const WorkspaceEditClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .documentChanges = .field,
+        .resourceOperations = .field,
+        .failureHandling = .field,
+        .normalizesLineEndings = .field,
+        .changeAnnotationSupport = .field,
+    };
+
     /// The client supports versioned document changes in `WorkspaceEdit`s
-    /// field can be undefined, but this possible state is non-critical
     documentChanges: ?bool = null,
     /// The resource operations the client supports. Clients should at least
     /// support 'create', 'rename' and 'delete' files and folders.
     ///
     /// @since 3.13.0
-    /// field can be undefined, but this possible state is non-critical
     resourceOperations: ?[]const ResourceOperationKind = null,
     /// The failure handling strategy of a client if applying the workspace edit
     /// fails.
     ///
     /// @since 3.13.0
-    /// field can be undefined, but this possible state is non-critical
     failureHandling: ?FailureHandlingKind = null,
     /// Whether the client normalizes line endings to the client specific
     /// setting.
@@ -5806,50 +7129,66 @@ pub const WorkspaceEditClientCapabilities = struct {
     /// character.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     normalizesLineEndings: ?bool = null,
     /// Whether the client in general supports change annotations on text edits,
     /// create file, rename file and delete file changes.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     changeAnnotationSupport: ?struct {
+        pub const tres_null_meaning = .{
+            .groupsOnLabel = .field,
+        };
+
         /// Whether the client groups edits with equal labels into tree nodes,
         /// for instance all edits labelled with "Changes in Strings" would
         /// be a tree node.
-        /// field can be undefined, but this possible state is non-critical
         groupsOnLabel: ?bool = null,
     } = null,
 };
 
 pub const DidChangeConfigurationClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Did change configuration notification supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 pub const DidChangeWatchedFilesClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .relativePatternSupport = .field,
+    };
+
     /// Did change watched files notification supports dynamic registration. Please note
     /// that the current protocol doesn't support static configuration for file changes
     /// from the server side.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Whether the client has support for {@link  RelativePattern relative pattern}
     /// or not.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     relativePatternSupport: ?bool = null,
 };
 
 /// Client capabilities for a [WorkspaceSymbolRequest](#WorkspaceSymbolRequest).
 pub const WorkspaceSymbolClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .symbolKind = .field,
+        .tagSupport = .field,
+        .resolveSupport = .field,
+    };
+
     /// Symbol request supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Specific capabilities for the `SymbolKind` in the `workspace/symbol` request.
-    /// field can be undefined, but this possible state is non-critical
     symbolKind: ?struct {
+        pub const tres_null_meaning = .{
+            .valueSet = .field,
+        };
+
         /// The symbol kind values the client supports. When this
         /// property exists the client also guarantees that it will
         /// handle values outside its set gracefully and falls back
@@ -5858,15 +7197,15 @@ pub const WorkspaceSymbolClientCapabilities = struct {
         /// If this property is not present the client only supports
         /// the symbol kinds from `File` to `Array` as defined in
         /// the initial version of the protocol.
-        /// field can be undefined, but this possible state is non-critical
         valueSet: ?[]const SymbolKind = null,
     } = null,
     /// The client supports tags on `SymbolInformation`.
     /// Clients supporting tags have to handle unknown tags gracefully.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     tagSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The tags supported by the client.
         valueSet: []const SymbolTag,
     } = null,
@@ -5875,8 +7214,9 @@ pub const WorkspaceSymbolClientCapabilities = struct {
     /// properties.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     resolveSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The properties that a client can resolve lazily. Usually
         /// `location.range`
         properties: []const []const u8,
@@ -5885,13 +7225,20 @@ pub const WorkspaceSymbolClientCapabilities = struct {
 
 /// The client capabilities of a [ExecuteCommandRequest](#ExecuteCommandRequest).
 pub const ExecuteCommandClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Execute command supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensWorkspaceClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .refreshSupport = .field,
+    };
+
     /// Whether the client implementation supports a refresh request sent from
     /// the server to the client.
     ///
@@ -5899,12 +7246,15 @@ pub const SemanticTokensWorkspaceClientCapabilities = struct {
     /// semantic tokens currently shown. It should be used with absolute care
     /// and is useful for situation where a server for example detects a project
     /// wide change that requires such a calculation.
-    /// field can be undefined, but this possible state is non-critical
     refreshSupport: ?bool = null,
 };
 
 /// @since 3.16.0
 pub const CodeLensWorkspaceClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .refreshSupport = .field,
+    };
+
     /// Whether the client implementation supports a refresh request sent from the
     /// server to the client.
     ///
@@ -5912,7 +7262,6 @@ pub const CodeLensWorkspaceClientCapabilities = struct {
     /// code lenses currently shown. It should be used with absolute care and is
     /// useful for situation where a server for example detect a project wide
     /// change that requires such a calculation.
-    /// field can be undefined, but this possible state is non-critical
     refreshSupport: ?bool = null,
 };
 
@@ -5923,26 +7272,29 @@ pub const CodeLensWorkspaceClientCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const FileOperationClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .didCreate = .field,
+        .willCreate = .field,
+        .didRename = .field,
+        .willRename = .field,
+        .didDelete = .field,
+        .willDelete = .field,
+    };
+
     /// Whether the client supports dynamic registration for file requests/notifications.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client has support for sending didCreateFiles notifications.
-    /// field can be undefined, but this possible state is non-critical
     didCreate: ?bool = null,
     /// The client has support for sending willCreateFiles requests.
-    /// field can be undefined, but this possible state is non-critical
     willCreate: ?bool = null,
     /// The client has support for sending didRenameFiles notifications.
-    /// field can be undefined, but this possible state is non-critical
     didRename: ?bool = null,
     /// The client has support for sending willRenameFiles requests.
-    /// field can be undefined, but this possible state is non-critical
     willRename: ?bool = null,
     /// The client has support for sending didDeleteFiles notifications.
-    /// field can be undefined, but this possible state is non-critical
     didDelete: ?bool = null,
     /// The client has support for sending willDeleteFiles requests.
-    /// field can be undefined, but this possible state is non-critical
     willDelete: ?bool = null,
 };
 
@@ -5950,6 +7302,10 @@ pub const FileOperationClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueWorkspaceClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .refreshSupport = .field,
+    };
+
     /// Whether the client implementation supports a refresh request sent from the
     /// server to the client.
     ///
@@ -5957,7 +7313,6 @@ pub const InlineValueWorkspaceClientCapabilities = struct {
     /// inline values currently shown. It should be used with absolute care and is
     /// useful for situation where a server for example detects a project wide
     /// change that requires such a calculation.
-    /// field can be undefined, but this possible state is non-critical
     refreshSupport: ?bool = null,
 };
 
@@ -5965,6 +7320,10 @@ pub const InlineValueWorkspaceClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const InlayHintWorkspaceClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .refreshSupport = .field,
+    };
+
     /// Whether the client implementation supports a refresh request sent from
     /// the server to the client.
     ///
@@ -5972,7 +7331,6 @@ pub const InlayHintWorkspaceClientCapabilities = struct {
     /// inlay hints currently shown. It should be used with absolute care and
     /// is useful for situation where a server for example detects a project wide
     /// change that requires such a calculation.
-    /// field can be undefined, but this possible state is non-critical
     refreshSupport: ?bool = null,
 };
 
@@ -5980,6 +7338,10 @@ pub const InlayHintWorkspaceClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const DiagnosticWorkspaceClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .refreshSupport = .field,
+    };
+
     /// Whether the client implementation supports a refresh request sent from
     /// the server to the client.
     ///
@@ -5987,56 +7349,73 @@ pub const DiagnosticWorkspaceClientCapabilities = struct {
     /// pulled diagnostics currently shown. It should be used with absolute care and
     /// is useful for situation where a server for example detects a project wide
     /// change that requires such a calculation.
-    /// field can be undefined, but this possible state is non-critical
     refreshSupport: ?bool = null,
 };
 
 pub const TextDocumentSyncClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .willSave = .field,
+        .willSaveWaitUntil = .field,
+        .didSave = .field,
+    };
+
     /// Whether text document synchronization supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports sending will save notifications.
-    /// field can be undefined, but this possible state is non-critical
     willSave: ?bool = null,
     /// The client supports sending a will save request and
     /// waits for a response providing text edits which will
     /// be applied to the document before it is saved.
-    /// field can be undefined, but this possible state is non-critical
     willSaveWaitUntil: ?bool = null,
     /// The client supports did save notifications.
-    /// field can be undefined, but this possible state is non-critical
     didSave: ?bool = null,
 };
 
 /// Completion client capabilities
 pub const CompletionClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .completionItem = .field,
+        .completionItemKind = .field,
+        .insertTextMode = .field,
+        .contextSupport = .field,
+        .completionList = .field,
+    };
+
     /// Whether completion supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports the following `CompletionItem` specific
     /// capabilities.
-    /// field can be undefined, but this possible state is non-critical
     completionItem: ?struct {
+        pub const tres_null_meaning = .{
+            .snippetSupport = .field,
+            .commitCharactersSupport = .field,
+            .documentationFormat = .field,
+            .deprecatedSupport = .field,
+            .preselectSupport = .field,
+            .tagSupport = .field,
+            .insertReplaceSupport = .field,
+            .resolveSupport = .field,
+            .insertTextModeSupport = .field,
+            .labelDetailsSupport = .field,
+        };
+
         /// Client supports snippets as insert text.
         ///
         /// A snippet can define tab stops and placeholders with `$1`, `$2`
         /// and `${3:foo}`. `$0` defines the final tab stop, it defaults to
         /// the end of the snippet. Placeholders with equal identifiers are linked,
         /// that is typing in one will update others too.
-        /// field can be undefined, but this possible state is non-critical
         snippetSupport: ?bool = null,
         /// Client supports commit characters on a completion item.
-        /// field can be undefined, but this possible state is non-critical
         commitCharactersSupport: ?bool = null,
         /// Client supports the following content formats for the documentation
         /// property. The order describes the preferred format of the client.
-        /// field can be undefined, but this possible state is non-critical
         documentationFormat: ?[]const MarkupKind = null,
         /// Client supports the deprecated property on a completion item.
-        /// field can be undefined, but this possible state is non-critical
         deprecatedSupport: ?bool = null,
         /// Client supports the preselect property on a completion item.
-        /// field can be undefined, but this possible state is non-critical
         preselectSupport: ?bool = null,
         /// Client supports the tag property on a completion item. Clients supporting
         /// tags have to handle unknown tags gracefully. Clients especially need to
@@ -6044,8 +7423,9 @@ pub const CompletionClientCapabilities = struct {
         /// a resolve call.
         ///
         /// @since 3.15.0
-        /// field can be undefined, but this possible state is non-critical
         tagSupport: ?struct {
+            pub const tres_null_meaning = .{};
+
             /// The tags supported by the client.
             valueSet: []const CompletionItemTag,
         } = null,
@@ -6053,15 +7433,15 @@ pub const CompletionClientCapabilities = struct {
         /// completion item is inserted in the text or should replace text.
         ///
         /// @since 3.16.0
-        /// field can be undefined, but this possible state is non-critical
         insertReplaceSupport: ?bool = null,
         /// Indicates which properties a client can resolve lazily on a completion
         /// item. Before version 3.16.0 only the predefined properties `documentation`
         /// and `details` could be resolved lazily.
         ///
         /// @since 3.16.0
-        /// field can be undefined, but this possible state is non-critical
         resolveSupport: ?struct {
+            pub const tres_null_meaning = .{};
+
             /// The properties that a client can resolve lazily.
             properties: []const []const u8,
         } = null,
@@ -6070,19 +7450,22 @@ pub const CompletionClientCapabilities = struct {
         /// as defined by the client (see `insertTextMode`).
         ///
         /// @since 3.16.0
-        /// field can be undefined, but this possible state is non-critical
         insertTextModeSupport: ?struct {
+            pub const tres_null_meaning = .{};
+
             valueSet: []const InsertTextMode,
         } = null,
         /// The client has support for completion item label
         /// details (see also `CompletionItemLabelDetails`).
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         labelDetailsSupport: ?bool = null,
     } = null,
-    /// field can be undefined, but this possible state is non-critical
     completionItemKind: ?struct {
+        pub const tres_null_meaning = .{
+            .valueSet = .field,
+        };
+
         /// The completion item kind values the client supports. When this
         /// property exists the client also guarantees that it will
         /// handle values outside its set gracefully and falls back
@@ -6091,7 +7474,6 @@ pub const CompletionClientCapabilities = struct {
         /// If this property is not present the client only supports
         /// the completion items kinds from `Text` to `Reference` as defined in
         /// the initial version of the protocol.
-        /// field can be undefined, but this possible state is non-critical
         valueSet: ?[]const CompletionItemKind = null,
     } = null,
     /// Defines how the client handles whitespace and indentation
@@ -6099,18 +7481,19 @@ pub const CompletionClientCapabilities = struct {
     /// text in either `insertText` or `textEdit`.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     insertTextMode: ?InsertTextMode = null,
     /// The client supports to send additional context information for a
     /// `textDocument/completion` request.
-    /// field can be undefined, but this possible state is non-critical
     contextSupport: ?bool = null,
     /// The client supports the following `CompletionList` specific
     /// capabilities.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     completionList: ?struct {
+        pub const tres_null_meaning = .{
+            .itemDefaults = .field,
+        };
+
         /// The client supports the following itemDefaults on
         /// a completion list.
         ///
@@ -6119,49 +7502,61 @@ pub const CompletionClientCapabilities = struct {
         /// no properties are supported.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         itemDefaults: ?[]const []const u8 = null,
     } = null,
 };
 
 pub const HoverClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .contentFormat = .field,
+    };
+
     /// Whether hover supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Client supports the following content formats for the content
     /// property. The order describes the preferred format of the client.
-    /// field can be undefined, but this possible state is non-critical
     contentFormat: ?[]const MarkupKind = null,
 };
 
 /// Client Capabilities for a [SignatureHelpRequest](#SignatureHelpRequest).
 pub const SignatureHelpClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .signatureInformation = .field,
+        .contextSupport = .field,
+    };
+
     /// Whether signature help supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports the following `SignatureInformation`
     /// specific properties.
-    /// field can be undefined, but this possible state is non-critical
     signatureInformation: ?struct {
+        pub const tres_null_meaning = .{
+            .documentationFormat = .field,
+            .parameterInformation = .field,
+            .activeParameterSupport = .field,
+        };
+
         /// Client supports the following content formats for the documentation
         /// property. The order describes the preferred format of the client.
-        /// field can be undefined, but this possible state is non-critical
         documentationFormat: ?[]const MarkupKind = null,
         /// Client capabilities specific to parameter information.
-        /// field can be undefined, but this possible state is non-critical
         parameterInformation: ?struct {
+            pub const tres_null_meaning = .{
+                .labelOffsetSupport = .field,
+            };
+
             /// The client supports processing label offsets instead of a
             /// simple label string.
             ///
             /// @since 3.14.0
-            /// field can be undefined, but this possible state is non-critical
             labelOffsetSupport: ?bool = null,
         } = null,
         /// The client supports the `activeParameter` property on `SignatureInformation`
         /// literal.
         ///
         /// @since 3.16.0
-        /// field can be undefined, but this possible state is non-critical
         activeParameterSupport: ?bool = null,
     } = null,
     /// The client supports to send additional context information for a
@@ -6170,85 +7565,112 @@ pub const SignatureHelpClientCapabilities = struct {
     /// `SignatureHelpOptions`.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     contextSupport: ?bool = null,
 };
 
 /// @since 3.14.0
 pub const DeclarationClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .linkSupport = .field,
+    };
+
     /// Whether declaration supports dynamic registration. If this is set to `true`
     /// the client supports the new `DeclarationRegistrationOptions` return value
     /// for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports additional metadata in the form of declaration links.
-    /// field can be undefined, but this possible state is non-critical
     linkSupport: ?bool = null,
 };
 
 /// Client Capabilities for a [DefinitionRequest](#DefinitionRequest).
 pub const DefinitionClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .linkSupport = .field,
+    };
+
     /// Whether definition supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports additional metadata in the form of definition links.
     ///
     /// @since 3.14.0
-    /// field can be undefined, but this possible state is non-critical
     linkSupport: ?bool = null,
 };
 
 /// Since 3.6.0
 pub const TypeDefinitionClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .linkSupport = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `TypeDefinitionRegistrationOptions` return value
     /// for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports additional metadata in the form of definition links.
     ///
     /// Since 3.14.0
-    /// field can be undefined, but this possible state is non-critical
     linkSupport: ?bool = null,
 };
 
 /// @since 3.6.0
 pub const ImplementationClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .linkSupport = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `ImplementationRegistrationOptions` return value
     /// for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports additional metadata in the form of definition links.
     ///
     /// @since 3.14.0
-    /// field can be undefined, but this possible state is non-critical
     linkSupport: ?bool = null,
 };
 
 /// Client Capabilities for a [ReferencesRequest](#ReferencesRequest).
 pub const ReferenceClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether references supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// Client Capabilities for a [DocumentHighlightRequest](#DocumentHighlightRequest).
 pub const DocumentHighlightClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether document highlight supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// Client Capabilities for a [DocumentSymbolRequest](#DocumentSymbolRequest).
 pub const DocumentSymbolClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .symbolKind = .field,
+        .hierarchicalDocumentSymbolSupport = .field,
+        .tagSupport = .field,
+        .labelSupport = .field,
+    };
+
     /// Whether document symbol supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Specific capabilities for the `SymbolKind` in the
     /// `textDocument/documentSymbol` request.
-    /// field can be undefined, but this possible state is non-critical
     symbolKind: ?struct {
+        pub const tres_null_meaning = .{
+            .valueSet = .field,
+        };
+
         /// The symbol kind values the client supports. When this
         /// property exists the client also guarantees that it will
         /// handle values outside its set gracefully and falls back
@@ -6257,19 +7679,18 @@ pub const DocumentSymbolClientCapabilities = struct {
         /// If this property is not present the client only supports
         /// the symbol kinds from `File` to `Array` as defined in
         /// the initial version of the protocol.
-        /// field can be undefined, but this possible state is non-critical
         valueSet: ?[]const SymbolKind = null,
     } = null,
     /// The client supports hierarchical document symbols.
-    /// field can be undefined, but this possible state is non-critical
     hierarchicalDocumentSymbolSupport: ?bool = null,
     /// The client supports tags on `SymbolInformation`. Tags are supported on
     /// `DocumentSymbol` if `hierarchicalDocumentSymbolSupport` is set to true.
     /// Clients supporting tags have to handle unknown tags gracefully.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     tagSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The tags supported by the client.
         valueSet: []const SymbolTag,
     } = null,
@@ -6277,25 +7698,36 @@ pub const DocumentSymbolClientCapabilities = struct {
     /// registering a document symbol provider.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     labelSupport: ?bool = null,
 };
 
 /// The Client Capabilities of a [CodeActionRequest](#CodeActionRequest).
 pub const CodeActionClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .codeActionLiteralSupport = .field,
+        .isPreferredSupport = .field,
+        .disabledSupport = .field,
+        .dataSupport = .field,
+        .resolveSupport = .field,
+        .honorsChangeAnnotations = .field,
+    };
+
     /// Whether code action supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client support code action literals of type `CodeAction` as a valid
     /// response of the `textDocument/codeAction` request. If the property is not
     /// set the request can only return `Command` literals.
     ///
     /// @since 3.8.0
-    /// field can be undefined, but this possible state is non-critical
     codeActionLiteralSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The code action kind is support with the following value
         /// set.
         codeActionKind: struct {
+            pub const tres_null_meaning = .{};
+
             /// The code action kind values the client supports. When this
             /// property exists the client also guarantees that it will
             /// handle values outside its set gracefully and falls back
@@ -6306,26 +7738,24 @@ pub const CodeActionClientCapabilities = struct {
     /// Whether code action supports the `isPreferred` property.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     isPreferredSupport: ?bool = null,
     /// Whether code action supports the `disabled` property.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     disabledSupport: ?bool = null,
     /// Whether code action supports the `data` property which is
     /// preserved between a `textDocument/codeAction` and a
     /// `codeAction/resolve` request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     dataSupport: ?bool = null,
     /// Whether the client supports resolving additional code action
     /// properties via a separate `codeAction/resolve` request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     resolveSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The properties that a client can resolve lazily.
         properties: []const []const u8,
     } = null,
@@ -6336,67 +7766,89 @@ pub const CodeActionClientCapabilities = struct {
     /// for confirmation.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     honorsChangeAnnotations: ?bool = null,
 };
 
 /// The client capabilities  of a [CodeLensRequest](#CodeLensRequest).
 pub const CodeLensClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether code lens supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// The client capabilities of a [DocumentLinkRequest](#DocumentLinkRequest).
 pub const DocumentLinkClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .tooltipSupport = .field,
+    };
+
     /// Whether document link supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Whether the client supports the `tooltip` property on `DocumentLink`.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     tooltipSupport: ?bool = null,
 };
 
 pub const DocumentColorClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `DocumentColorRegistrationOptions` return value
     /// for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// Client capabilities of a [DocumentFormattingRequest](#DocumentFormattingRequest).
 pub const DocumentFormattingClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether formatting supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// Client capabilities of a [DocumentRangeFormattingRequest](#DocumentRangeFormattingRequest).
 pub const DocumentRangeFormattingClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether range formatting supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// Client capabilities of a [DocumentOnTypeFormattingRequest](#DocumentOnTypeFormattingRequest).
 pub const DocumentOnTypeFormattingClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether on type formatting supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 pub const RenameClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .prepareSupport = .field,
+        .prepareSupportDefaultBehavior = .field,
+        .honorsChangeAnnotations = .field,
+    };
+
     /// Whether rename supports dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Client supports testing for validity of rename operations
     /// before execution.
     ///
     /// @since 3.12.0
-    /// field can be undefined, but this possible state is non-critical
     prepareSupport: ?bool = null,
     /// Client supports the default behavior result.
     ///
@@ -6404,7 +7856,6 @@ pub const RenameClientCapabilities = struct {
     /// client.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     prepareSupportDefaultBehavior: ?PrepareSupportDefaultBehavior = null,
     /// Whether the client honors the change annotations in
     /// text edits and resource operations returned via the
@@ -6413,72 +7864,91 @@ pub const RenameClientCapabilities = struct {
     /// for confirmation.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     honorsChangeAnnotations: ?bool = null,
 };
 
 pub const FoldingRangeClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .rangeLimit = .field,
+        .lineFoldingOnly = .field,
+        .foldingRangeKind = .field,
+        .foldingRange = .field,
+    };
+
     /// Whether implementation supports dynamic registration for folding range
     /// providers. If this is set to `true` the client supports the new
     /// `FoldingRangeRegistrationOptions` return value for the corresponding
     /// server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The maximum number of folding ranges that the client prefers to receive
     /// per document. The value serves as a hint, servers are free to follow the
     /// limit.
-    /// field can be undefined, but this possible state is non-critical
-    rangeLimit: ?u64 = null,
+    rangeLimit: ?u32 = null,
     /// If set, the client signals that it only supports folding complete lines.
     /// If set, client will ignore specified `startCharacter` and `endCharacter`
     /// properties in a FoldingRange.
-    /// field can be undefined, but this possible state is non-critical
     lineFoldingOnly: ?bool = null,
     /// Specific options for the folding range kind.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     foldingRangeKind: ?struct {
+        pub const tres_null_meaning = .{
+            .valueSet = .field,
+        };
+
         /// The folding range kind values the client supports. When this
         /// property exists the client also guarantees that it will
         /// handle values outside its set gracefully and falls back
         /// to a default value when unknown.
-        /// field can be undefined, but this possible state is non-critical
         valueSet: ?[]const FoldingRangeKind = null,
     } = null,
     /// Specific options for the folding range.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     foldingRange: ?struct {
+        pub const tres_null_meaning = .{
+            .collapsedText = .field,
+        };
+
         /// If set, the client signals that it supports setting collapsedText on
         /// folding ranges to display custom labels instead of the default text.
         ///
         /// @since 3.17.0
-        /// field can be undefined, but this possible state is non-critical
         collapsedText: ?bool = null,
     } = null,
 };
 
 pub const SelectionRangeClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether implementation supports dynamic registration for selection range providers. If this is set to `true`
     /// the client supports the new `SelectionRangeRegistrationOptions` return value for the corresponding server
     /// capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// The publish diagnostic client capabilities.
 pub const PublishDiagnosticsClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .relatedInformation = .field,
+        .tagSupport = .field,
+        .versionSupport = .field,
+        .codeDescriptionSupport = .field,
+        .dataSupport = .field,
+    };
+
     /// Whether the clients accepts diagnostics with related information.
-    /// field can be undefined, but this possible state is non-critical
     relatedInformation: ?bool = null,
     /// Client supports the tag property to provide meta data about a diagnostic.
     /// Clients supporting tags have to handle unknown tags gracefully.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     tagSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The tags supported by the client.
         valueSet: []const DiagnosticTag,
     } = null,
@@ -6486,37 +7956,44 @@ pub const PublishDiagnosticsClientCapabilities = struct {
     /// `textDocument/publishDiagnostics` notification's parameter.
     ///
     /// @since 3.15.0
-    /// field can be undefined, but this possible state is non-critical
     versionSupport: ?bool = null,
     /// Client supports a codeDescription property
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     codeDescriptionSupport: ?bool = null,
     /// Whether code action supports the `data` property which is
     /// preserved between a `textDocument/publishDiagnostics` and
     /// `textDocument/codeAction` request.
     ///
     /// @since 3.16.0
-    /// field can be undefined, but this possible state is non-critical
     dataSupport: ?bool = null,
 };
 
 /// @since 3.16.0
 pub const CallHierarchyClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
     /// return value for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// @since 3.16.0
 pub const SemanticTokensClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .overlappingTokenSupport = .field,
+        .multilineTokenSupport = .field,
+        .serverCancelSupport = .field,
+        .augmentsSyntaxTokens = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
     /// return value for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Which requests the client supports and might send to the server
     /// depending on the server's capability. Please note that clients might not
@@ -6527,22 +8004,30 @@ pub const SemanticTokensClientCapabilities = struct {
     /// range provider the client might not render a minimap correctly or might
     /// even decide to not show any semantic tokens at all.
     requests: struct {
+        pub const tres_null_meaning = .{
+            .range = .field,
+            .full = .field,
+        };
+
         /// The client will send the `textDocument/semanticTokens/range` request if
         /// the server provides a corresponding handler.
-        /// field can be undefined, but this possible state is non-critical
         range: ?union(enum) {
             bool: bool,
-            literal_1: struct {},
+            literal_1: struct {
+                pub const tres_null_meaning = .{};
+            },
         } = null,
         /// The client will send the `textDocument/semanticTokens/full` request if
         /// the server provides a corresponding handler.
-        /// field can be undefined, but this possible state is non-critical
         full: ?union(enum) {
             bool: bool,
             literal_1: struct {
+                pub const tres_null_meaning = .{
+                    .delta = .field,
+                };
+
                 /// The client will send the `textDocument/semanticTokens/full/delta` request if
                 /// the server provides a corresponding handler.
-                /// field can be undefined, but this possible state is non-critical
                 delta: ?bool = null,
             },
         } = null,
@@ -6554,10 +8039,8 @@ pub const SemanticTokensClientCapabilities = struct {
     /// The token formats the clients supports.
     formats: []const TokenFormat,
     /// Whether the client supports tokens that can overlap each other.
-    /// field can be undefined, but this possible state is non-critical
     overlappingTokenSupport: ?bool = null,
     /// Whether the client supports tokens that can span multiple lines.
-    /// field can be undefined, but this possible state is non-critical
     multilineTokenSupport: ?bool = null,
     /// Whether the client allows the server to actively cancel a
     /// semantic token request, e.g. supports returning
@@ -6565,7 +8048,6 @@ pub const SemanticTokensClientCapabilities = struct {
     /// needs to retrigger the request.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     serverCancelSupport: ?bool = null,
     /// Whether the client uses semantic tokens to augment existing
     /// syntax tokens. If set to `true` client side created syntax
@@ -6577,7 +8059,6 @@ pub const SemanticTokensClientCapabilities = struct {
     /// specified.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     augmentsSyntaxTokens: ?bool = null,
 };
 
@@ -6585,10 +8066,13 @@ pub const SemanticTokensClientCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const LinkedEditingRangeClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
     /// return value for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
@@ -6596,19 +8080,25 @@ pub const LinkedEditingRangeClientCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const MonikerClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether moniker supports dynamic registration. If this is set to `true`
     /// the client supports the new `MonikerRegistrationOptions` return value
     /// for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
 /// @since 3.17.0
 pub const TypeHierarchyClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
     /// return value for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
@@ -6616,8 +8106,11 @@ pub const TypeHierarchyClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const InlineValueClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+    };
+
     /// Whether implementation supports dynamic registration for inline value providers.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
 };
 
@@ -6625,13 +8118,18 @@ pub const InlineValueClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const InlayHintClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .resolveSupport = .field,
+    };
+
     /// Whether inlay hints support dynamic registration.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Indicates which properties a client can resolve lazily on an inlay
     /// hint.
-    /// field can be undefined, but this possible state is non-critical
     resolveSupport: ?struct {
+        pub const tres_null_meaning = .{};
+
         /// The properties that a client can resolve lazily.
         properties: []const []const u8,
     } = null,
@@ -6641,13 +8139,16 @@ pub const InlayHintClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const DiagnosticClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .relatedDocumentSupport = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is set to `true`
     /// the client supports the new `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
     /// return value for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// Whether the clients supports related documents for document diagnostic pulls.
-    /// field can be undefined, but this possible state is non-critical
     relatedDocumentSupport: ?bool = null,
 };
 
@@ -6655,26 +8156,35 @@ pub const DiagnosticClientCapabilities = struct {
 ///
 /// @since 3.17.0
 pub const NotebookDocumentSyncClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .dynamicRegistration = .field,
+        .executionSummarySupport = .field,
+    };
+
     /// Whether implementation supports dynamic registration. If this is
     /// set to `true` the client supports the new
     /// `(TextDocumentRegistrationOptions & StaticRegistrationOptions)`
     /// return value for the corresponding server capability as well.
-    /// field can be undefined, but this possible state is non-critical
     dynamicRegistration: ?bool = null,
     /// The client supports sending execution summary data per cell.
-    /// field can be undefined, but this possible state is non-critical
     executionSummarySupport: ?bool = null,
 };
 
 /// Show message request client capabilities
 pub const ShowMessageRequestClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .messageActionItem = .field,
+    };
+
     /// Capabilities specific to the `MessageActionItem` type.
-    /// field can be undefined, but this possible state is non-critical
     messageActionItem: ?struct {
+        pub const tres_null_meaning = .{
+            .additionalPropertiesSupport = .field,
+        };
+
         /// Whether the client supports additional attributes which
         /// are preserved and send back to the server in the
         /// request's response.
-        /// field can be undefined, but this possible state is non-critical
         additionalPropertiesSupport: ?bool = null,
     } = null,
 };
@@ -6683,6 +8193,8 @@ pub const ShowMessageRequestClientCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const ShowDocumentClientCapabilities = struct {
+    pub const tres_null_meaning = .{};
+
     /// The client has support for the showDocument
     /// request.
     support: bool,
@@ -6692,10 +8204,13 @@ pub const ShowDocumentClientCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const RegularExpressionsClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .version = .field,
+    };
+
     /// The engine's name.
     engine: []const u8,
     /// The engine's version.
-    /// field can be undefined, but this possible state is non-critical
     version: ?[]const u8 = null,
 };
 
@@ -6703,16 +8218,19 @@ pub const RegularExpressionsClientCapabilities = struct {
 ///
 /// @since 3.16.0
 pub const MarkdownClientCapabilities = struct {
+    pub const tres_null_meaning = .{
+        .version = .field,
+        .allowedTags = .field,
+    };
+
     /// The name of the parser.
     parser: []const u8,
     /// The version of the parser.
-    /// field can be undefined, but this possible state is non-critical
     version: ?[]const u8 = null,
     /// A list of HTML tags that the client allows / supports in
     /// Markdown.
     ///
     /// @since 3.17.0
-    /// field can be undefined, but this possible state is non-critical
     allowedTags: ?[]const []const u8 = null,
 };
 
@@ -7033,7 +8551,6 @@ pub const request_metadata = [_]RequestMetadata{
             // And PartialResultParams
             /// An optional token that a server can use to report partial results (e.g. streaming) to
             /// the client.
-            /// field can be undefined, but this possible state is non-critical
             partialResultToken: ?ProgressToken = null,
         },
         .Result = []const LSPAny,
@@ -7071,7 +8588,6 @@ pub const request_metadata = [_]RequestMetadata{
             .method = null,
             .Options = struct {
                 // And WorkDoneProgressOptions
-                /// field can be undefined, but this possible state is non-critical
                 workDoneProgress: ?bool = null,
                 // And TextDocumentRegistrationOptions
                 /// A document selector to identify the scope of the registration. If set to null
