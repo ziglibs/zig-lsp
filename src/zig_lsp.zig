@@ -231,7 +231,9 @@ pub fn Connection(
                         if (std.mem.eql(u8, req.method, method)) {
                             @setEvalBranchQuota(100_000);
                             const value = try tres.parse(Params(req.method), tree.Object.get("params").?, allocator);
+                            if (@hasDecl(ContextType, "lspPre")) try ContextType.lspPre(conn, req.method, .request, id, value);
                             try conn.respond(req.method, id, try @field(ContextType, req.method)(conn, id, value));
+                            if (@hasDecl(ContextType, "lspPost")) try ContextType.lspPost(conn, req.method, .request, id, value);
                             return;
                         }
                     }
@@ -246,17 +248,20 @@ pub fn Connection(
                     .id = id,
                     .@"error" = .{ .code = -32601, .message = "NotImplemented" },
                 });
-            } else if (maybe_id) |id| {
+            } else if (maybe_id) |id_raw| {
                 @setEvalBranchQuota(100_000);
 
                 // TODO: Handle errors
-                const iid = @intCast(usize, id.Integer);
+                const id = try tres.parse(types.RequestId, id_raw, allocator);
+                const iid = @intCast(usize, id.integer);
 
                 const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
                 inline for (types.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
                         const value = try tres.parse(Result(req.method), tree.Object.get("result").?, allocator);
+                        if (@hasDecl(ContextType, "lspPre")) try ContextType.lspPre(conn, req.method, .response, id, value);
                         try (RequestCallback(Self, req.method).unstore(entry.value).onResponse(conn, value));
+                        if (@hasDecl(ContextType, "lspPost")) try ContextType.lspPost(conn, req.method, .response, id, value);
                         return;
                     }
                 }
@@ -267,7 +272,9 @@ pub fn Connection(
                     if (@hasDecl(ContextType, notif.method)) {
                         if (std.mem.eql(u8, notif.method, method.String)) {
                             const value = try tres.parse(Params(notif.method), tree.Object.get("params").?, allocator);
+                            if (@hasDecl(ContextType, "lspPre")) try ContextType.lspPre(conn, notif.method, .notification, null, value);
                             try @field(ContextType, notif.method)(conn, value);
+                            if (@hasDecl(ContextType, "lspPost")) try ContextType.lspPost(conn, notif.method, .notification, null, value);
                             return;
                         }
                     }

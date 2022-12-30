@@ -18,7 +18,17 @@ pub const Context = struct {
         id: ?types.RequestId,
         payload: lsp.Payload(method, kind),
     ) !void {
-        std.log.info("id {any}: {any} {s} w/ payload {any}", .{ id, kind, method, payload });
+        std.log.info("LSPPRE id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
+    }
+
+    pub fn lspPost(
+        _: *Connection,
+        comptime method: []const u8,
+        comptime kind: lsp.MessageKind,
+        id: ?types.RequestId,
+        payload: lsp.Payload(method, kind),
+    ) !void {
+        std.log.info("LSPPOST id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
     }
 
     pub fn @"window/logMessage"(_: *Connection, params: types.LogMessageParams) !void {
@@ -86,7 +96,7 @@ pub fn main() !void {
 
     const arena_allocator = arena.allocator();
 
-    std.log.info("{any}", .{try conn.requestSync(arena_allocator, "initialize", .{
+    _ = try conn.requestSync(arena_allocator, "initialize", .{
         .capabilities = .{
             .textDocument = .{
                 .documentSymbol = .{
@@ -100,8 +110,8 @@ pub fn main() !void {
                 },
             },
         },
-    })});
-    // try conn.notify("initialized", .{});
+    });
+    try conn.notify("initialized", .{});
 
     // try conn.acceptUntilResponse();
 
