@@ -1,8 +1,8 @@
 const std = @import("std");
-const lsp = @import("lsp.zig");
-const connection = @import("connection.zig");
+const lsp = @import("zig_lsp.zig");
+const types = lsp.types;
 
-const Connection = connection.Connection(
+const Connection = lsp.Connection(
     std.fs.File.Reader,
     std.fs.File.Writer,
     Context,
@@ -11,7 +11,17 @@ const Connection = connection.Connection(
 pub const Context = struct {
     pub const Error = error{};
 
-    pub fn @"window/logMessage"(_: *Connection, params: lsp.LogMessageParams) !void {
+    pub fn lspPre(
+        _: *Connection,
+        comptime method: []const u8,
+        comptime kind: lsp.MessageKind,
+        id: ?types.RequestId,
+        payload: lsp.Payload(method, kind),
+    ) !void {
+        std.log.info("id {any}: {any} {s} w/ payload {any}", .{ id, kind, method, payload });
+    }
+
+    pub fn @"window/logMessage"(_: *Connection, params: types.LogMessageParams) !void {
         const logMessage = std.log.scoped(.logMessage);
         switch (params.type) {
             .Error => logMessage.err("{s}", .{params.message}),
@@ -21,7 +31,7 @@ pub const Context = struct {
         }
     }
 
-    pub fn @"textDocument/publishDiagnostics"(_: *Connection, _: lsp.PublishDiagnosticsParams) !void {}
+    pub fn @"textDocument/publishDiagnostics"(_: *Connection, _: types.PublishDiagnosticsParams) !void {}
 };
 
 pub fn main() !void {

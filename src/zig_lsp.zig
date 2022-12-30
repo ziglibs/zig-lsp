@@ -1,30 +1,46 @@
 const std = @import("std");
 const tres = @import("tres");
 const Header = @import("Header.zig");
-const lsp = @import("lsp.zig");
+pub const types = @import("types.zig");
 
-pub fn NotificationParams(comptime method: []const u8) type {
-    for (lsp.notification_metadata) |notif| {
+pub const MessageKind = enum { request, notification, response };
+pub fn messageKind(method: []const u8) MessageKind {
+    inline for (types.notification_metadata) |notif| {
+        if (std.mem.eql(u8, method, notif.method)) return .notification;
+    }
+
+    inline for (types.request_metadata) |req| {
+        if (std.mem.eql(u8, method, req.method)) return .request;
+    }
+
+    @panic("Couldn't find method");
+}
+
+pub fn Params(comptime method: []const u8) type {
+    for (types.notification_metadata) |notif| {
         if (std.mem.eql(u8, method, notif.method)) return notif.Params orelse void;
     }
 
-    @compileError("Couldn't find notification named " ++ method);
-}
-
-pub fn RequestParams(comptime method: []const u8) type {
-    for (lsp.request_metadata) |req| {
+    for (types.request_metadata) |req| {
         if (std.mem.eql(u8, method, req.method)) return req.Params orelse void;
     }
 
-    @compileError("Couldn't find notification named " ++ method);
+    @compileError("Couldn't find params for method named " ++ method);
 }
 
-pub fn RequestResult(comptime method: []const u8) type {
-    for (lsp.request_metadata) |req| {
+pub fn Result(comptime method: []const u8) type {
+    for (types.request_metadata) |req| {
         if (std.mem.eql(u8, method, req.method)) return req.Result;
     }
 
-    @compileError("Couldn't find notification named " ++ method);
+    @compileError("Couldn't find result for method named " ++ method);
+}
+
+pub fn Payload(comptime method: []const u8, comptime kind: MessageKind) type {
+    return switch (kind) {
+        .request, .notification => Params(method),
+        .response => Result(method),
+    };
 }
 
 const StoredCallback = struct {
@@ -39,7 +55,7 @@ pub fn RequestCallback(
     return struct {
         const Self = @This();
 
-        const OnResponse = *const fn (conn: *ConnectionType, result: RequestResult(method)) anyerror!void;
+        const OnResponse = *const fn (conn: *ConnectionType, result: Result(method)) anyerror!void;
         const OnError = *const fn (conn: *ConnectionType) anyerror!void;
 
         onResponse: OnResponse,
@@ -116,8 +132,11 @@ pub fn Connection(
         pub fn notify(
             conn: *Self,
             comptime method: []const u8,
-            params: NotificationParams(method),
+            params: Params(method),
         ) !void {
+            if (comptime messageKind(method) != .notification)
+                @compileError("Cannot send request as notification");
+
             try conn.send(.{
                 .jsonrpc = "2.0",
                 .method = method,
@@ -128,9 +147,12 @@ pub fn Connection(
         pub fn request(
             conn: *Self,
             comptime method: []const u8,
-            params: RequestParams(method),
+            params: Params(method),
             callback: RequestCallback(Self, method),
         ) !void {
+            if (comptime messageKind(method) != .request)
+                @compileError("Cannot send notification as request");
+
             try conn.send(.{
                 .jsonrpc = "2.0",
                 .id = conn.id,
@@ -147,14 +169,14 @@ pub fn Connection(
             conn: *Self,
             arena: std.mem.Allocator,
             comptime method: []const u8,
-            params: RequestParams(method),
-        ) !RequestResult(method) {
-            var resdata: RequestResult(method) = undefined;
+            params: Params(method),
+        ) !Result(method) {
+            var resdata: Result(method) = undefined;
             conn._resdata = &resdata;
 
             const cb = struct {
-                pub fn res(conn_: *Self, result: RequestResult(method)) !void {
-                    @ptrCast(*RequestResult(method), @alignCast(@alignOf(RequestResult(method)), conn_._resdata)).* = result;
+                pub fn res(conn_: *Self, result: Result(method)) !void {
+                    @ptrCast(*Result(method), @alignCast(@alignOf(Result(method)), conn_._resdata)).* = result;
                 }
 
                 pub fn err(_: *Self) !void {}
@@ -169,8 +191,8 @@ pub fn Connection(
         pub fn respond(
             conn: *Self,
             comptime method: []const u8,
-            id: lsp.RequestId,
-            result: RequestResult(method),
+            id: types.RequestId,
+            result: Result(method),
         ) !void {
             try conn.send(.{
                 .jsonrpc = "2.0",
@@ -180,9 +202,6 @@ pub fn Connection(
         }
 
         pub fn accept(conn: *Self, arena: std.mem.Allocator) !void {
-            // var arena = std.heap.ArenaAllocator.init(conn.allocator);
-            // defer arena.deinit();
-            // const allocator = arena.allocator();
             const allocator = arena;
 
             const header = try Header.decode(allocator, conn.reader);
@@ -204,14 +223,14 @@ pub fn Connection(
             const maybe_method = tree.Object.get("method");
 
             if (maybe_id != null and maybe_method != null) {
-                const id = try tres.parse(lsp.RequestId, maybe_id.?, allocator);
+                const id = try tres.parse(types.RequestId, maybe_id.?, allocator);
                 const method = maybe_method.?.String;
 
-                inline for (lsp.request_metadata) |req| {
+                inline for (types.request_metadata) |req| {
                     if (@hasDecl(ContextType, req.method)) {
                         if (std.mem.eql(u8, req.method, method)) {
                             @setEvalBranchQuota(100_000);
-                            const value = try tres.parse(RequestParams(req.method), tree.Object.get("params").?, allocator);
+                            const value = try tres.parse(Params(req.method), tree.Object.get("params").?, allocator);
                             try conn.respond(req.method, id, try @field(ContextType, req.method)(conn, id, value));
                             return;
                         }
@@ -234,9 +253,9 @@ pub fn Connection(
                 const iid = @intCast(usize, id.Integer);
 
                 const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
-                inline for (lsp.request_metadata) |req| {
+                inline for (types.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
-                        const value = try tres.parse(RequestResult(req.method), tree.Object.get("result").?, allocator);
+                        const value = try tres.parse(Result(req.method), tree.Object.get("result").?, allocator);
                         try (RequestCallback(Self, req.method).unstore(entry.value).onResponse(conn, value));
                         return;
                     }
@@ -244,10 +263,10 @@ pub fn Connection(
 
                 std.log.warn("Received unhandled response: {d}", .{iid});
             } else if (maybe_method) |method| {
-                inline for (lsp.notification_metadata) |notif| {
+                inline for (types.notification_metadata) |notif| {
                     if (@hasDecl(ContextType, notif.method)) {
                         if (std.mem.eql(u8, notif.method, method.String)) {
-                            const value = try tres.parse(NotificationParams(notif.method), tree.Object.get("params").?, allocator);
+                            const value = try tres.parse(Params(notif.method), tree.Object.get("params").?, allocator);
                             try @field(ContextType, notif.method)(conn, value);
                             return;
                         }
