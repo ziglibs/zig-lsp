@@ -11,7 +11,7 @@ const Connection = lsp.Connection(
 pub const Context = struct {
     pub const Error = error{};
 
-    pub fn lspPre(
+    pub fn lspRecvPre(
         _: *Connection,
         comptime method: []const u8,
         comptime kind: lsp.MessageKind,
@@ -21,7 +21,7 @@ pub const Context = struct {
         std.log.info("LSPPRE id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
     }
 
-    pub fn lspPost(
+    pub fn lspRecvPost(
         _: *Connection,
         comptime method: []const u8,
         comptime kind: lsp.MessageKind,
