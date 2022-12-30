@@ -18,7 +18,7 @@ pub const Context = struct {
         id: ?types.RequestId,
         payload: lsp.Payload(method, kind),
     ) !void {
-        std.log.info("LSPPRE id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
+        std.log.info("RECV LSPPRE id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
     }
 
     pub fn lspRecvPost(
@@ -28,7 +28,27 @@ pub const Context = struct {
         id: ?types.RequestId,
         payload: lsp.Payload(method, kind),
     ) !void {
-        std.log.info("LSPPOST id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
+        std.log.info("RECV LSPPOST id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
+    }
+
+    pub fn lspSendPre(
+        _: *Connection,
+        comptime method: []const u8,
+        comptime kind: lsp.MessageKind,
+        id: ?types.RequestId,
+        payload: lsp.Payload(method, kind),
+    ) !void {
+        std.log.info("SEND LSPPRE id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
+    }
+
+    pub fn lspSendPost(
+        _: *Connection,
+        comptime method: []const u8,
+        comptime kind: lsp.MessageKind,
+        id: ?types.RequestId,
+        payload: lsp.Payload(method, kind),
+    ) !void {
+        std.log.info("SEND LSPPOST id {any}: {any} {s} w/ payload type {s}", .{ id, kind, method, @typeName(@TypeOf(payload)) });
     }
 
     pub fn @"window/logMessage"(_: *Connection, params: types.LogMessageParams) !void {
