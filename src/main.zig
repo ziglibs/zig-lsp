@@ -11,6 +11,20 @@ const Connection = lsp.Connection(
 pub const Context = struct {
     pub const Error = error{};
 
+    pub fn dataRecv(
+        _: *Connection,
+        data: []const u8,
+    ) !void {
+        std.log.info("RECV DATA {s}", .{data});
+    }
+
+    pub fn dataSend(
+        _: *Connection,
+        data: []const u8,
+    ) !void {
+        std.log.info("SEND DATA {s}", .{data});
+    }
+
     pub fn lspRecvPre(
         _: *Connection,
         comptime method: []const u8,

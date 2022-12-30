@@ -123,6 +123,8 @@ pub fn Connection(
             conn.write_buffer.items.len = 0;
             try tres.stringify(value, .{}, conn.write_buffer.writer(conn.allocator));
 
+            if (@hasDecl(ContextType, "dataSend")) try ContextType.dataSend(conn, conn.write_buffer.items);
+
             try Header.encode(.{
                 .content_length = conn.write_buffer.items.len,
             }, conn.writer);
@@ -226,6 +228,8 @@ pub fn Connection(
 
             var data = try allocator.alloc(u8, header.content_length);
             _ = try conn.reader.readAll(data);
+
+            if (@hasDecl(ContextType, "dataRecv")) try ContextType.dataRecv(conn, data);
 
             var parser = std.json.Parser.init(allocator, false);
             defer parser.deinit();
