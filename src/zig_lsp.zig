@@ -221,6 +221,44 @@ pub fn Connection(
                 try ContextType.lspSendPost(conn, method, .response, id, result);
         }
 
+        pub fn respondError(
+            conn: *Self,
+            arena: std.mem.Allocator,
+            id: types.RequestId,
+            err: anyerror,
+            error_return_trace: ?*std.builtin.StackTrace,
+        ) !void {
+            const error_code: types.ErrorCodes = switch (err) {
+                error.ParseError => .ParseError,
+                error.InvalidRequest => .InvalidRequest,
+                error.MethodNotFound => .MethodNotFound,
+                error.InvalidParams => .InvalidParams,
+                error.InternalError => .InternalError,
+
+                error.ServerNotInitialized => .ServerNotInitialized,
+                error.UnknownErrorCode => .UnknownErrorCode,
+
+                else => .InternalError,
+            };
+
+            std.log.err("{s}", .{@errorName(err)});
+            if (error_return_trace) |trace| {
+                std.debug.dumpStackTrace(trace.*);
+            }
+
+            try conn.send(.{
+                .jsonrpc = "2.0",
+                .id = id,
+                .@"error" = types.ResponseError{
+                    .code = @enumToInt(error_code),
+                    .message = if (error_return_trace) |ert|
+                        try std.fmt.allocPrint(arena, "{s}: {any}", .{ @errorName(err), ert })
+                    else
+                        try std.fmt.allocPrint(arena, "{s}: No error return trace available", .{@errorName(err)}),
+                },
+            });
+        }
+
         pub fn accept(conn: *Self, arena: std.mem.Allocator) !void {
             const allocator = arena;
 
@@ -254,7 +292,11 @@ pub fn Connection(
                             @setEvalBranchQuota(100_000);
                             const value = try tres.parse(Params(req.method), tree.Object.get("params").?, allocator);
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .request, id, value);
-                            try conn.respond(req.method, id, try @field(ContextType, req.method)(conn, id, value));
+                            try conn.respond(req.method, id, @field(ContextType, req.method)(conn, id, value) catch |err| {
+                                try conn.respondError(arena, id, err, @errorReturnTrace());
+                                if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, req.method, .request, id, value);
+                                return;
+                            });
                             if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, req.method, .request, id, value);
                             return;
                         }

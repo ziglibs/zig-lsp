@@ -76,6 +76,9 @@ pub const Context = struct {
     }
 
     pub fn @"textDocument/publishDiagnostics"(_: *Connection, _: types.PublishDiagnosticsParams) !void {}
+    pub fn @"client/registerCapability"(_: *Connection, _: types.RequestId, _: types.RegistrationParams) !void {
+        return error.ServerNotInitialized;
+    }
 };
 
 pub fn main() !void {
