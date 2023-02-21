@@ -3,6 +3,8 @@ const tres = @import("tres");
 const Header = @import("Header.zig");
 pub const types = @import("types.zig");
 
+const log = std.log.scoped(.zig_lsp);
+
 pub const MessageKind = enum { request, notification, response };
 pub fn messageKind(method: []const u8) MessageKind {
     inline for (types.notification_metadata) |notif| {
@@ -56,7 +58,7 @@ pub fn RequestCallback(
         const Self = @This();
 
         const OnResponse = *const fn (conn: *ConnectionType, result: Result(method)) anyerror!void;
-        const OnError = *const fn (conn: *ConnectionType) anyerror!void;
+        const OnError = *const fn (conn: *ConnectionType, err: types.ResponseError) anyerror!void;
 
         onResponse: OnResponse,
         onError: OnError,
@@ -94,13 +96,14 @@ pub fn Connection(
         reader: ReaderType,
         writer: WriterType,
         context: *ContextType,
-        _resdata: *anyopaque = undefined,
 
         id: usize = 0,
         write_buffer: std.ArrayListUnmanaged(u8) = .{},
 
         // TODO: Handle string ids
         callback_map: std.AutoHashMapUnmanaged(usize, StoredCallback) = .{},
+
+        _resdata: *anyopaque = undefined,
 
         pub fn init(
             allocator: std.mem.Allocator,
@@ -193,7 +196,18 @@ pub fn Connection(
                     @ptrCast(*Result(method), @alignCast(@alignOf(Result(method)), conn_._resdata)).* = result;
                 }
 
-                pub fn err(_: *Self) !void {}
+                pub fn err(_: *Self, resperr: types.ResponseError) !void {
+                    return switch (resperr.code) {
+                        @enumToInt(types.ErrorCodes.ParseError) => error.ParseError,
+                        @enumToInt(types.ErrorCodes.InvalidRequest) => error.InvalidRequest,
+                        @enumToInt(types.ErrorCodes.MethodNotFound) => error.MethodNotFound,
+                        @enumToInt(types.ErrorCodes.InvalidParams) => error.InvalidParams,
+                        @enumToInt(types.ErrorCodes.InternalError) => error.InternalError,
+                        @enumToInt(types.ErrorCodes.ServerNotInitialized) => error.ServerNotInitialized,
+                        @enumToInt(types.ErrorCodes.UnknownErrorCode) => error.UnknownErrorCode,
+                        else => error.InternalError,
+                    };
+                }
             };
 
             try conn.request(method, params, .{ .onResponse = cb.res, .onError = cb.err });
@@ -241,7 +255,7 @@ pub fn Connection(
                 else => .InternalError,
             };
 
-            std.log.err("{s}", .{@errorName(err)});
+            log.err("{s}", .{@errorName(err)});
             if (error_return_trace) |trace| {
                 std.debug.dumpStackTrace(trace.*);
             }
@@ -306,7 +320,7 @@ pub fn Connection(
                 // TODO: Are ids shared between server and client or not? If not, we can remove the line below
                 conn.id +%= 1;
 
-                std.log.warn("Request not handled: {s}", .{method});
+                log.warn("Request not handled: {s}", .{method});
                 try conn.send(.{
                     .jsonrpc = "2.0",
                     .id = id,
@@ -322,7 +336,11 @@ pub fn Connection(
                 const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
                 inline for (types.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
-                        const value = try tres.parse(Result(req.method), tree.Object.get("result").?, allocator);
+                        const value = try tres.parse(Result(req.method), tree.Object.get("result") orelse {
+                            const response_error = try tres.parse(types.ResponseError, tree.Object.get("error").?, allocator);
+                            try (RequestCallback(Self, req.method).unstore(entry.value).onError(conn, response_error));
+                            return;
+                        }, allocator);
                         if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .response, id, value);
                         try (RequestCallback(Self, req.method).unstore(entry.value).onResponse(conn, value));
                         if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, req.method, .response, id, value);
@@ -330,7 +348,7 @@ pub fn Connection(
                     }
                 }
 
-                std.log.warn("Received unhandled response: {d}", .{iid});
+                log.warn("Received unhandled response: {d}", .{iid});
             } else if (maybe_method) |method| {
                 inline for (types.notification_metadata) |notif| {
                     if (@hasDecl(ContextType, notif.method)) {
@@ -344,7 +362,7 @@ pub fn Connection(
                     }
                 }
 
-                std.log.warn("Notification not handled: {s}", .{method.String});
+                log.warn("Notification not handled: {s}", .{method.String});
             } else {
                 @panic("Invalid JSON-RPC message.");
             }

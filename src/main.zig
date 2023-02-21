@@ -150,6 +150,8 @@ pub fn main() !void {
     });
     try conn.notify("initialized", .{});
 
+    _ = try conn.requestSync(arena_allocator, "workspace/willRenameFiles", .{ .files = &.{} });
+
     // try conn.acceptUntilResponse();
 
     // try conn.notify("textDocument/didOpen", .{
