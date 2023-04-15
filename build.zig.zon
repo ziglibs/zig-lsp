@@ -1,0 +1,10 @@
+.{
+    .name = "zig-lsp",
+    .version = "0.1.0",
+    .dependencies = .{
+        .tres = .{
+            .url = "https://github.com/ziglibs/tres/archive/7161c72e3cd455fc2c8e516554eeb03a48fe83f7.tar.gz",
+            .hash = "12209d98a41266532e82efbfa532043c17b3ea66736392637c394bb814370b66d75f",
+        },
+    },
+}

@@ -1,6 +1,18 @@
 const std = @import("std");
 
 pub fn build(b: *std.build.Builder) void {
+    const tres = b.dependency("tres", .{}).module("tres");
+
+    _ = b.addModule("zig-lsp", .{
+        .source_file = .{ .path = "src/zig_lsp.zig" },
+        .dependencies = &.{
+            .{
+                .name = "tres",
+                .module = tres,
+            },
+        },
+    });
+
     // Standard target options allows the person running `zig build` to choose
     // what target to build for. Here we do not override the defaults, which
     // means any target is allowed, and the default is native. Other options
@@ -21,15 +33,17 @@ pub fn build(b: *std.build.Builder) void {
         .optimize = optimize,
     });
 
+    exe.addModule("tres", tres);
+
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
     // step when running `zig build`).
-    exe.install();
+    b.installArtifact(exe);
 
     // This *creates* a RunStep in the build graph, to be executed when another
     // step is evaluated that depends on it. The next line below will establish
     // such a dependency.
-    const run_cmd = exe.run();
+    const run_cmd = b.addRunArtifact(exe);
 
     // By making the run step depend on the install step, it will be run from the
     // installation directory rather than directly from within the cache directory.
