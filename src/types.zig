@@ -34,7 +34,7 @@ pub const ResponseError = struct {
 
     /// A primitive or structured value that contains additional
     /// information about the error. Can be omitted.
-    data: std.json.Value = .Null,
+    data: std.json.Value = .null,
 };
 
 pub const MessageDirection = enum {
@@ -735,9 +735,9 @@ pub const CodeActionKind = enum {
 
     pub fn tresParse(json_value: std.json.Value, maybe_allocator: ?std.mem.Allocator) error{InvalidEnumTag}!@This() {
         _ = maybe_allocator;
-        if (json_value != .String) return error.InvalidEnumTag;
-        if (json_value.String.len == 0) return .empty;
-        return std.meta.stringToEnum(@This(), json_value.String) orelse return error.InvalidEnumTag;
+        if (json_value != .string) return error.InvalidEnumTag;
+        if (json_value.string.len == 0) return .empty;
+        return std.meta.stringToEnum(@This(), json_value.string) orelse return error.InvalidEnumTag;
     }
 };
 
