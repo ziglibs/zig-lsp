@@ -3,8 +3,8 @@
     .version = "0.1.0",
     .dependencies = .{
         .tres = .{
-            .url = "https://github.com/ziglibs/tres/archive/7161c72e3cd455fc2c8e516554eeb03a48fe83f7.tar.gz",
-            .hash = "12209d98a41266532e82efbfa532043c17b3ea66736392637c394bb814370b66d75f",
+            .url = "https://github.com/ziglibs/tres/archive/220d01f3931595e3a2e2a6a0693363c0bfaf47e9.tar.gz",
+            .hash = "12204d32c44b494c0cbe553811dedfb7a73da37b13b492872dd4edc0340983072697",
         },
     },
 }
