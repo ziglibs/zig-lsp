@@ -283,18 +283,15 @@ pub fn Connection(
 
             if (@hasDecl(ContextType, "dataRecv")) try ContextType.dataRecv(conn, data);
 
-            var parser = std.json.Parser.init(allocator, .alloc_if_needed);
-            defer parser.deinit();
-
-            var tree = (try parser.parse(data)).root;
+            var root = try std.json.parseFromSliceLeaky(std.json.Value, arena, data, .{});
 
             // There are three cases at this point:
             // 1. We have a request (id + method)
             // 2. We have a response (id)
             // 3. We have a notification (method)
 
-            const maybe_id = tree.object.get("id");
-            const maybe_method = tree.object.get("method");
+            const maybe_id = root.object.get("id");
+            const maybe_method = root.object.get("method");
 
             if (maybe_id != null and maybe_method != null) {
                 const id = try tres.parse(types.RequestId, maybe_id.?, allocator);
@@ -304,7 +301,7 @@ pub fn Connection(
                     if (@hasDecl(ContextType, req.method)) {
                         if (std.mem.eql(u8, req.method, method)) {
                             @setEvalBranchQuota(100_000);
-                            const value = try tres.parse(Params(req.method), tree.object.get("params").?, allocator);
+                            const value = try tres.parse(Params(req.method), root.object.get("params").?, allocator);
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .request, id, value);
                             try conn.respond(req.method, id, @field(ContextType, req.method)(conn, id, value) catch |err| {
                                 try conn.respondError(arena, id, err, @errorReturnTrace());
@@ -331,13 +328,13 @@ pub fn Connection(
 
                 // TODO: Handle errors
                 const id = try tres.parse(types.RequestId, id_raw, allocator);
-                const iid = @intCast(usize, id.integer);
+                const iid: usize = @intCast(id.integer);
 
                 const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
                 inline for (types.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
-                        const value = try tres.parse(Result(req.method), tree.object.get("result") orelse {
-                            const response_error = try tres.parse(types.ResponseError, tree.object.get("error").?, allocator);
+                        const value = try tres.parse(Result(req.method), root.object.get("result") orelse {
+                            const response_error = try tres.parse(types.ResponseError, root.object.get("error").?, allocator);
                             try (RequestCallback(Self, req.method).unstore(entry.value).onError(conn, response_error));
                             return;
                         }, allocator);
@@ -353,7 +350,7 @@ pub fn Connection(
                 inline for (types.notification_metadata) |notif| {
                     if (@hasDecl(ContextType, notif.method)) {
                         if (std.mem.eql(u8, notif.method, method.string)) {
-                            const value = try tres.parse(Params(notif.method), tree.object.get("params").?, allocator);
+                            const value = try tres.parse(Params(notif.method), root.object.get("params").?, allocator);
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, notif.method, .notification, null, value);
                             try @field(ContextType, notif.method)(conn, value);
                             if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, notif.method, .notification, null, value);
