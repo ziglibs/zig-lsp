@@ -66,15 +66,15 @@ pub fn RequestCallback(
         pub fn store(self: Self) StoredCallback {
             return .{
                 .method = method,
-                .onResponse = @ptrCast(*const fn () void, self.onResponse),
-                .onError = @ptrCast(*const fn () void, self.onError),
+                .onResponse = @ptrCast(self.onResponse),
+                .onError = @ptrCast(self.onError),
             };
         }
 
         pub fn unstore(stored: StoredCallback) Self {
             return .{
-                .onResponse = @ptrCast(OnResponse, stored.onResponse),
-                .onError = @ptrCast(OnError, stored.onError),
+                .onResponse = @ptrCast(stored.onResponse),
+                .onError = @ptrCast(stored.onError),
             };
         }
     };
@@ -165,7 +165,7 @@ pub fn Connection(
                 @compileError("Cannot send notification as request");
 
             if (@hasDecl(ContextType, "lspSendPre"))
-                try ContextType.lspSendPre(conn, method, .request, .{ .integer = @intCast(i64, conn.id) }, params);
+                try ContextType.lspSendPre(conn, method, .request, .{ .integer = @intCast(conn.id) }, params);
 
             try conn.send(.{
                 .jsonrpc = "2.0",
@@ -179,7 +179,7 @@ pub fn Connection(
             conn.id +%= 1;
 
             if (@hasDecl(ContextType, "lspSendPost"))
-                try ContextType.lspSendPost(conn, method, .request, .{ .integer = @intCast(i64, conn.id -% 1) }, params);
+                try ContextType.lspSendPost(conn, method, .request, .{ .integer = @intCast(conn.id -% 1) }, params);
         }
 
         pub fn requestSync(
@@ -193,7 +193,7 @@ pub fn Connection(
 
             const cb = struct {
                 pub fn res(conn_: *Self, result: Result(method)) !void {
-                    @ptrCast(*Result(method), @alignCast(@alignOf(Result(method)), conn_._resdata)).* = result;
+                    @as(*Result(method), @ptrCast(@alignCast(conn_._resdata))).* = result;
                 }
 
                 pub fn err(_: *Self, resperr: types.ResponseError) !void {
