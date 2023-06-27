@@ -198,13 +198,13 @@ pub fn Connection(
 
                 pub fn err(_: *Self, resperr: types.ResponseError) !void {
                     return switch (resperr.code) {
-                        @enumToInt(types.ErrorCodes.ParseError) => error.ParseError,
-                        @enumToInt(types.ErrorCodes.InvalidRequest) => error.InvalidRequest,
-                        @enumToInt(types.ErrorCodes.MethodNotFound) => error.MethodNotFound,
-                        @enumToInt(types.ErrorCodes.InvalidParams) => error.InvalidParams,
-                        @enumToInt(types.ErrorCodes.InternalError) => error.InternalError,
-                        @enumToInt(types.ErrorCodes.ServerNotInitialized) => error.ServerNotInitialized,
-                        @enumToInt(types.ErrorCodes.UnknownErrorCode) => error.UnknownErrorCode,
+                        @intFromEnum(types.ErrorCodes.ParseError) => error.ParseError,
+                        @intFromEnum(types.ErrorCodes.InvalidRequest) => error.InvalidRequest,
+                        @intFromEnum(types.ErrorCodes.MethodNotFound) => error.MethodNotFound,
+                        @intFromEnum(types.ErrorCodes.InvalidParams) => error.InvalidParams,
+                        @intFromEnum(types.ErrorCodes.InternalError) => error.InternalError,
+                        @intFromEnum(types.ErrorCodes.ServerNotInitialized) => error.ServerNotInitialized,
+                        @intFromEnum(types.ErrorCodes.UnknownErrorCode) => error.UnknownErrorCode,
                         else => error.InternalError,
                     };
                 }
@@ -264,7 +264,7 @@ pub fn Connection(
                 .jsonrpc = "2.0",
                 .id = id,
                 .@"error" = types.ResponseError{
-                    .code = @enumToInt(error_code),
+                    .code = @intFromEnum(error_code),
                     .message = if (error_return_trace) |ert|
                         try std.fmt.allocPrint(arena, "{s}: {any}", .{ @errorName(err), ert })
                     else
