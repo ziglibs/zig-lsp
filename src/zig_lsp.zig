@@ -66,15 +66,15 @@ pub fn RequestCallback(
         pub fn store(self: Self) StoredCallback {
             return .{
                 .method = method,
-                .onResponse = @ptrCast(*const fn () void, self.onResponse),
-                .onError = @ptrCast(*const fn () void, self.onError),
+                .onResponse = @ptrCast(self.onResponse),
+                .onError = @ptrCast(self.onError),
             };
         }
 
         pub fn unstore(stored: StoredCallback) Self {
             return .{
-                .onResponse = @ptrCast(OnResponse, stored.onResponse),
-                .onError = @ptrCast(OnError, stored.onError),
+                .onResponse = @ptrCast(stored.onResponse),
+                .onError = @ptrCast(stored.onError),
             };
         }
     };
@@ -165,7 +165,7 @@ pub fn Connection(
                 @compileError("Cannot send notification as request");
 
             if (@hasDecl(ContextType, "lspSendPre"))
-                try ContextType.lspSendPre(conn, method, .request, .{ .integer = @intCast(i64, conn.id) }, params);
+                try ContextType.lspSendPre(conn, method, .request, .{ .integer = @intCast(conn.id) }, params);
 
             try conn.send(.{
                 .jsonrpc = "2.0",
@@ -179,7 +179,7 @@ pub fn Connection(
             conn.id +%= 1;
 
             if (@hasDecl(ContextType, "lspSendPost"))
-                try ContextType.lspSendPost(conn, method, .request, .{ .integer = @intCast(i64, conn.id -% 1) }, params);
+                try ContextType.lspSendPost(conn, method, .request, .{ .integer = @intCast(conn.id -% 1) }, params);
         }
 
         pub fn requestSync(
@@ -193,18 +193,18 @@ pub fn Connection(
 
             const cb = struct {
                 pub fn res(conn_: *Self, result: Result(method)) !void {
-                    @ptrCast(*Result(method), @alignCast(@alignOf(Result(method)), conn_._resdata)).* = result;
+                    @as(*Result(method), @ptrCast(@alignCast(conn_._resdata))).* = result;
                 }
 
                 pub fn err(_: *Self, resperr: types.ResponseError) !void {
                     return switch (resperr.code) {
-                        @enumToInt(types.ErrorCodes.ParseError) => error.ParseError,
-                        @enumToInt(types.ErrorCodes.InvalidRequest) => error.InvalidRequest,
-                        @enumToInt(types.ErrorCodes.MethodNotFound) => error.MethodNotFound,
-                        @enumToInt(types.ErrorCodes.InvalidParams) => error.InvalidParams,
-                        @enumToInt(types.ErrorCodes.InternalError) => error.InternalError,
-                        @enumToInt(types.ErrorCodes.ServerNotInitialized) => error.ServerNotInitialized,
-                        @enumToInt(types.ErrorCodes.UnknownErrorCode) => error.UnknownErrorCode,
+                        @intFromEnum(types.ErrorCodes.ParseError) => error.ParseError,
+                        @intFromEnum(types.ErrorCodes.InvalidRequest) => error.InvalidRequest,
+                        @intFromEnum(types.ErrorCodes.MethodNotFound) => error.MethodNotFound,
+                        @intFromEnum(types.ErrorCodes.InvalidParams) => error.InvalidParams,
+                        @intFromEnum(types.ErrorCodes.InternalError) => error.InternalError,
+                        @intFromEnum(types.ErrorCodes.ServerNotInitialized) => error.ServerNotInitialized,
+                        @intFromEnum(types.ErrorCodes.UnknownErrorCode) => error.UnknownErrorCode,
                         else => error.InternalError,
                     };
                 }
@@ -264,7 +264,7 @@ pub fn Connection(
                 .jsonrpc = "2.0",
                 .id = id,
                 .@"error" = types.ResponseError{
-                    .code = @enumToInt(error_code),
+                    .code = @intFromEnum(error_code),
                     .message = if (error_return_trace) |ert|
                         try std.fmt.allocPrint(arena, "{s}: {any}", .{ @errorName(err), ert })
                     else
@@ -283,18 +283,15 @@ pub fn Connection(
 
             if (@hasDecl(ContextType, "dataRecv")) try ContextType.dataRecv(conn, data);
 
-            var parser = std.json.Parser.init(allocator, .alloc_if_needed);
-            defer parser.deinit();
-
-            var tree = (try parser.parse(data)).root;
+            var root = try std.json.parseFromSliceLeaky(std.json.Value, arena, data, .{});
 
             // There are three cases at this point:
             // 1. We have a request (id + method)
             // 2. We have a response (id)
             // 3. We have a notification (method)
 
-            const maybe_id = tree.object.get("id");
-            const maybe_method = tree.object.get("method");
+            const maybe_id = root.object.get("id");
+            const maybe_method = root.object.get("method");
 
             if (maybe_id != null and maybe_method != null) {
                 const id = try tres.parse(types.RequestId, maybe_id.?, allocator);
@@ -304,7 +301,7 @@ pub fn Connection(
                     if (@hasDecl(ContextType, req.method)) {
                         if (std.mem.eql(u8, req.method, method)) {
                             @setEvalBranchQuota(100_000);
-                            const value = try tres.parse(Params(req.method), tree.object.get("params").?, allocator);
+                            const value = try tres.parse(Params(req.method), root.object.get("params").?, allocator);
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .request, id, value);
                             try conn.respond(req.method, id, @field(ContextType, req.method)(conn, id, value) catch |err| {
                                 try conn.respondError(arena, id, err, @errorReturnTrace());
@@ -331,13 +328,13 @@ pub fn Connection(
 
                 // TODO: Handle errors
                 const id = try tres.parse(types.RequestId, id_raw, allocator);
-                const iid = @intCast(usize, id.integer);
+                const iid: usize = @intCast(id.integer);
 
                 const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
                 inline for (types.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
-                        const value = try tres.parse(Result(req.method), tree.object.get("result") orelse {
-                            const response_error = try tres.parse(types.ResponseError, tree.object.get("error").?, allocator);
+                        const value = try tres.parse(Result(req.method), root.object.get("result") orelse {
+                            const response_error = try tres.parse(types.ResponseError, root.object.get("error").?, allocator);
                             try (RequestCallback(Self, req.method).unstore(entry.value).onError(conn, response_error));
                             return;
                         }, allocator);
@@ -353,7 +350,7 @@ pub fn Connection(
                 inline for (types.notification_metadata) |notif| {
                     if (@hasDecl(ContextType, notif.method)) {
                         if (std.mem.eql(u8, notif.method, method.string)) {
-                            const value = try tres.parse(Params(notif.method), tree.object.get("params").?, allocator);
+                            const value = try tres.parse(Params(notif.method), root.object.get("params").?, allocator);
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, notif.method, .notification, null, value);
                             try @field(ContextType, notif.method)(conn, value);
                             if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, notif.method, .notification, null, value);
