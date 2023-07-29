@@ -1,5 +1,4 @@
 const std = @import("std");
-const tres = @import("tres");
 const Header = @import("Header.zig");
 pub const types = @import("types.zig");
 
@@ -123,8 +122,8 @@ pub fn Connection(
             conn: *Self,
             value: anytype,
         ) !void {
-            conn.write_buffer.items.len = 0;
-            try tres.stringify(value, .{}, conn.write_buffer.writer(conn.allocator));
+            conn.write_buffer.clearRetainingCapacity();
+            try std.json.stringify(value, .{}, conn.write_buffer.writer(conn.allocator));
 
             if (@hasDecl(ContextType, "dataSend")) try ContextType.dataSend(conn, conn.write_buffer.items);
 
@@ -228,7 +227,7 @@ pub fn Connection(
             try conn.send(.{
                 .jsonrpc = "2.0",
                 .id = id,
-                .result = result,
+                .result = if (@TypeOf(result) == ?void) null else result,
             });
 
             if (@hasDecl(ContextType, "lspSendPost"))
@@ -274,11 +273,9 @@ pub fn Connection(
         }
 
         pub fn accept(conn: *Self, arena: std.mem.Allocator) !void {
-            const allocator = arena;
+            const header = try Header.decode(arena, conn.reader);
 
-            const header = try Header.decode(allocator, conn.reader);
-
-            var data = try allocator.alloc(u8, header.content_length);
+            var data = try arena.alloc(u8, header.content_length);
             _ = try conn.reader.readAll(data);
 
             if (@hasDecl(ContextType, "dataRecv")) try ContextType.dataRecv(conn, data);
@@ -294,14 +291,19 @@ pub fn Connection(
             const maybe_method = root.object.get("method");
 
             if (maybe_id != null and maybe_method != null) {
-                const id = try tres.parse(types.RequestId, maybe_id.?, allocator);
+                const id = try std.json.parseFromValueLeaky(types.RequestId, arena, maybe_id.?, .{});
                 const method = maybe_method.?.string;
 
                 inline for (types.request_metadata) |req| {
                     if (@hasDecl(ContextType, req.method)) {
                         if (std.mem.eql(u8, req.method, method)) {
                             @setEvalBranchQuota(100_000);
-                            const value = try tres.parse(Params(req.method), root.object.get("params").?, allocator);
+                            const value = if (comptime Params(req.method) == ?void) {} else try std.json.parseFromValueLeaky(
+                                Params(req.method),
+                                arena,
+                                root.object.get("params").?,
+                                .{ .ignore_unknown_fields = true },
+                            );
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .request, id, value);
                             try conn.respond(req.method, id, @field(ContextType, req.method)(conn, id, value) catch |err| {
                                 try conn.respondError(arena, id, err, @errorReturnTrace());
@@ -327,17 +329,22 @@ pub fn Connection(
                 @setEvalBranchQuota(100_000);
 
                 // TODO: Handle errors
-                const id = try tres.parse(types.RequestId, id_raw, allocator);
+                const id = try std.json.parseFromValueLeaky(types.RequestId, arena, id_raw, .{});
                 const iid: usize = @intCast(id.integer);
 
                 const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
                 inline for (types.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
-                        const value = try tres.parse(Result(req.method), root.object.get("result") orelse {
-                            const response_error = try tres.parse(types.ResponseError, root.object.get("error").?, allocator);
-                            try (RequestCallback(Self, req.method).unstore(entry.value).onError(conn, response_error));
-                            return;
-                        }, allocator);
+                        const value = if (comptime Result(req.method) == ?void) {} else try std.json.parseFromValueLeaky(
+                            Result(req.method),
+                            arena,
+                            root.object.get("result") orelse {
+                                const response_error = try std.json.parseFromValueLeaky(types.ResponseError, arena, root.object.get("error").?, .{});
+                                try (RequestCallback(Self, req.method).unstore(entry.value).onError(conn, response_error));
+                                return;
+                            },
+                            .{ .ignore_unknown_fields = true },
+                        );
                         if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .response, id, value);
                         try (RequestCallback(Self, req.method).unstore(entry.value).onResponse(conn, value));
                         if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, req.method, .response, id, value);
@@ -350,7 +357,12 @@ pub fn Connection(
                 inline for (types.notification_metadata) |notif| {
                     if (@hasDecl(ContextType, notif.method)) {
                         if (std.mem.eql(u8, notif.method, method.string)) {
-                            const value = try tres.parse(Params(notif.method), root.object.get("params").?, allocator);
+                            const value = if (comptime Params(notif.method) == ?void) {} else try std.json.parseFromValueLeaky(
+                                Params(notif.method),
+                                arena,
+                                root.object.get("params").?,
+                                .{ .ignore_unknown_fields = true },
+                            );
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, notif.method, .notification, null, value);
                             try @field(ContextType, notif.method)(conn, value);
                             if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, notif.method, .notification, null, value);

@@ -1,16 +1,8 @@
 const std = @import("std");
 
 pub fn build(b: *std.build.Builder) void {
-    const tres = b.dependency("tres", .{}).module("tres");
-
     _ = b.addModule("zig-lsp", .{
         .source_file = .{ .path = "src/zig_lsp.zig" },
-        .dependencies = &.{
-            .{
-                .name = "tres",
-                .module = tres,
-            },
-        },
     });
 
     // Standard target options allows the person running `zig build` to choose
@@ -32,8 +24,6 @@ pub fn build(b: *std.build.Builder) void {
         .target = target,
         .optimize = optimize,
     });
-
-    exe.addModule("tres", tres);
 
     // This declares intent for the executable to be installed into the
     // standard location when the user invokes the "install" step (the default
