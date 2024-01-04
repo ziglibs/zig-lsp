@@ -2,4 +2,7 @@
     .name = "zig-lsp",
     .version = "0.1.0",
     .dependencies = .{},
+    .paths = .{
+        "",
+    },
 }
