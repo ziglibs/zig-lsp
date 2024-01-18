@@ -1,8 +1,8 @@
 const std = @import("std");
 
-pub fn build(b: *std.build.Builder) void {
+pub fn build(b: *std.Build) void {
     _ = b.addModule("zig-lsp", .{
-        .source_file = .{ .path = "src/zig_lsp.zig" },
+        .root_source_file = .{ .path = "src/zig_lsp.zig" },
     });
 
     // Standard target options allows the person running `zig build` to choose
