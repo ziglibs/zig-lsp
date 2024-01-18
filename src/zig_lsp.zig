@@ -170,7 +170,11 @@ pub fn Connection(
                 .jsonrpc = "2.0",
                 .id = conn.id,
                 .method = method,
-                .params = params,
+                .params = switch (@TypeOf(params)) {
+                    void => .{},
+                    ?void => null,
+                    else => params,
+                },
             });
 
             try conn.callback_map.put(conn.allocator, conn.id, callback.store());
@@ -298,12 +302,15 @@ pub fn Connection(
                     if (@hasDecl(ContextType, req.method)) {
                         if (std.mem.eql(u8, req.method, method)) {
                             @setEvalBranchQuota(100_000);
-                            const value = if (comptime Params(req.method) == ?void) {} else try std.json.parseFromValueLeaky(
-                                Params(req.method),
-                                arena,
-                                root.object.get("params").?,
-                                .{ .ignore_unknown_fields = true },
-                            );
+                            const value = switch (Params(req.method)) {
+                                void, ?void => {},
+                                else => try std.json.parseFromValueLeaky(
+                                    Params(req.method),
+                                    arena,
+                                    root.object.get("params").?,
+                                    .{ .ignore_unknown_fields = true },
+                                ),
+                            };
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .request, id, value);
                             try conn.respond(req.method, id, @field(ContextType, req.method)(conn, id, value) catch |err| {
                                 try conn.respondError(arena, id, err, @errorReturnTrace());
@@ -335,16 +342,19 @@ pub fn Connection(
                 const entry = conn.callback_map.fetchRemove(iid) orelse @panic("nothing!");
                 inline for (types.request_metadata) |req| {
                     if (std.mem.eql(u8, req.method, entry.value.method)) {
-                        const value = if (comptime Result(req.method) == ?void) {} else try std.json.parseFromValueLeaky(
-                            Result(req.method),
-                            arena,
-                            root.object.get("result") orelse {
-                                const response_error = try std.json.parseFromValueLeaky(types.ResponseError, arena, root.object.get("error").?, .{});
-                                try (RequestCallback(Self, req.method).unstore(entry.value).onError(conn, response_error));
-                                return;
-                            },
-                            .{ .ignore_unknown_fields = true },
-                        );
+                        const value = switch (Result(req.method)) {
+                            void, ?void => {},
+                            else => try std.json.parseFromValueLeaky(
+                                Result(req.method),
+                                arena,
+                                root.object.get("result") orelse {
+                                    const response_error = try std.json.parseFromValueLeaky(types.ResponseError, arena, root.object.get("error").?, .{});
+                                    try (RequestCallback(Self, req.method).unstore(entry.value).onError(conn, response_error));
+                                    return;
+                                },
+                                .{ .ignore_unknown_fields = true },
+                            ),
+                        };
                         if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, req.method, .response, id, value);
                         try (RequestCallback(Self, req.method).unstore(entry.value).onResponse(conn, value));
                         if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, req.method, .response, id, value);
@@ -357,12 +367,15 @@ pub fn Connection(
                 inline for (types.notification_metadata) |notif| {
                     if (@hasDecl(ContextType, notif.method)) {
                         if (std.mem.eql(u8, notif.method, method.string)) {
-                            const value = if (comptime Params(notif.method) == ?void) {} else try std.json.parseFromValueLeaky(
-                                Params(notif.method),
-                                arena,
-                                root.object.get("params").?,
-                                .{ .ignore_unknown_fields = true },
-                            );
+                            const value = switch (Params(notif.method)) {
+                                void, ?void => {},
+                                else => try std.json.parseFromValueLeaky(
+                                    Params(notif.method),
+                                    arena,
+                                    root.object.get("params").?,
+                                    .{ .ignore_unknown_fields = true },
+                                ),
+                            };
                             if (@hasDecl(ContextType, "lspRecvPre")) try ContextType.lspRecvPre(conn, notif.method, .notification, null, value);
                             try @field(ContextType, notif.method)(conn, value);
                             if (@hasDecl(ContextType, "lspRecvPost")) try ContextType.lspRecvPost(conn, notif.method, .notification, null, value);
