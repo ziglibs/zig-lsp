@@ -93,8 +93,8 @@ pub fn main() !void {
     try process.spawn();
     defer _ = process.kill() catch {};
 
-    var reader = process.stdout.?.reader();
-    var writer = process.stdin.?.writer();
+    const reader = process.stdout.?.reader();
+    const writer = process.stdin.?.writer();
 
     var context = Context{};
     var conn = Connection.init(

@@ -279,7 +279,7 @@ pub fn Connection(
         pub fn accept(conn: *Self, arena: std.mem.Allocator) !void {
             const header = try Header.decode(arena, conn.reader);
 
-            var data = try arena.alloc(u8, header.content_length);
+            const data = try arena.alloc(u8, header.content_length);
             _ = try conn.reader.readAll(data);
 
             if (@hasDecl(ContextType, "dataRecv")) try ContextType.dataRecv(conn, data);
